@@ -35,3 +35,12 @@ html.rg-motion .rgm-slide-on .rg-17 p{animation:rgm-rise .9s cubic-bezier(.22,.6
 html.rg-motion .rgm-slide-on .rg-22{animation:rgm-rise .9s cubic-bezier(.22,.61,.36,1) .95s both}
 html.rg-motion body.cms-editing .rgm-slide-on *{animation:none!important}
 @media (prefers-reduced-motion:reduce){html.rg-motion .rgm-slide-on *{animation:none!important}}
+
+/* ---- inner pages: title banner entrance (same feel as the home hero) ---- */
+html.rg-motion .rgm-banner{overflow:hidden}
+html.rg-motion .rgm-banner-on>img,html.rg-motion .rgm-banner-on .rg-15 img{animation:rgm-kb 7s cubic-bezier(.2,.6,.3,1) both}
+html.rg-motion .rgm-banner-on h1{animation:rgm-slide 1s cubic-bezier(.22,.61,.36,1) .25s both}
+html.rg-motion .rgm-banner-on h1 ~ *{animation:rgm-rise .9s cubic-bezier(.22,.61,.36,1) .6s both}
+html.rg-motion .rgm-banner-on .rg-93{animation:rgm-rise .9s cubic-bezier(.22,.61,.36,1) .1s both}
+html.rg-motion body.cms-editing .rgm-banner-on *{animation:none!important}
+@media (prefers-reduced-motion:reduce){html.rg-motion .rgm-banner-on *{animation:none!important}}

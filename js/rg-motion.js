@@ -10,7 +10,7 @@
   var SKIP = 'header, footer, nav, #rg-loader, .sl-arr, button, [data-screen-label="Home hero"], .rg-25';
   var seen = new WeakSet();
 
-  function skip(el) { return !!el.closest(SKIP); }
+  function skip(el) { return !!el.closest(SKIP) || !!el.closest('.rgm-banner'); }
 
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (en) {
@@ -57,6 +57,25 @@
     });
   }
 
+  // run fn once the page loader has gone, so an entrance animation is actually seen
+  function afterLoader(fn) {
+    if (!root.classList.contains('rg-loading') && !document.getElementById('rg-loader')) { fn(); return; }
+    var started = false;
+    function begin() { if (started) return; started = true; setTimeout(fn, 200); }
+    new MutationObserver(function (m, o) { if (!root.classList.contains('rg-loading')) { o.disconnect(); begin(); } }).observe(root, { attributes: true, attributeFilter: ['class'] });
+    setTimeout(begin, 6000);
+  }
+
+  // inner pages: the title banner (photo + h1 + breadcrumb / text / buttons) gets the same entrance as the home hero
+  function bannerMotion() {
+    if (document.querySelector('section[data-screen-label="Home hero"]')) return;
+    var h = document.querySelector('main h1, section h1'); if (!h) return;
+    var sec = h.closest('section'); if (!sec || sec.classList.contains('rgm-banner')) return;
+    if (sec.getBoundingClientRect().top > innerHeight * 0.8) return;   // only a banner at the top of the page
+    sec.classList.add('rgm-banner');
+    afterLoader(function () { void sec.offsetWidth; sec.classList.add('rgm-banner-on'); });
+  }
+
   // home hero: mark the visible slide (class restarts the CSS animations each time a slide comes round)
   function heroMotion() {
     var hero = document.querySelector('section[data-screen-label="Home hero"]'); if (!hero) return;
@@ -85,10 +104,11 @@
   function start() {
     root.classList.add('rg-motion');
     heroMotion();
+    bannerMotion();
     scan();
     // content that appears later (CMS content, tabs, filters): pick up new nodes
     var t = 0;
-    new MutationObserver(function () { clearTimeout(t); t = setTimeout(function () { scan(document, true); }, 120); })
+    new MutationObserver(function () { clearTimeout(t); t = setTimeout(function () { bannerMotion(); scan(document, true); }, 120); })
       .observe(document.body, { childList: true, subtree: true });
 
     // top progress bar
