@@ -5,9 +5,9 @@
 .hv-4:hover{background:#E52C1A !important}
 .hv-5:hover{background:#2C2E35 !important;color:#fff !important}
 .hv-6:hover{transform:translateY(-3px) scale(1.05) !important}
-.hv-7:hover{background:#c42312 !important}
-.hv-8:hover{background:#0E3692 !important;color:#fff !important}
-.hv-9:hover{color:#F2B8A8 !important}
+.hv-7:hover{color:#F2B8A8 !important}
+.hv-8:hover{background:#c42312 !important}
+.hv-9:hover{background:#0E3692 !important;color:#fff !important}
 .hv-10:hover{box-shadow:0 12px 28px rgba(44,46,53,0.14) !important}
 .hv-11:hover{color:#E52C1A !important}
 /* ==== end generated ==== */
@@ -251,3 +251,10 @@ body.nav-open .rg-burger span:nth-child(3){transform:translateY(-7px) rotate(-45
 /* two white sections one after the other (Why choose -> Top 10 benefits): a smaller gap between them (was 100 + 100 px) */
 section.rg-26:has(+ section.rg-52){padding-bottom:36px}
 section.rg-26 + section.rg-52{padding-top:36px}
+
+/* blog post / webinar page: formatted text (js/rg-content.js fmtArticle) */
+.art p{margin:0 0 18px}
+.art .art-h{margin:34px 0 10px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:28px;line-height:1.1;text-transform:uppercase;color:#0E3692}
+.art .art-h:first-child{margin-top:0}
+.art ul{margin:0 0 18px;padding-left:22px;display:grid;gap:8px}
+.art li::marker{color:#E52C1A}
