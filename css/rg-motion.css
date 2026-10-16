@@ -1,0 +1,22 @@
+/* Scroll animations (js/rg-motion.js). Everything is gated by html.rg-motion, so without JS or with
+ * "reduce motion" the page renders exactly as before. */
+html.rg-motion .rgm{--rgm-d:0ms;opacity:0;transition:opacity .8s cubic-bezier(.22,.61,.36,1) var(--rgm-d),transform .8s cubic-bezier(.22,.61,.36,1) var(--rgm-d),clip-path .9s cubic-bezier(.22,.61,.36,1) var(--rgm-d),filter .8s ease var(--rgm-d)}
+html.rg-motion .rgm-up{transform:translateY(34px)}
+html.rg-motion .rgm-left{transform:translateX(-40px)}
+html.rg-motion .rgm-right{transform:translateX(40px)}
+/* headings: slide in from the left, blur clearing (no clip-path: it would hide them from the observer) */
+html.rg-motion .rgm-head{transform:translate(-36px,16px);filter:blur(8px)}
+/* photos: unveil + slow zoom-out */
+html.rg-motion .rgm-img{transform:scale(1.12);clip-path:inset(0 0 12% 0);filter:saturate(.7)}
+html.rg-motion .rgm.rgm-in{opacity:1;transform:none;clip-path:inset(0 0 0 0);filter:none}
+/* image hover: gentle zoom inside its frame (only on photos that are clipped by a parent) */
+@media (hover:hover){
+  html.rg-motion .rgm-img.rgm-in{transition:transform .9s cubic-bezier(.22,.61,.36,1),filter .5s ease}
+  html.rg-motion .rgm-img.rgm-in.rgm-zoom:hover{transform:scale(1.05)}
+}
+/* thin progress bar at the top while scrolling */
+#rgm-bar{position:fixed;left:0;top:0;height:3px;width:100%;z-index:2147482000;background:#E52C1A;transform:scaleX(0);transform-origin:0 50%;pointer-events:none}
+@media (prefers-reduced-motion:reduce){
+  html.rg-motion .rgm{opacity:1!important;transform:none!important;clip-path:none!important;filter:none!important;transition:none!important}
+  #rgm-bar{display:none}
+}

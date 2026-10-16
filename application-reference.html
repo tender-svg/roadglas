@@ -14,6 +14,7 @@
 <script>(function(){var d=document,n=0,ready=false,hid=false,t0=Date.now(),c=false;d.documentElement.classList.add("rg-loading");try{var nv=performance.getEntriesByType("navigation")[0];if(nv&&nv.type==="reload"){localStorage.removeItem("rg-cache-v1");localStorage.removeItem("rg-cache-t")}var t=+localStorage.getItem("rg-cache-t");c=!!(t&&Date.now()-t<864e5&&!localStorage.getItem("rg-admin"))}catch(e){}if(c)d.documentElement.classList.add("rg-cached");function hide(){if(hid)return;hid=true;var e=d.getElementById("rg-loader");d.documentElement.classList.remove("rg-loading");d.documentElement.classList.remove("rg-cached");if(e){e.classList.add("done");setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e)},600)}}function check(){if(ready&&n<=0)setTimeout(function(){if(n<=0)hide()},Math.max(30,(RGL.cached?0:380)-(Date.now()-t0)))}window.RGL={cached:c,cachedUsed:false,hold:function(){n++},release:function(){n=Math.max(0,n-1);check()},miss:function(){RGL.cached=false;d.documentElement.classList.remove("rg-cached")}};d.addEventListener("DOMContentLoaded",function(){ready=true;check()});setTimeout(hide,c?2500:12000)})();</script>
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/rg-motion.css">
 <link rel="stylesheet" href="css/cms.css">
 </head>
 <body data-page="ref-application" data-state='{}'>
@@ -60,6 +61,7 @@
 <script src="js/site.js" defer></script>
 <script src="js/rg-edit.js" defer></script>
 <script src="js/rg-cache.js" defer></script>
+<script src="js/rg-motion.js" defer></script>
 <script src="js/rg-content.js" defer></script>
 <script src="js/cms.js" defer></script>
 <script src="js/rg-toolbar.js" defer></script>
