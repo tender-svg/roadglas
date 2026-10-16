@@ -1,0 +1,48 @@
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+
+# CMS backend: the site's own /api and /admin paths are forwarded to the multi-site backend (site id "roadglas")
+[[redirects]]
+  from = "/api/*"
+  to = "https://cmsapi.qpaix.com/roadglas/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/admin/*"
+  to = "https://cmsapi.qpaix.com/roadglas/admin/:splat"
+  status = 200
+  force = true
+
+# Pages of CMS items (made in the dashboard): one template page each, filled from the CMS by js/rg-content.js.
+# No force: a real file (e.g. project-highlight-1.html) always wins over these.
+[[redirects]]
+  from = "/product-detail-:slug.html"
+  to = "/solution-reference.html"
+  status = 200
+
+[[redirects]]
+  from = "/application-:slug.html"
+  to = "/application-reference.html"
+  status = 200
+
+[[redirects]]
+  from = "/project-highlight-:slug.html"
+  to = "/project-highlight.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog-:slug.html"
+  to = "/blog-details.html"
+  status = 200
+
+[[redirects]]
+  from = "/webinar-:slug.html"
+  to = "/webinar-details.html"
+  status = 200

@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://cmsapi.qpaix.com/roadglas/api/:path*" },
+    { "source": "/admin/:path*", "destination": "https://cmsapi.qpaix.com/roadglas/admin/:path*" },
+    { "source": "/product-detail-:slug.html", "destination": "/solution-reference.html" },
+    { "source": "/application-:slug.html", "destination": "/application-reference.html" },
+    { "source": "/project-highlight-:slug.html", "destination": "/project-highlight.html" },
+    { "source": "/blog-:slug.html", "destination": "/blog-details.html" },
+    { "source": "/webinar-:slug.html", "destination": "/webinar-details.html" }
+  ]
+}

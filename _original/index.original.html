@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RoadGlas® Asphalt Reinforcement</title>
+<link rel="stylesheet" href="css/styles.css">
+<script src="js/support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0E3692"/><text x="50" y="62" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="30" fill="#fff">R<tspan fill="#E52C1A">G</tspan></text></svg></template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="js/image-slot.js"></script>
+</helmet>
+
+<div class="rg-1">
+  <div class="rg-2">
+    <div class="rg-3"><span>800 848 4500</span></div>
+    <span>510 O'Neal Lane, Baton Rouge LA 70819</span>
+  </div>
+</div>
+
+<header class="rg-4">
+  <div class="rg-5">
+    <button onClick="{{ goHome }}" class="rg-6"><img src="images/img_p0_3.jpg" alt="RoadGlas Asphalt Reinforcement" class="rg-7"><span class="rg-8">ROAD<span class="rg-9">GLAS</span><sup class="rg-10">®</sup></span></button>
+    <nav class="rg-11">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="3">
+        <button onClick="{{ n.go }}" style="{{ n.style }}">{{ n.label }}</button>
+      </sc-for>
+      <div onMouseEnter="{{ supOpen }}" onMouseLeave="{{ supClose }}" class="rg-12">
+        <button onClick="{{ supToggle }}" style="{{ supStyle }}">Support ▾</button>
+        <sc-if value="{{ supShown }}" hint-placeholder-val="{{ false }}">
+          <div class="rg-13">
+            <sc-for list="{{ supItems }}" as="s" hint-placeholder-count="3">
+              <button onClick="{{ s.go }}" style="{{ s.style }}" style-hover="background:#ECECED;color:#E52C1A">{{ s.label }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="Home hero" class="rg-14">
+    <sc-for list="{{ slides }}" as="s" hint-placeholder-count="1">
+      <div style="{{ s.wrap }}">
+        <div class="rg-15"><image-slot id="{{ s.slot }}" shape="rect" src="{{ s.src }}" placeholder="{{ s.ph }}"></image-slot></div>
+        <div class="rg-16"></div>
+        <div class="rg-17">
+          <div class="rg-18">
+            <div class="rg-19">{{ s.eyebrow }}</div>
+            <h1 class="rg-20">{{ s.title }}</h1>
+            <p class="rg-21">{{ s.text }}</p>
+            <div class="rg-22">
+              <button onClick="{{ goSolutions }}" class="rg-23" style-hover="background:#fff;color:#0E3692">View Solutions</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+    <div class="rg-24">
+      <div class="rg-25">
+        <sc-for list="{{ dots }}" as="d" hint-placeholder-count="3">
+          <button onClick="{{ d.go }}" style="{{ d.style }}"></button>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section class="rg-26">
+    <div class="rg-27">
+      <div class="rg-28">Solutions</div>
+      <h2 class="rg-29">Reinforcement engineered to <span class="rg-30">extend pavement life</span></h2>
+      <div class="rg-31">
+        <sc-for list="{{ products }}" as="p" hint-placeholder-count="2">
+          <article class="rg-32">
+            <div class="rg-33"><image-slot id="{{ p.slot }}" shape="rect" src="{{ p.src }}" placeholder="{{ p.ph }}"></image-slot></div>
+            <div class="rg-34">
+              <h3 class="rg-35">{{ p.name }}</h3>
+              <p class="rg-36">{{ p.text }}</p>
+              <button onClick="{{ p.go }}" class="rg-37" style-hover="background:#0E3692">Read More</button>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section class="rg-38">
+    <div class="rg-27">
+      <div class="rg-28">Applications</div>
+      <h2 class="rg-29">Explore by <span class="rg-30">Application Sector</span></h2>
+      <div class="rg-39">
+        <sc-for list="{{ homeApps }}" as="a" hint-placeholder-count="3">
+          <button onClick="{{ a.go }}" class="rg-40">
+            <image-slot id="{{ a.slot }}" shape="rect" src="{{ a.src }}" placeholder="{{ a.ph }}"></image-slot>
+            <div class="rg-41">
+              <div class="rg-42">{{ a.name }}</div>
+            </div>
+          </button>
+        </sc-for>
+      </div>
+      <div class="rg-43">
+        <button onClick="{{ goApps }}" class="rg-44" style-hover="background:#E52C1A">View More Applications →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="rg-26">
+    <div class="rg-45">
+      <div>
+        <div class="rg-28">Why Choose RoadGlas®</div>
+        <h2 class="rg-46">RoadGlas® is to Asphalt What <span class="rg-30">Rebar is to Concrete</span></h2>
+        <p class="rg-47">Glass reinforcement in asphalt overlays is transforming pavement preservation strategies for owners, municipalities, and DOTs.</p>
+        <div class="rg-48">
+          <sc-for list="{{ whys }}" as="w" hint-placeholder-count="6">
+            <div class="rg-49"><span class="rg-50">✓</span>{{ w }}</div>
+          </sc-for>
+        </div>
+      </div>
+      <div class="rg-51"><image-slot id="why-img" shape="rect" fit="contain" src="images/img_p17_1.jpg" placeholder="Reinforced overlay diagram"></image-slot></div>
+    </div>
+  </section>
+
+  <section class="rg-52">
+    <div class="rg-27">
+      <div class="rg-28">Benefit Areas</div>
+      <div class="rg-53">
+        <h2 class="rg-54">Top 10 Benefits of <span class="rg-30">ROADGLAS®</span></h2>
+        <div class="rg-55">
+          <button onClick="{{ benPrev }}" aria-label="Previous" class="rg-56" style-hover="background:#2C2E35;color:#fff">←</button>
+          <button onClick="{{ benNext }}" aria-label="Next" class="rg-56" style-hover="background:#2C2E35;color:#fff">→</button>
+        </div>
+      </div>
+      <div onMouseEnter="{{ benPause }}" onMouseLeave="{{ benResume }}" class="rg-57">
+      <div style="{{ benTrack }}">
+        <sc-for list="{{ benefits }}" as="bn" hint-placeholder-count="4">
+          <div style="{{ benCard }}">
+            <div class="rg-58">{{ bn.num }}</div>
+            <h3 class="rg-59">{{ bn.title }}</h3>
+            <p class="rg-60">{{ bn.text }}</p>
+          </div>
+        </sc-for>
+      </div>
+      </div>
+      <div class="rg-61">
+        <sc-for list="{{ benDots }}" as="d" hint-placeholder-count="7">
+          <button onClick="{{ d.go }}" aria-label="Go to slide" style="{{ d.style }}"></button>
+        </sc-for>
+      </div>
+      <div data-screen-label="Plan your project" class="rg-62">
+        <img src="images/img_p5_1.jpg" alt="" class="rg-63">
+        <div class="rg-64"></div>
+        <div class="rg-65">
+          <div class="rg-66">
+            <div class="rg-67"><span class="rg-68"></span>Plan Your Project</div>
+            <h3 class="rg-69">Put these benefits to work on your next overlay</h3>
+            <p class="rg-70">Talk with our team about specifications, installation and the right RoadGlas® product for your pavement.</p>
+          </div>
+            <div class="rg-71">
+              <button onClick="{{ goContact }}" aria-label="Contact Us" class="rg-72" style-hover="transform:translateY(-3px) scale(1.05)"><img src="images/contact-shield.png" alt="Contact Us" class="rg-73"><span aria-hidden="true" class="rg-74">→</span></button>
+            </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ isSolutions }}" hint-placeholder-val="{{ false }}">
+  <section class="rg-75">
+    <img src="images/img_p19_1.jpg" alt="" class="rg-63">
+    <div class="rg-16"></div>
+    <div class="rg-76">
+      <h1 class="rg-77">Solutions</h1>
+      <div class="rg-78">Home / Solutions</div>
+    </div>
+  </section>
+  <section class="rg-79">
+    <div class="rg-27">
+      <div class="rg-80">
+        <div class="rg-28">Why Stop at Mill &amp; Fill?</div>
+        <h2 class="rg-81">Enhance pavement life with <span class="rg-30">interlayer design solutions</span></h2>
+        <p class="rg-82">Using interlayers in pavement rehabilitation creates minimal disruption while significantly improving long-term performance.</p>
+      </div>
+      <div class="rg-83">
+        <sc-for list="{{ solutionCards }}" as="s" hint-placeholder-count="2">
+          <article style="{{ s.row }}">
+            <div class="rg-84"><image-slot id="{{ s.slot }}" shape="rect" src="{{ s.src }}" placeholder="{{ s.name }}"></image-slot></div>
+            <div class="rg-85">
+              <div class="rg-86">{{ s.kicker }}</div>
+              <h3 class="rg-87">{{ s.name }}</h3>
+              <p class="rg-88">{{ s.intro }}</p>
+              <div class="rg-89">
+                <sc-for list="{{ s.bullets }}" as="bl" hint-placeholder-count="3">
+                  <div class="rg-49"><span class="rg-50">✓</span>{{ bl }}</div>
+                </sc-for>
+              </div>
+              <button onClick="{{ s.go }}" class="rg-90" style-hover="background:#0E3692">View Solution →</button>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
+  <section class="rg-91">
+    <div class="rg-15"><image-slot id="{{ prod.heroSlot }}" shape="rect" src="{{ prod.hero }}" placeholder="{{ prod.name }}"></image-slot></div>
+    <div class="rg-16"></div>
+    <div class="rg-92">
+      <div class="rg-93">
+        <button onClick="{{ goHome }}" class="rg-94">Home</button><span>/</span>
+        <button onClick="{{ goSolutions }}" class="rg-94">Solutions</button><span>/</span><span>{{ prod.name }}</span>
+      </div>
+      <div class="rg-95">{{ prod.kicker }}</div>
+      <h1 class="rg-96">{{ prod.name }}</h1>
+      <p class="rg-97">{{ prod.tagline }}</p>
+      <div class="rg-22">
+        <button onClick="{{ goContact }}" class="rg-98" style-hover="background:#c42312">Request Information</button>
+        <button onClick="{{ goResources }}" class="rg-23" style-hover="background:#fff;color:#0E3692">Documents</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="rg-99">
+    <div class="rg-100">
+      <sc-for list="{{ prod.stats }}" as="st" hint-placeholder-count="3">
+        <div class="rg-101">
+          <div class="rg-102">{{ st.v }}</div>
+          <div class="rg-103">{{ st.l }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section class="rg-26">
+    <div class="rg-104">
+      <div>
+        <div class="rg-28">Overview</div>
+        <h2 class="rg-105">{{ prod.overviewTitle }}</h2>
+        <sc-for list="{{ prod.overview }}" as="p" hint-placeholder-count="2">
+          <p class="rg-106">{{ p }}</p>
+        </sc-for>
+      </div>
+      <div class="rg-107"><image-slot id="{{ prod.diagramSlot }}" shape="rect" fit="contain" src="{{ prod.diagram }}" placeholder="Diagram"></image-slot></div>
+    </div>
+  </section>
+
+  <section class="rg-38">
+    <div class="rg-27">
+      <div class="rg-28">Key Features</div>
+      <h2 class="rg-108">Engineered for <span class="rg-30">performance</span></h2>
+      <div class="rg-109">
+        <sc-for list="{{ prod.features }}" as="f" hint-placeholder-count="3">
+          <div class="rg-110">
+            <div class="rg-111">{{ f.n }}</div>
+            <h3 class="rg-112">{{ f.t }}</h3>
+            <p class="rg-36">{{ f.d }}</p>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ prod.hasTypes }}" hint-placeholder-val="{{ false }}">
+        <div class="rg-113">
+          <div class="rg-28">Product Types</div>
+          <h2 class="rg-114">Choose the right <span class="rg-30">{{ prod.name }}</span></h2>
+        </div>
+        <div class="rg-115">
+          <div class="rg-116">
+            <sc-for list="{{ prod.typeTabs }}" as="tt" hint-placeholder-count="2">
+              <button onClick="{{ tt.go }}" style="{{ tt.style }}">{{ tt.label }}</button>
+            </sc-for>
+          </div>
+          <div class="rg-117">
+            <div class="rg-118">{{ prod.curType.code }}</div>
+            <div class="rg-119">
+              <div class="rg-86">{{ prod.curType.type }}</div>
+              <p class="rg-120">{{ prod.curType.d }}</p>
+            </div>
+          </div>
+          <div class="rg-121">
+            <button onClick="{{ prod.goTypeResources }}" class="rg-122" style-hover="background:#E52C1A">View Resources →</button>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+
+  <section class="rg-123">
+    <div class="rg-27">
+      <div class="rg-124">
+        <div>
+          <div class="rg-28">Advanced Coating</div>
+          <h2 class="rg-114">Elastomeric Polymer Coating</h2>
+        </div>
+        <p class="rg-125">ROADGLAS® features an advanced elastomeric polymer coating that delivers ultimate defense against structural failure. This specialized formula provides a high-strength, flexible barrier that adapts to environmental stress without cracking.</p>
+      </div>
+      <div class="rg-126">
+        <sc-for list="{{ coating }}" as="ct" hint-placeholder-count="3">
+          <div class="rg-127">
+            <div class="rg-128">{{ ct.n }}</div>
+            <h3 class="rg-129">{{ ct.t }}</h3>
+            <p class="rg-130">{{ ct.d }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section class="rg-26">
+    <div class="rg-131">
+      <div>
+        <div class="rg-28">Product Application Guide</div>
+        <h2 class="rg-132">Tack Coat Application Rates</h2>
+        <sc-if value="{{ prod.note }}" hint-placeholder-val="{{ false }}">
+          <div class="rg-133">{{ prod.note }}</div>
+        </sc-if>
+        <div class="rg-134">
+          <div class="rg-135"><span class="rg-136">Surface</span><span class="rg-136">Tack Coat</span><span class="rg-136">Rate</span></div>
+          <sc-for list="{{ prod.tack }}" as="r" hint-placeholder-count="3">
+            <div class="rg-137"><span class="rg-138">{{ r.s }}</span><span class="rg-136">{{ r.c }}</span><span class="rg-136">{{ r.r }}</span></div>
+          </sc-for>
+        </div>
+        <p class="rg-139">{{ prod.tackNote }}</p>
+      </div>
+      <div>
+        <div class="rg-28">Installation</div>
+        <h2 class="rg-132">How It's Installed</h2>
+        <div class="rg-140">
+          <sc-for list="{{ prod.steps }}" as="st" hint-placeholder-count="4">
+            <div class="rg-141">
+              <span class="rg-142">{{ st.n }}</span>
+              <p class="rg-143">{{ st.t }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{ prod.hasGuide }}" hint-placeholder-val="{{ false }}">
+        <div class="rg-144">
+          <a href="roadglas-brochure.pdf" target="_blank" class="rg-145" style-hover="background:#0E3692;color:#fff">Installation Guide ↓</a>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+
+  <section class="rg-38">
+    <div class="rg-146">
+      <div class="rg-147">Installation Q&amp;A</div>
+      <h2 class="rg-148">Frequently Asked <span class="rg-30">Questions</span></h2>
+      <div class="rg-149">
+        <sc-for list="{{ prodFaqs }}" as="q" hint-placeholder-count="6">
+          <div class="rg-150">
+            <button onClick="{{ q.toggle }}" class="rg-151">
+              <span>{{ q.q }}</span><span class="rg-152">{{ q.sign }}</span>
+            </button>
+            <sc-if value="{{ q.open }}" hint-placeholder-val="{{ false }}">
+              <p class="rg-153">{{ q.a }}</p>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+</sc-if>
+
+<sc-if value="{{ isApps }}" hint-placeholder-val="{{ false }}">
+  <section class="rg-75">
+    <img src="images/img_p15_1.jpg" alt="" class="rg-63">
+    <div class="rg-16"></div>
+    <div class="rg-76">
+      <h1 class="rg-154">Applications</h1>
+      <div class="rg-78">Home / Applications</div>
+    </div>
+  </section>
+  <section class="rg-79">
+    <div class="rg-27">
+      <div class="rg-155">
+        <sc-for list="{{ apps }}" as="a" hint-placeholder-count="6">
+          <button onClick="{{ a.go }}" style="{{ a.tab }}">{{ a.short }}</button>
+        </sc-for>
+      </div>
+      <div class="rg-156">
+        <div class="rg-157"><image-slot id="{{ app.slot }}" shape="rect" src="{{ app.src }}" placeholder="{{ app.ph }}"></image-slot></div>
+        <div class="rg-158">
+          <h2 class="rg-159">{{ app.name }}</h2>
+          <p class="rg-88">{{ app.text }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="rg-160">
+    <div class="rg-161">
+      <div>
+        <div class="rg-162">Strategic Applications · {{ app.short }}</div>
+        <h2 class="rg-163">Where the Investment Makes Sense</h2>
+        <div class="rg-140">
+          <sc-for list="{{ invest }}" as="iv" hint-placeholder-count="4">
+            <div class="rg-164"><span class="rg-165">✓</span>{{ iv }}</div>
+          </sc-for>
+        </div>
+      </div>
+      <div>
+        <div class="rg-162">Structural Triggers · {{ app.short }}</div>
+        <h2 class="rg-166">Primary Structural Triggers for Use</h2>
+        <p class="rg-167">Public and private civil engineering agencies routinely require structural glass reinforcement interlayers:</p>
+        <div class="rg-140">
+          <sc-for list="{{ triggers }}" as="tg" hint-placeholder-count="3">
+            <div class="rg-164"><span class="rg-165">!</span>{{ tg }}</div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ isProjects }}" hint-placeholder-val="{{ false }}">
+  <section class="rg-75">
+    <img src="images/img_p16_1.jpg" alt="" class="rg-63">
+    <div class="rg-16"></div>
+    <div class="rg-76">
+      <h1 class="rg-154">Project Highlights</h1>
+      <div class="rg-168"><button onClick="{{ goHome }}" class="rg-169" style-hover="color:#F2B8A8">Home</button> / <span>Project Highlights</span></div>
+    </div>
+  </section>
+  <section class="rg-79">
+    <div class="rg-27">
+      <div class="rg-170">Project Highlights</div>
+      <h2 class="rg-171">Pavement Reinforcement <strong class="rg-172">Product Solutions</strong></h2>
+      <div class="rg-173">
+        <div class="rg-174">
+          <sc-for list="{{ projFilters }}" as="f" hint-placeholder-count="3">
+            <button onClick="{{ f.go }}" style="{{ f.style }}">{{ f.label }}</button>
+          </sc-for>
+        </div>
+        <div class="rg-175">
+          <span class="rg-176">View Mode:</span>
+          <button onClick="{{ setGrid }}" aria-label="Grid view" style="{{ gridBtn }}"><span class="rg-177"><i class="rg-178"></i><i class="rg-178"></i><i class="rg-178"></i><i class="rg-178"></i></span></button>
+          <button onClick="{{ setList }}" aria-label="List view" style="{{ listBtn }}"><span class="rg-179"><i class="rg-180"></i><i class="rg-180"></i><i class="rg-180"></i></span></button>
+        </div>
+      </div>
+      <div style="{{ projWrap }}">
+        <sc-for list="{{ projList }}" as="p" hint-placeholder-count="3">
+          <article onClick="{{ p.go }}" style="{{ p.card }}" style-hover="box-shadow:0 12px 28px rgba(44,46,53,0.14)">
+            <div style="{{ p.media }}">
+              <img src="{{ p.img }}" alt="{{ p.title }}" class="rg-63">
+              <span class="rg-181">{{ p.year }}</span>
+            </div>
+            <div class="rg-182">
+              <div class="rg-183">{{ p.products }}</div>
+              <h3 class="rg-184">{{ p.title }}</h3>
+              <div class="rg-185">{{ p.location }}</div>
+              <span class="rg-186">View Project →</span>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+      <sc-if value="{{ projNone }}" hint-placeholder-val="{{ false }}">
+        <div class="rg-187">No projects for this product yet.</div>
+      </sc-if>
+    </div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ isProject }}" hint-placeholder-val="{{ false }}">
+  <section class="rg-75">
+    <img src="{{ pj.img }}" alt="" class="rg-63">
+    <div class="rg-16"></div>
+    <div class="rg-76">
+      <h1 class="rg-154">{{ pj.title }}</h1>
+      <div class="rg-168"><button onClick="{{ goHome }}" class="rg-169" style-hover="color:#F2B8A8">Home</button> / <button onClick="{{ goProjects }}" class="rg-169" style-hover="color:#F2B8A8">Project Highlights</button> / <span>{{ pj.title }}</span></div>
+    </div>
+  </section>
+  <section class="rg-79">
+    <div class="rg-131">
+      <div class="rg-188">
+        <div class="rg-189">
+          <img src="{{ pj.main }}" alt="{{ pj.title }}" class="rg-63">
+          <button onClick="{{ pj.prevImg }}" aria-label="Previous image" class="rg-190" style-hover="background:#E52C1A">‹</button>
+          <button onClick="{{ pj.nextImg }}" aria-label="Next image" class="rg-191" style-hover="background:#E52C1A">›</button>
+          <span class="rg-192">{{ pj.counter }}</span>
+        </div>
+        <div class="rg-193">
+          <sc-for list="{{ pj.thumbs }}" as="t" hint-placeholder-count="4">
+            <button onClick="{{ t.go }}" style="{{ t.style }}"><img src="{{ t.src }}" alt="" class="rg-63"></button>
+          </sc-for>
+        </div>
+      </div>
+      <div class="rg-194">
+        <div class="rg-195">Project Highlights</div>
+        <h2 class="rg-196">{{ pj.title }}</h2>
+        <div class="rg-197"><span class="rg-198"></span>{{ pj.location }}</div>
+        <div class="rg-199">
+          <div><strong>{{ pj.year }}</strong></div>
+          <div><strong>Owner:</strong> {{ pj.owner }}</div>
+          <div><strong>Products Used:</strong> {{ pj.products }}</div>
+        </div>
+        <div class="rg-200">
+          <a href="roadglas-brochure.pdf" target="_blank" class="rg-145" style-hover="background:#0E3692;color:#fff">Download Case Study ↓</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="rg-201">
+    <div class="rg-202">
+      <div class="rg-203">
+        <sc-for list="{{ pj.tabs }}" as="t" hint-placeholder-count="2">
+          <button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
+        </sc-for>
+      </div>
+      <h3 class="rg-204">{{ pj.tabTitle }}</h3>
+      <p class="rg-205">{{ pj.tabText }}</p>
+    </div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ isResources }}" hint-placeholder-val="{{ false }}">
+  <section class="rg-75">
+    <img src="images/img_p0_1.jpg" alt="" class="rg-63">
+    <div class="rg-16"></div>
+    <div class="rg-76">
+      <h1 class="rg-154">Resources</h1>
+      <div class="rg-78">Home / Resources</div>
+    </div>
+  </section>
+  <section class="rg-206">
+    <div class="rg-27">
+      <div class="rg-207">
+        <img src="images/img_p0_3.jpg" alt="RoadGlas" class="rg-208">
+        <div class="rg-209">
+          <div class="rg-210">Full Brochure</div>
+          <h2 class="rg-211">Engineered to Perform.</h2>
+          <p class="rg-212">Reinforcement solutions that extend pavement life and maximize value.</p>
+        </div>
+        <a href="roadglas-brochure.pdf" target="_blank" class="rg-213" style-hover="background:#0E3692;color:#fff">Download PDF ↓</a>
+      </div>
+      <div class="rg-214">
+      <div class="rg-215">
+        <div>
+          <div class="rg-210">Browse by Product</div>
+          <h2 class="rg-216">{{ resPTitle }}</h2>
+        </div>
+        <p class="rg-217">Pavement Reinforcement Resources</p>
+      </div>
+      <div class="rg-218">
+        <sc-for list="{{ resProducts }}" as="p" hint-placeholder-count="3">
+          <button onClick="{{ p.go }}" style="{{ p.style }}">
+            <img src="{{ p.src }}" alt="" class="rg-63">
+            <span class="rg-219"></span>
+            <span class="rg-220">
+              <span class="rg-221">{{ p.count }}</span>
+              <span class="rg-222">{{ p.label }}</span>
+            </span>
+            <span style="{{ p.bar }}"></span>
+          </button>
+        </sc-for>
+      </div>
+      <div class="rg-223">
+      <div class="rg-224">
+        <sc-for list="{{ resTabs }}" as="t" hint-placeholder-count="6">
+          <button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
+        </sc-for>
+      </div>
+      <sc-if value="{{ resEmpty }}" hint-placeholder-val="{{ false }}">
+        <div class="rg-225">
+          <h3 class="rg-226">{{ resEmptyTitle }}</h3>
+          <p class="rg-227">Contact the RoadGlas® team to request this content or be notified when it is published.</p>
+          <button onClick="{{ goContact }}" aria-label="Contact Us" class="rg-72" style-hover="transform:translateY(-3px) scale(1.05)"><img src="images/contact-shield.png" alt="Contact Us" class="rg-73"><span aria-hidden="true" class="rg-74">→</span></button>
+        </div>
+      </sc-if>
+      <div class="rg-228">
+        <sc-for list="{{ resourceList }}" as="r" hint-placeholder-count="6">
+          <article class="rg-32">
+            <div class="rg-229">
+              <div class="rg-230">
+                <span class="rg-231">{{ r.type }}</span>
+                <span class="rg-232">PDF</span>
+              </div>
+              <div class="rg-183">{{ r.product }}</div>
+              <h3 class="rg-233">{{ r.title }}</h3>
+              <a href="roadglas-brochure.pdf" target="_blank" class="rg-234" style-hover="color:#E52C1A">Download PDF ↓</a>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+      </div>
+      </div>
+    </div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ isContact }}" hint-placeholder-val="{{ false }}">
+  <section class="rg-75">
+    <img src="images/img_p22_2.jpg" alt="" class="rg-63">
+    <div class="rg-16"></div>
+    <div class="rg-76">
+      <h1 class="rg-154">Contact Us</h1>
+      <div class="rg-235"><button onClick="{{ goHome }}" class="rg-169" style-hover="color:#E52C1A">Home</button><span>/</span><span>Contact Us</span></div>
+    </div>
+  </section>
+
+  <section data-screen-label="Contact - Who we are" class="rg-236">
+    <div class="rg-237">
+      <div>
+        <div class="rg-28">About Us</div>
+        <h2 class="rg-238">Who <span class="rg-30">We Are</span></h2>
+        <p class="rg-239">RoadGlas®, by Industrial Fabrics, Inc., is a family of paving interlayer solutions engineered to seal pavements, delay reflective cracking and extend the service life of asphalt on streets, highways, airports and parking areas.</p>
+        <p class="rg-240">With decades of engineering expertise and a commitment to innovation, Industrial Fabrics partners with contractors, engineers and project owners to solve complex pavement challenges reliably, cost-effectively and sustainably.</p>
+        <div class="rg-241">
+          <div class="rg-242"><div class="rg-243">50+</div><div class="rg-244">Years of Industry Experience</div></div><div class="rg-242"><div class="rg-243">1000+</div><div class="rg-244">Projects Completed</div></div><div class="rg-242"><div class="rg-243">15+</div><div class="rg-244">Industries Served</div></div>
+        </div>
+      </div>
+      <div class="rg-245"><image-slot id="rg-contact-team" shape="rect" src="images/img_p22_1.jpg" placeholder="RoadGlas team at work"></image-slot></div>
+    </div>
+  </section>
+
+  <section data-screen-label="Contact - Get in touch" class="rg-246">
+    <div class="rg-247">
+      <div class="rg-248">
+        <div class="rg-28">Send a Message</div>
+        <h2 class="rg-249">Get In <span class="rg-30">Touch</span></h2>
+        <p class="rg-250">Fill out the form below and our team will respond promptly.</p>
+        <sc-if value="{{ notSent }}" hint-placeholder-val="{{ true }}">
+          <form onSubmit="{{ submit }}" class="rg-251">
+            <label class="rg-89"><span class="rg-252">First Name <span class="rg-9">*</span></span><input type="text" value="{{ fv.first }}" onChange="{{ fon.first }}" style="{{ fbox.first }}"><span class="rg-253">{{ ferr.first }}</span></label>
+            <label class="rg-89"><span class="rg-252">Last Name <span class="rg-9">*</span></span><input type="text" value="{{ fv.last }}" onChange="{{ fon.last }}" style="{{ fbox.last }}"><span class="rg-253">{{ ferr.last }}</span></label>
+            <label class="rg-89"><span class="rg-252">Email Address <span class="rg-9">*</span></span><input type="email" value="{{ fv.email }}" onChange="{{ fon.email }}" style="{{ fbox.email }}"><span class="rg-253">{{ ferr.email }}</span></label>
+            <label class="rg-89"><span class="rg-252">Company Name</span><input type="text" value="{{ fv.company }}" onChange="{{ fon.company }}" style="{{ fbox.company }}"><span class="rg-253">{{ ferr.company }}</span></label>
+            <label class="rg-89"><span class="rg-252">Phone</span><input type="tel" value="{{ fv.phone }}" onChange="{{ fon.phone }}" style="{{ fbox.phone }}"><span class="rg-253">{{ ferr.phone }}</span></label>
+            <label class="rg-89"><span class="rg-252">Project Location</span><input type="text" value="{{ fv.location }}" onChange="{{ fon.location }}" style="{{ fbox.location }}"><span class="rg-253">{{ ferr.location }}</span></label>
+            <label class="rg-89"><span class="rg-252">Product of Interest</span>
+              <select value="{{ fv.product }}" onChange="{{ fon.product }}" style="{{ fbox.product }}">
+                <option value="">Select a product</option>
+                <option>ROADGLAS® Paving Mat</option>
+                <option>RoadGlas® RG100</option>
+                <option>RoadGlas® RG200</option>
+                <option>Not sure yet</option>
+              </select>
+            </label>
+            <label class="rg-89"><span class="rg-252">Application Sector</span>
+              <select value="{{ fv.sector }}" onChange="{{ fon.sector }}" style="{{ fbox.sector }}">
+                <option value="">Select a sector</option>
+                <sc-for list="{{ sectorOpts }}" as="o" hint-placeholder-count="6"><option>{{ o }}</option></sc-for>
+              </select>
+            </label>
+            <label class="rg-254"><span class="rg-252">Message <span class="rg-9">*</span></span>
+              <textarea rows="6" value="{{ fv.message }}" onChange="{{ fon.message }}" style="{{ fbox.message }}"></textarea>
+              <span class="rg-255">{{ ferr.message }}</span>
+            </label>
+            <div class="rg-256">
+              <span class="rg-257"><span class="rg-9">*</span> Required fields</span>
+              <button type="submit" class="rg-258" style-hover="background:#0E3692">Send Message</button>
+            </div>
+          </form>
+        </sc-if>
+        <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+          <div class="rg-259">
+            <div class="rg-260">✓</div>
+            <h3 class="rg-261">Thank you, {{ fv.first }}</h3>
+            <p class="rg-262">Your message has been sent to Industrial Fabrics, Inc. For immediate assistance call 1-800-848-4500.</p>
+            <button onClick="{{ resetForm }}" class="rg-263" style-hover="background:#0E3692;color:#fff">Send another message</button>
+          </div>
+        </sc-if>
+      </div>
+      <aside class="rg-264">
+        <div class="rg-265"><div class="rg-266">Reach Us Directly</div><div class="rg-267">Corporate Office</div></div>
+        <div><div class="rg-268">Address</div><div class="rg-269"><span>510 O'Neal Lane Ext.</span><span>Baton Rouge, LA 70819</span></div></div>
+        <div><div class="rg-268">Phone</div><div class="rg-269"><a href="tel:+18008484500" class="rg-270" style-hover="color:#F2B8A8">1-800-848-4500</a><a href="tel:+12252739600" class="rg-270" style-hover="color:#F2B8A8">1-225-273-9600</a></div></div>
+        <div><div class="rg-268">Email</div><div class="rg-269"><a href="mailto:support@industrialfabrics.com" class="rg-271" style-hover="color:#F2B8A8">support@industrialfabrics.com</a></div></div>
+        <div><div class="rg-268">Business Hours</div><div class="rg-269"><span>Monday – Friday | 8AM – 5PM CST</span></div></div>
+      </aside>
+    </div>
+  </section>
+
+  <section data-screen-label="Contact - Regional offices" class="rg-272">
+    <div class="rg-27">
+      <div class="rg-147">Locations</div>
+      <h2 class="rg-273">Our <span class="rg-30">Regional Offices</span></h2>
+      <p class="rg-274">With our manufacturing plant in <strong>Houston, Texas.</strong> We ship worldwide.</p>
+      <div class="rg-275">
+        <div class="rg-276"><div class="rg-277">Corporate Office</div><div class="rg-278"><h3 class="rg-279">Baton Rouge, LA</h3><div>510 O'Neal Lane Ext.<br>Baton Rouge, LA 70819</div><a href="tel:+18008484500" class="rg-280" style-hover="color:#E52C1A">1-800-848-4500</a><a href="tel:+12252739600" class="rg-280" style-hover="color:#E52C1A">1-225-273-9600</a><div class="rg-78">Mon – Fri | 8AM – 5PM</div></div></div>
+        <div class="rg-276"><div class="rg-281">Manufacturing Facility</div><div class="rg-278"><h3 class="rg-279">Houston, TX</h3><div>5102 Galveston Rd.<br>Houston, TX 77017</div><a href="tel:+17136412727" class="rg-280" style-hover="color:#E52C1A">1-713-641-2727</a><div class="rg-78">Mon – Fri | 8AM – 5PM</div></div></div>
+        <div class="rg-276"><div class="rg-277">Distribution</div><div class="rg-278"><h3 class="rg-279">Arlington, TX</h3><div>3420 Dalworth St.<br>Arlington, TX 76011</div><a href="tel:+19722635640" class="rg-280" style-hover="color:#E52C1A">1-972-263-5640</a><div class="rg-78">Mon – Fri | 8AM – 5PM</div></div></div>
+        <div class="rg-276"><div class="rg-277">Distribution</div><div class="rg-278"><h3 class="rg-279">Corpus Christi, TX</h3><div>1911 North Lexington Blvd.<br>Corpus Christi, TX 78409</div><a href="tel:+18886356209" class="rg-280" style-hover="color:#E52C1A">1-888-635-6209</a><div class="rg-78">Mon – Fri | 8AM – 5PM</div></div></div>
+        <div class="rg-276"><div class="rg-277">Distribution</div><div class="rg-278"><h3 class="rg-279">Oklahoma City, OK</h3><div>234 S.E. 45th Street<br>Oklahoma City, OK 73129</div><a href="tel:+14054448701" class="rg-280" style-hover="color:#E52C1A">1-405-444-8701</a><div class="rg-78">Mon – Fri | 8AM – 5PM</div></div></div>
+      </div>
+    </div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ isLunch }}" hint-placeholder-val="{{ false }}">
+  <section class="rg-282">
+    <img src="images/img_p16_1.jpg" alt="" class="rg-63">
+    <div class="rg-16"></div>
+    <div class="rg-283">
+      <div class="rg-78">Home / Support / Lunch &amp; Learn</div>
+      <h1 class="rg-284">Join Us for Lunch!</h1>
+      <p class="rg-285">Learn about IFI's geosynthetic solutions over a free lunch — and earn Professional Development Hours while you're at it.</p>
+      <button onClick="{{ toLunchForm }}" class="rg-286" style-hover="background:#fff;color:#0E3692">Request a Lunch &amp; Learn</button>
+    </div>
+  </section>
+  <section class="rg-287">
+    <div class="rg-27">
+      <div class="rg-288">
+        <h2 class="rg-289">What Is <span class="rg-30">Lunch &amp; Learn?</span></h2>
+        <p class="rg-290">The program is coordinated by an IFI representative. A presentation typically lasts about an hour depending on questions, and lunch is provided by our company.</p>
+      </div>
+      <div class="rg-291">
+        <sc-for list="{{ lunchFaq }}" as="q" hint-placeholder-count="3">
+          <div class="rg-292">
+            <span class="rg-293">{{ q.n }}</span>
+            <h3 class="rg-184">{{ q.t }}</h3>
+            <p class="rg-36">{{ q.d }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+  <section class="rg-79">
+    <div ref="{{ lunchRef }}" class="rg-294">
+      <aside class="rg-295">
+        <div class="rg-296">
+          <h3 class="rg-226">Questions? Contact Us</h3>
+          <p class="rg-36">Have a question before submitting a request? Reach our customer service team Monday through Friday, 8:00 a.m. EST to 5:00 p.m. EST.</p>
+          <a href="mailto:support@industrialfabrics.com" class="rg-297">support@industrialfabrics.com</a>
+          <a href="tel:+18008484500" class="rg-297">+1 (800) 848-4500 Toll Free</a>
+        </div>
+      </aside>
+      <div class="rg-298">
+        <div class="rg-28">Request a Session</div>
+        <h2 class="rg-299">Lunch &amp; Learn <span class="rg-30">Request Form</span></h2>
+        <p class="rg-300">Fill out the form below and our team will follow up to schedule your session.</p>
+        <sc-if value="{{ lnotSent }}" hint-placeholder-val="{{ true }}">
+          <form onSubmit="{{ lsubmit }}" class="rg-301">
+            <label class="rg-302"><span class="rg-252">First Name <span class="rg-9">*</span></span><input type="text" value="{{ lv.first }}" onChange="{{ lon.first }}" style="{{ lbox.first }}"><span class="rg-255">{{ lerr.first }}</span></label>
+            <label class="rg-302"><span class="rg-252">Last Name <span class="rg-9">*</span></span><input type="text" value="{{ lv.last }}" onChange="{{ lon.last }}" style="{{ lbox.last }}"><span class="rg-255">{{ lerr.last }}</span></label>
+            <label class="rg-302"><span class="rg-252">Title <span class="rg-9">*</span></span><input type="text" value="{{ lv.title }}" onChange="{{ lon.title }}" style="{{ lbox.title }}"><span class="rg-255">{{ lerr.title }}</span></label>
+            <label class="rg-302"><span class="rg-252">Company / Firm <span class="rg-9">*</span></span><input type="text" value="{{ lv.company }}" onChange="{{ lon.company }}" style="{{ lbox.company }}"><span class="rg-255">{{ lerr.company }}</span></label>
+            <label class="rg-302"><span class="rg-252">Phone <span class="rg-9">*</span></span><input type="tel" value="{{ lv.phone }}" onChange="{{ lon.phone }}" style="{{ lbox.phone }}"><span class="rg-255">{{ lerr.phone }}</span></label>
+            <label class="rg-302"><span class="rg-252">Email <span class="rg-9">*</span></span><input type="email" value="{{ lv.email }}" onChange="{{ lon.email }}" style="{{ lbox.email }}"><span class="rg-255">{{ lerr.email }}</span></label>
+            <label class="rg-302"><span class="rg-252">Country <span class="rg-9">*</span></span><input type="text" value="{{ lv.country }}" onChange="{{ lon.country }}" style="{{ lbox.country }}"><span class="rg-255">{{ lerr.country }}</span></label>
+            <label class="rg-302"><span class="rg-252">State / Province</span><input type="text" value="{{ lv.state }}" onChange="{{ lon.state }}" style="{{ lbox.state }}"><span class="rg-255">{{ lerr.state }}</span></label>
+            <label class="rg-302"><span class="rg-252">City</span><input type="text" value="{{ lv.city }}" onChange="{{ lon.city }}" style="{{ lbox.city }}"><span class="rg-255">{{ lerr.city }}</span></label>
+            <label class="rg-302"><span class="rg-252">Number Attending <span class="rg-9">*</span></span><input type="number" value="{{ lv.attending }}" onChange="{{ lon.attending }}" style="{{ lbox.attending }}"><span class="rg-255">{{ lerr.attending }}</span></label>
+            <label class="rg-302"><span class="rg-252">Preferred Date</span><input type="date" value="{{ lv.date }}" onChange="{{ lon.date }}" style="{{ lbox.date }}"><span class="rg-255">{{ lerr.date }}</span></label>
+            <label class="rg-302"><span class="rg-252">Products</span><select value="{{ lv.products }}" onChange="{{ lon.products }}" style="{{ lbox.products }}"><option value="">Select a product...</option><option>ROADGLAS® Paving Mat</option><option>RoadGlas® RG100</option><option>RoadGlas® RG200</option></select><span class="rg-255">{{ lerr.products }}</span></label>
+            <label class="rg-254"><span class="rg-252">Additional Notes</span><textarea rows="4" value="{{ lv.notes }}" onChange="{{ lon.notes }}" style="{{ lbox.notes }}"></textarea></label>
+            <div class="rg-256">
+              <span class="rg-257"><span class="rg-9">*</span> Required</span>
+              <button type="submit" class="rg-303" style-hover="background:#0E3692">Submit Request</button>
+            </div>
+          </form>
+        </sc-if>
+        <sc-if value="{{ lsent }}" hint-placeholder-val="{{ false }}">
+          <div class="rg-259">
+            <div class="rg-260">✓</div>
+            <h3 class="rg-261">Thank you, {{ lv.first }}</h3>
+            <p class="rg-262">Your Lunch &amp; Learn request has been received. Our team will contact you and begin working on securing a speaker.</p>
+            <button onClick="{{ lreset }}" class="rg-304" style-hover="background:#0E3692;color:#fff">Start a new request</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+    <div class="rg-27"><div class="rg-305">
+      <div class="rg-306"><div class="rg-307">Support &amp; Email</div><a href="mailto:info@ind-fab.com" class="rg-308">info@ind-fab.com</a></div>
+      <div class="rg-306"><div class="rg-307">Customer Support</div><div class="rg-309"><a href="tel:+18008484500" class="rg-308">+1 (800) 848-4500</a><a href="tel:+12252739600" class="rg-308">+1 (225) 273-9600</a></div></div>
+      <div class="rg-306"><div class="rg-307">Our Location</div><span class="rg-310">7765 Pecue Lane, Baton Rouge, LA 70809</span></div>
+    </div></div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ isCredit }}" hint-placeholder-val="{{ false }}">
+  <section class="rg-282">
+    <img src="images/img_p26_1-upright.jpg" alt="" class="rg-63">
+    <div class="rg-16"></div>
+    <div class="rg-283">
+      <div class="rg-78">Home / Support / Apply for Credit</div>
+      <h1 class="rg-284">Application for Credit</h1>
+      <p class="rg-285">Apply for a credit account with Industrial Fabrics, Inc. online. Estimated processing time is 24–48 hours.</p>
+      <a href="https://www.ind-fab.com/download/Industrial-Fabrics-Credit-App-FGB.pdf" target="_blank" class="rg-311" style-hover="background:#fff;color:#0E3692">Download Credit Application ↓</a>
+    </div>
+  </section>
+  <section class="rg-312">
+    <div class="rg-313">
+      <sc-if value="{{ cnotSent }}" hint-placeholder-val="{{ true }}">
+        <form onSubmit="{{ csubmit }}" class="rg-301">
+          <div class="rg-314"><span class="rg-9">*</span> Required</div>
+          <div class="rg-315"><div class="rg-316">Section 1</div><h3 class="rg-317">Business Information</h3></div>
+          <label class="rg-302"><span class="rg-252">Company Name <span class="rg-9">*</span></span><input type="text" value="{{ cv.company }}" onChange="{{ con.company }}" style="{{ cbox.company }}"><span class="rg-255">{{ cerr.company }}</span></label>
+          <label class="rg-302"><span class="rg-252">Salesperson</span><input type="text" value="{{ cv.salesperson }}" onChange="{{ con.salesperson }}" style="{{ cbox.salesperson }}"><span class="rg-255">{{ cerr.salesperson }}</span></label>
+          <label class="rg-318"><span class="rg-252">Address <span class="rg-9">*</span></span><input type="text" value="{{ cv.address }}" onChange="{{ con.address }}" style="{{ cbox.address }}"><span class="rg-255">{{ cerr.address }}</span></label>
+          <label class="rg-302"><span class="rg-252">Products</span><select value="{{ cv.products }}" onChange="{{ con.products }}" style="{{ cbox.products }}"><option value="">Select a product...</option><option>ROADGLAS® Paving Mat</option><option>RoadGlas® RG100</option><option>RoadGlas® RG200</option></select><span class="rg-255">{{ cerr.products }}</span></label>
+          <label class="rg-302"><span class="rg-252">Country <span class="rg-9">*</span></span><input type="text" value="{{ cv.country }}" onChange="{{ con.country }}" style="{{ cbox.country }}"><span class="rg-255">{{ cerr.country }}</span></label>
+          <label class="rg-302"><span class="rg-252">State <span class="rg-9">*</span></span><input type="text" value="{{ cv.state }}" onChange="{{ con.state }}" style="{{ cbox.state }}"><span class="rg-255">{{ cerr.state }}</span></label>
+          <label class="rg-302"><span class="rg-252">City <span class="rg-9">*</span></span><input type="text" value="{{ cv.city }}" onChange="{{ con.city }}" style="{{ cbox.city }}"><span class="rg-255">{{ cerr.city }}</span></label>
+          <label class="rg-302"><span class="rg-252">Zip <span class="rg-9">*</span></span><input type="text" value="{{ cv.zip }}" onChange="{{ con.zip }}" style="{{ cbox.zip }}"><span class="rg-255">{{ cerr.zip }}</span></label>
+          <label class="rg-302"><span class="rg-252">County / Parish <span class="rg-9">*</span></span><input type="text" value="{{ cv.county }}" onChange="{{ con.county }}" style="{{ cbox.county }}"><span class="rg-255">{{ cerr.county }}</span></label>
+          <label class="rg-302"><span class="rg-252">Date Started</span><input type="date" value="{{ cv.started }}" onChange="{{ con.started }}" style="{{ cbox.started }}"><span class="rg-255">{{ cerr.started }}</span></label>
+          <label class="rg-318"><span class="rg-252">Mailing Address (if different)</span><input type="text" value="{{ cv.maddress }}" onChange="{{ con.maddress }}" style="{{ cbox.maddress }}"><span class="rg-255">{{ cerr.maddress }}</span></label>
+          <label class="rg-302"><span class="rg-252">Mailing City</span><input type="text" value="{{ cv.mcity }}" onChange="{{ con.mcity }}" style="{{ cbox.mcity }}"><span class="rg-255">{{ cerr.mcity }}</span></label>
+          <label class="rg-302"><span class="rg-252">Mailing State</span><input type="text" value="{{ cv.mstate }}" onChange="{{ con.mstate }}" style="{{ cbox.mstate }}"><span class="rg-255">{{ cerr.mstate }}</span></label>
+          <label class="rg-302"><span class="rg-252">Mailing Zip</span><input type="text" value="{{ cv.mzip }}" onChange="{{ con.mzip }}" style="{{ cbox.mzip }}"><span class="rg-255">{{ cerr.mzip }}</span></label>
+          <label class="rg-302"><span class="rg-252">Phone <span class="rg-9">*</span></span><input type="tel" value="{{ cv.phone }}" onChange="{{ con.phone }}" style="{{ cbox.phone }}"><span class="rg-255">{{ cerr.phone }}</span></label>
+          <label class="rg-302"><span class="rg-252">Fax</span><input type="tel" value="{{ cv.fax }}" onChange="{{ con.fax }}" style="{{ cbox.fax }}"><span class="rg-255">{{ cerr.fax }}</span></label>
+          <label class="rg-302"><span class="rg-252">Full Name of Owner(s) <span class="rg-9">*</span></span><input type="text" value="{{ cv.owners }}" onChange="{{ con.owners }}" style="{{ cbox.owners }}"><span class="rg-255">{{ cerr.owners }}</span></label>
+          <label class="rg-302"><span class="rg-252">Federal Tax ID <span class="rg-9">*</span></span><input type="text" value="{{ cv.taxid }}" onChange="{{ con.taxid }}" style="{{ cbox.taxid }}"><span class="rg-255">{{ cerr.taxid }}</span></label>
+          <label class="rg-302"><span class="rg-252">D.U.N.S. #</span><input type="text" value="{{ cv.duns }}" onChange="{{ con.duns }}" style="{{ cbox.duns }}"><span class="rg-255">{{ cerr.duns }}</span></label>
+          <label class="rg-302"><span class="rg-252">Accounting Contact <span class="rg-9">*</span></span><input type="text" value="{{ cv.accounting }}" onChange="{{ con.accounting }}" style="{{ cbox.accounting }}"><span class="rg-255">{{ cerr.accounting }}</span></label>
+          <label class="rg-302"><span class="rg-252">Email Address <span class="rg-9">*</span></span><input type="email" value="{{ cv.email }}" onChange="{{ con.email }}" style="{{ cbox.email }}"><span class="rg-255">{{ cerr.email }}</span></label>
+          <label class="rg-302"><span class="rg-252">Business Type <span class="rg-9">*</span></span><select value="{{ cv.btype }}" onChange="{{ con.btype }}" style="{{ cbox.btype }}"><option value="">Select...</option><option>Proprietorship</option><option>Partnership</option><option>Corporation</option></select><span class="rg-255">{{ cerr.btype }}</span></label>
+          <label class="rg-302"><span class="rg-252">Amount of Credit Requested <span class="rg-9">*</span></span><input type="text" value="{{ cv.amount }}" onChange="{{ con.amount }}" style="{{ cbox.amount }}"><span class="rg-255">{{ cerr.amount }}</span></label>
+          <div class="rg-319"><span class="rg-252">Are Purchase Orders Required From Your Company? <span class="rg-9">*</span></span><div class="rg-320"><label class="rg-321"><input type="radio" name="c-po" value="Yes" checked="{{ cr.poYes }}" onChange="{{ con.po }}" class="rg-322">Yes</label><label class="rg-321"><input type="radio" name="c-po" value="No" checked="{{ cr.poNo }}" onChange="{{ con.po }}" class="rg-322">No</label></div><span class="rg-255">{{ cerr.po }}</span></div>
+          <div class="rg-315"><div class="rg-316">Section 2</div><h3 class="rg-317">Credit References</h3><p class="rg-323">Please provide at least one trade reference.</p></div>
+          <label class="rg-302"><span class="rg-252">Reference 1 — Company Name <span class="rg-9">*</span></span><input type="text" value="{{ cv.r1 }}" onChange="{{ con.r1 }}" style="{{ cbox.r1 }}"><span class="rg-255">{{ cerr.r1 }}</span></label><label class="rg-302"><span class="rg-252">Email</span><input type="email" value="{{ cv.r1email }}" onChange="{{ con.r1email }}" style="{{ cbox.r1email }}"><span class="rg-255">{{ cerr.r1email }}</span></label><label class="rg-302"><span class="rg-252">Phone</span><input type="tel" value="{{ cv.r1phone }}" onChange="{{ con.r1phone }}" style="{{ cbox.r1phone }}"><span class="rg-255">{{ cerr.r1phone }}</span></label>
+          <label class="rg-302"><span class="rg-252">Reference 2 — Company Name</span><input type="text" value="{{ cv.r2 }}" onChange="{{ con.r2 }}" style="{{ cbox.r2 }}"><span class="rg-255">{{ cerr.r2 }}</span></label><label class="rg-302"><span class="rg-252">Email</span><input type="email" value="{{ cv.r2email }}" onChange="{{ con.r2email }}" style="{{ cbox.r2email }}"><span class="rg-255">{{ cerr.r2email }}</span></label><label class="rg-302"><span class="rg-252">Phone</span><input type="tel" value="{{ cv.r2phone }}" onChange="{{ con.r2phone }}" style="{{ cbox.r2phone }}"><span class="rg-255">{{ cerr.r2phone }}</span></label>
+          <label class="rg-302"><span class="rg-252">Reference 3 — Company Name</span><input type="text" value="{{ cv.r3 }}" onChange="{{ con.r3 }}" style="{{ cbox.r3 }}"><span class="rg-255">{{ cerr.r3 }}</span></label><label class="rg-302"><span class="rg-252">Email</span><input type="email" value="{{ cv.r3email }}" onChange="{{ con.r3email }}" style="{{ cbox.r3email }}"><span class="rg-255">{{ cerr.r3email }}</span></label><label class="rg-302"><span class="rg-252">Phone</span><input type="tel" value="{{ cv.r3phone }}" onChange="{{ con.r3phone }}" style="{{ cbox.r3phone }}"><span class="rg-255">{{ cerr.r3phone }}</span></label>
+          <div class="rg-315"><div class="rg-316">Section 3</div><h3 class="rg-317">Bank Information</h3></div>
+          <label class="rg-302"><span class="rg-252">Name of Bank <span class="rg-9">*</span></span><input type="text" value="{{ cv.bank }}" onChange="{{ con.bank }}" style="{{ cbox.bank }}"><span class="rg-255">{{ cerr.bank }}</span></label>
+          <label class="rg-302"><span class="rg-252">Bank Phone</span><input type="tel" value="{{ cv.bankphone }}" onChange="{{ con.bankphone }}" style="{{ cbox.bankphone }}"><span class="rg-255">{{ cerr.bankphone }}</span></label>
+          <label class="rg-302"><span class="rg-252">Account #</span><input type="text" value="{{ cv.bankacct }}" onChange="{{ con.bankacct }}" style="{{ cbox.bankacct }}"><span class="rg-255">{{ cerr.bankacct }}</span></label>
+          <label class="rg-302"><span class="rg-252">Bank Contact</span><input type="text" value="{{ cv.bankcontact }}" onChange="{{ con.bankcontact }}" style="{{ cbox.bankcontact }}"><span class="rg-255">{{ cerr.bankcontact }}</span></label>
+          <label class="rg-318"><span class="rg-252">Bank Address</span><input type="text" value="{{ cv.bankaddr }}" onChange="{{ con.bankaddr }}" style="{{ cbox.bankaddr }}"><span class="rg-255">{{ cerr.bankaddr }}</span></label>
+          <label class="rg-302"><span class="rg-252">Bank City</span><input type="text" value="{{ cv.bankcity }}" onChange="{{ con.bankcity }}" style="{{ cbox.bankcity }}"><span class="rg-255">{{ cerr.bankcity }}</span></label>
+          <label class="rg-302"><span class="rg-252">Bank State</span><input type="text" value="{{ cv.bankstate }}" onChange="{{ con.bankstate }}" style="{{ cbox.bankstate }}"><span class="rg-255">{{ cerr.bankstate }}</span></label>
+          <label class="rg-302"><span class="rg-252">Bank Zip</span><input type="text" value="{{ cv.bankzip }}" onChange="{{ con.bankzip }}" style="{{ cbox.bankzip }}"><span class="rg-255">{{ cerr.bankzip }}</span></label>
+          <div class="rg-315"><div class="rg-316">Section 4</div><h3 class="rg-317">Sales Tax Exemption</h3></div>
+          <label class="rg-318"><span class="rg-252">Type of Business</span><input type="text" value="{{ cv.taxbiz }}" onChange="{{ con.taxbiz }}" style="{{ cbox.taxbiz }}"><span class="rg-255">{{ cerr.taxbiz }}</span></label>
+          <div class="rg-324"><span class="rg-252">I am exempt from sales tax on ALL purchases:</span><div class="rg-320"><label class="rg-321"><input type="radio" name="c-exall" value="Yes" checked="{{ cr.exallYes }}" onChange="{{ con.exall }}" class="rg-322">Yes</label><label class="rg-321"><input type="radio" name="c-exall" value="No" checked="{{ cr.exallNo }}" onChange="{{ con.exall }}" class="rg-322">No</label></div><span class="rg-255">{{ cerr.exall }}</span></div>
+          <div class="rg-324"><span class="rg-252">I am exempt from sales tax on SOME purchases:</span><div class="rg-320"><label class="rg-321"><input type="radio" name="c-exsome" value="Yes" checked="{{ cr.exsomeYes }}" onChange="{{ con.exsome }}" class="rg-322">Yes</label><label class="rg-321"><input type="radio" name="c-exsome" value="No" checked="{{ cr.exsomeNo }}" onChange="{{ con.exsome }}" class="rg-322">No</label></div><span class="rg-255">{{ cerr.exsome }}</span></div>
+          <p class="rg-325">If exempt, a signed Tax Exempt Certificate for each applicable state must be provided with this application, and a current certificate will be required with every order prior to delivery. Sales tax will not be refunded if a current exempt certificate is not provided prior to delivery of merchandise.</p>
+          <div class="rg-315"><div class="rg-316">Section 5</div><h3 class="rg-317">Terms &amp; Conditions</h3></div>
+          <ol class="rg-326"><sc-for list="{{ creditTerms }}" as="t" hint-placeholder-count="4"><li><strong class="rg-327">{{ t.b }}</strong> {{ t.t }}</li></sc-for></ol>
+          <label class="rg-328"><input type="checkbox" checked="{{ cv.agreeTerms }}" onChange="{{ con.agreeTerms }}" class="rg-329"><span>I have read and agree to the Terms &amp; Conditions above, and attest to my financial responsibility, ability, and willingness to pay invoices under NET 30 DAY terms. <span class="rg-9">*</span><br><span class="rg-255">{{ cerr.agreeTerms }}</span></span></label>
+          <div class="rg-315"><div class="rg-316">Section 6</div><h3 class="rg-317">Guaranty</h3></div>
+          <p class="rg-325">For value received, the undersigned personally, primarily, and individually guarantees payment of all amounts due and owing by Applicant to Industrial Fabrics, Inc., including principal, interest, attorney fees, and costs.</p>
+          <p class="rg-325">This guaranty remains valid and enforceable as to all indebtedness now existing or later incurred by Applicant until ten (10) days after Industrial Fabrics, Inc. receives written notice from the undersigned terminating it. To the extent not prohibited by law, the Guarantor waives all notices and defenses, including impairment of collateral.</p>
+          <p class="rg-325">The Guarantor agrees they may be sued without the need to join the Applicant.</p>
+          <p class="rg-330"><strong>Original signature required.</strong> The Guaranty must be signed by hand. After submitting this application, use the <em>Print Guaranty</em> button at the bottom of this page, sign it, and email the signed copy to <a href="mailto:credit@ind-fab.com" class="rg-331">credit@ind-fab.com</a>.</p>
+          <label class="rg-302"><span class="rg-252">Owner / Guarantor Print Name <span class="rg-9">*</span></span><input type="text" value="{{ cv.gname }}" onChange="{{ con.gname }}" style="{{ cbox.gname }}"><span class="rg-255">{{ cerr.gname }}</span></label>
+          <label class="rg-302"><span class="rg-252">Guarantor Title</span><input type="text" value="{{ cv.gtitle }}" onChange="{{ con.gtitle }}" style="{{ cbox.gtitle }}"><span class="rg-255">{{ cerr.gtitle }}</span></label>
+          <label class="rg-328"><input type="checkbox" checked="{{ cv.agreeGuaranty }}" onChange="{{ con.agreeGuaranty }}" class="rg-329"><span>I have read and agree to the Guaranty above. <span class="rg-9">*</span><br><span class="rg-255">{{ cerr.agreeGuaranty }}</span></span></label>
+          <div class="rg-315"><div class="rg-316">Reference</div><h3 class="rg-317">Terms &amp; General Conditions of Sale</h3></div>
+          <div class="rg-332"><button type="button" onClick="{{ toggleSale }}" class="rg-304" style-hover="background:#0E3692;color:#fff">{{ saleLabel }}</button></div>
+          <sc-if value="{{ showSale }}" hint-placeholder-val="{{ false }}"><ol class="rg-326"><sc-for list="{{ saleTerms }}" as="t" hint-placeholder-count="4"><li><strong class="rg-327">{{ t.b }}</strong> {{ t.t }}</li></sc-for></ol></sc-if>
+          <label class="rg-328"><input type="checkbox" checked="{{ cv.agreeSale }}" onChange="{{ con.agreeSale }}" class="rg-329"><span>I have read and agree to the Terms &amp; General Conditions of Sale above. <span class="rg-9">*</span><br><span class="rg-255">{{ cerr.agreeSale }}</span></span></label>
+          <div class="rg-315"><div class="rg-316">Final Step</div><h3 class="rg-317">Signature</h3><p class="rg-323">Typing your name below and submitting this form constitutes your electronic signature on this Application for Credit, its Guaranty, and its Terms &amp; General Conditions of Sale.</p></div>
+          <label class="rg-302"><span class="rg-252">Print Name <span class="rg-9">*</span></span><input type="text" value="{{ cv.pname }}" onChange="{{ con.pname }}" style="{{ cbox.pname }}"><span class="rg-255">{{ cerr.pname }}</span></label>
+          <label class="rg-302"><span class="rg-252">Type Full Name as Signature <span class="rg-9">*</span></span><input type="text" value="{{ cv.sig }}" onChange="{{ con.sig }}" style="{{ cbox.sig }}"><span class="rg-255">{{ cerr.sig }}</span></label>
+          <label class="rg-302"><span class="rg-252">Title <span class="rg-9">*</span></span><input type="text" value="{{ cv.stitle }}" onChange="{{ con.stitle }}" style="{{ cbox.stitle }}"><span class="rg-255">{{ cerr.stitle }}</span></label>
+          <div class="rg-333"><button type="submit" class="rg-303" style-hover="background:#0E3692">Submit Application</button></div>
+        </form>
+      </sc-if>
+      <sc-if value="{{ csent }}" hint-placeholder-val="{{ false }}">
+          <div class="rg-259">
+            <div class="rg-260">✓</div>
+            <h3 class="rg-261">Application received</h3>
+            <p class="rg-262">Thank you. Your Application for Credit has been submitted to Industrial Fabrics, Inc. Estimated processing time is 24–48 hours.</p>
+            <button onClick="{{ creset }}" class="rg-304" style-hover="background:#0E3692;color:#fff">Start a new request</button>
+          </div>
+        </sc-if>
+      <div class="rg-334">
+        <div class="rg-335">
+          <div class="rg-336">After You Submit</div>
+          <h3 class="rg-337">Sign &amp; Return the Guaranty</h3>
+          <ol class="rg-338">
+            <li>Print the Guaranty (or save it as a PDF). Your company and guarantor details are filled in for you.</li>
+            <li>Sign it by hand with an original signature.</li>
+            <li>Scan or photograph the signed page and email it to credit@ind-fab.com.</li>
+          </ol>
+        </div>
+        <div class="rg-339">
+          <a href="https://www.ind-fab.com/download/Industrial-Fabrics-Credit-App-Guaranty.pdf" target="_blank" class="rg-340" style-hover="background:#fff;color:#0E3692">Print Guaranty</a>
+          <a href="mailto:credit@ind-fab.com?subject=Signed%20Guaranty%20-%20Credit%20Application" class="rg-341" style-hover="background:#fff;color:#0E3692">Email credit@ind-fab.com</a>
+        </div>
+      </div>
+      <div class="rg-305">
+      <div class="rg-306"><div class="rg-307">Support &amp; Email</div><a href="mailto:info@ind-fab.com" class="rg-308">info@ind-fab.com</a></div>
+      <div class="rg-306"><div class="rg-307">Customer Support</div><div class="rg-309"><a href="tel:+18008484500" class="rg-308">+1 (800) 848-4500</a><a href="tel:+12252739600" class="rg-308">+1 (225) 273-9600</a></div></div>
+      <div class="rg-306"><div class="rg-307">Our Location</div><span class="rg-310">7765 Pecue Lane, Baton Rouge, LA 70809</span></div>
+    </div>
+    </div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ showCta }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="Contact CTA" class="rg-342">
+    <div class="rg-343">
+      <img src="images/img_p5_1.jpg" alt="" class="rg-63">
+      <div class="rg-64"></div>
+      <div class="rg-65">
+        <div class="rg-66">
+          <div class="rg-67"><span class="rg-68"></span>{{ cta.eyebrow }}</div>
+          <h3 class="rg-69">{{ cta.title }}</h3>
+          <p class="rg-344">{{ cta.text }}</p>
+        </div>
+        <div class="rg-71">
+          <button onClick="{{ goContact }}" aria-label="Contact Us" class="rg-72" style-hover="transform:translateY(-3px) scale(1.05)"><img src="images/contact-shield.png" alt="Contact Us" class="rg-73"><span aria-hidden="true" class="rg-74">→</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+</sc-if>
+
+<footer id="contact" class="rg-345">
+  <div class="rg-346">
+    <div>
+      <div class="rg-347">
+        <img src="images/logo-shield.png" alt="RoadGlas" class="rg-348">
+        <div>
+          <div class="rg-349">ROAD<span class="rg-9">GLAS</span>®</div>
+          <p class="rg-350">Pound For Pound | Stronger Than Steel</p>
+        </div>
+      </div>
+    </div>
+    <img src="images/img_p27_3.jpg" alt="Build America Buy America" class="rg-351">
+    <div class="rg-352">
+      <span class="rg-270">Industrial Fabrics, Inc.</span>
+      <span>510 O'Neal Lane, Baton Rouge LA 70819</span>
+      <span>800 848 4500 · www.ind-fab.com</span>
+    </div>
+  </div>
+  <p class="rg-353">ROADGLAS® is the registered trademark of Industrial Fabrics, Inc.</p>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { view: 'home', faq: 0, slide: 0, app: 0, sel: [], res: 'downloads', resP: 'all', form: {}, errors: {}, sent: false };
+  componentDidMount() { this.t = setInterval(() => this.setState(s => ({ slide: (s.slide + 1) % 3 })), 7000); this.bt = setInterval(() => { if (!this.bp) this.benStep(1); }, 4000); this.onR = () => this.setState({ w: window.innerWidth }); this.onR(); window.addEventListener('resize', this.onR); }
+  benPV() { const w = this.state.w || 1280; return w >= 1100 ? 4 : w >= 780 ? 3 : w >= 540 ? 2 : 1; }
+  benStep(n) { this.setState(s => { const max = 10 - this.benPV(); let b = (s.ben || 0) + n; if (b > max) b = 0; if (b < 0) b = max; return { ben: b }; }); }
+  componentWillUnmount() { clearInterval(this.t); clearInterval(this.bt); window.removeEventListener('resize', this.onR); }
+  show(view, extra = {}) { this.setState({ view, ...extra }); window.scrollTo({ top: 0 }); }
+  productData() {
+    const view = this.state.view;
+    const P = {
+      mat: {
+        name: 'ROADGLAS® Paving Mat', kicker: 'Waterproofing Reinforcement Paving Mat',
+        tagline: 'An advanced hybrid geosynthetic that seals the pavement and slows the development of reflective cracking. Proudly manufactured in the USA.',
+        hero: 'images/img_p15_2.jpg', diagram: 'images/img_p6_2.jpg',
+        stats: [{ v: '4–6 mi', l: 'Installed per crew day' }, { v: '45°F+', l: 'Minimum surface temperature' }, { v: 'USA', l: 'Manufactured & BABA compliant' }],
+        overviewTitle: 'Hybrid fiberglass structure (Placeholder)',
+        overview: [
+          'The ROADGLAS® Mat integrates fiberglass mesh within a high-performance polyester mat. Its non-woven structure enables asphalt binder to saturate the fabric, helping to seal the pavement and reduce moisture intrusion.',
+          'Unlike polypropylene fabrics, fiberglass mats do not shrink or change dimensions when exposed to hot mix asphalt, preventing premature slippage or loss of bond.',
+        ],
+        features: [
+          { n: '01', t: 'Reinforced Moisture Barrier', d: 'Asphalt binder fills void spaces within the fabric and forms a continuous waterproof layer, reducing moisture infiltration into the underlying pavement.' },
+          { n: '02', t: 'Delay Reflective Cracking', d: 'Substantially greater tensile strength at low-strain levels than conventional paving fabrics and mats, reducing crack propagation from underlying layers.' },
+          { n: '03', t: 'Sized for Efficiency', d: 'Roll lengths allow installation with fewer roll changes. Available in various widths for all streets and highways. Custom rolls available upon request.' },
+        ],
+        hasTypes: true, types: [{ code: 'PM', type: 'Type I (Placeholder)', d: 'Describe placement and recommended use for this paving mat type. (Placeholder)' }, { code: 'PM', type: 'Type II (Placeholder)', d: 'Describe placement and recommended use for this paving mat type. (Placeholder)' }], note: '', hasGuide: true,
+        tack: [{ s: 'Existing', c: 'PG 70, PG 76', r: '0.20 – 0.25 gal/yd² or >' }, { s: 'Milled', c: 'PG 70, PG 76', r: '0.24 – 0.30 gal/yd² or >' }, { s: 'New', c: 'PG 70, PG 76', r: '0.20 – 0.25 gal/yd² or >' }],
+        tackNote: 'Below 70 degrees use PG 70; above 70 degrees use PG 76. Verify rates in the field based on surface conditions.',
+        steps: [
+          'Repair potholes, fill cracks wider than ¼” (6mm) and clean the surface until dust-free.',
+          'Apply a hot, uniform tack coat to the full width of the mat plus 2-4 inches on each side.',
+          'Place the mat immediately, free of wrinkles, and roll in with a pneumatic roller.',
+        ],
+        faqs: [
+          ['Is construction traffic allowed on the products during installation?', 'Necessary construction traffic is permitted. Steel drum rollers are prohibited.'],
+          ['Is public/transportation traffic allowed on the products during installation?', 'Minimal traffic is allowed; however, product should be covered by asphalt same day to minimize damage to the material.'],
+          ['How many linear lane miles can be installed on a standard 8-hour day?', 'An Industrial Fabrics, Inc. crew can install up to 4 to 6 miles of ROADGLAS® PM per day.'],
+          ['Can installed material stay uncovered overnight?', 'It is recommended that asphalt be applied over installed material same day or within 24 hours of installation. If left unpaved, material must be coned off from traffic, or light sanding applied on top before traffic is allowed.'],
+          ['How do I repair damaged material?', 'Cut out as much damaged material as possible, retack area and install new material overlapping 6-8 inches.'],
+          ['What if material gets rained on?', 'Cease paving operations, no traffic allowed, wait until material is completely dry and then begin paving.'],
+        ],
+        other: 'grid',
+      },
+      grid: {
+        name: 'ROADGLAS® Reinforcement Grid', kicker: 'Pressure Activated Adhesive Backing',
+        tagline: 'Fiberglass reinforcement with modified elastomeric polymer coating that extends the service life of asphalt two to three times longer.',
+        hero: 'images/img_p22_1.jpg', diagram: 'images/img_p17_1.jpg',
+        stats: [{ v: '2–3×', l: 'Longer asphalt service life' }, { v: '3–4 mi', l: 'Installed per crew day' }, { v: '< 3%', l: 'Strain where tensile strength resists cracks' }],
+        overviewTitle: 'A hidden layer of strength',
+        overview: [
+          'The grid matrix is composed of fiberglass strands coated with an elastomeric polymer. Fiberglass has high tensile strengths and low elongation properties, which is critical given that asphaltic concrete typically fails at low-strain levels.',
+          'Installed between the leveling and surface courses, it redirects vertical crack stresses horizontally to dissipate them. RoadGlas® is to Asphalt what Rebar is to Concrete.',
+        ],
+        features: [
+          { n: '01', t: 'Open-Grid Structure', d: 'Facilitates through-hole bonding and efficient stress transfer between the overlying and underlying asphalt layers.' },
+          { n: '02', t: 'Efficient Installation', d: 'Installed quickly without specialized equipment or labor. Pressure-activated adhesive makes it one of the fastest interlayer systems to install.' },
+          { n: '03', t: 'Proven in Any Climate', d: 'Reliable performance in diverse environments, from hot desert regions to near-arctic conditions.' },
+        ],
+        hasTypes: true,
+        types: [{ code: 'RG100', type: 'Type I', d: 'Placement over entire width of roadway.' }, { code: 'RG200', type: 'Type II', d: 'Placement over entire width of roadway, transverse and longitudinal joints.' }],
+        note: 'Not recommended for milled surfaces', hasGuide: true,
+        tack: [{ s: 'Existing', c: 'Hot Applied Track Free', r: '0.25 – 0.30 gal/yd or greater' }, { s: 'New', c: 'Hot Applied Track Free', r: '0.20 – 0.25 gal/yd or greater' }],
+        tackNote: 'Recommended tack coats: UltraFuse Bond Seal and Jebro, Inc. Polymer Modified Asphalt Cement Underseal Membrane. All tack coats: 45 degrees and rising.',
+        steps: [
+          'Repair potholes and fill cracks more than ¼” wide. Milled pavement requires a leveling course, cured a minimum of 24 hours.',
+          'Place self-adhesive grid wrinkle-free with a laydown tractor, overlapping joints 2 in. longitudinal and 6 in. transverse.',
+          'Spray hot-applied trackless tack on top of the grid and roll with a pneumatic rubber tire roller.',
+        ],
+        faqs: [
+          ['Is construction traffic allowed on the products during installation?', 'Once tack coat has cured, and rolling with pneumatic roller is completed, all construction traffic is permitted. Steel drum rollers are prohibited.'],
+          ['Is public/transportation traffic allowed on the products during installation?', 'Minimal traffic is allowed; however, product should be covered by asphalt same day to minimize damage to the material.'],
+          ['How many linear lane miles can be installed on a standard 8-hour day?', 'An Industrial Fabrics, Inc. crew can install up to 3 to 4 miles for ROADGLAS® RG per day. (Average one mile every 2 hours)'],
+          ['Can installed material stay uncovered overnight?', 'It is recommended that asphalt be applied over installed material the same day or within 24 hours of installation.'],
+          ['How do I repair damaged material?', 'Cut out as much damaged material as possible. Install new material overlapping 6-8 inches. Retack area with rubber tire roller on the repaired area.'],
+          ['What is the minimum asphalt overlay thickness required?', 'HMA Asphalt overlay must be a minimum of 1.5 inches. TOM Asphalt overlay must be a minimum of 1.0 inches.'],
+        ],
+        other: 'mat',
+      },
+    };
+    const solutionCards = [
+      { key: 'mat', bullets: ['Installs on existing, milled, or new pavement', 'Continuous waterproof layer', 'Up to 4 to 6 miles per crew day'], src: 'images/img_p5_1.jpg' },
+      { key: 'grid', bullets: ['RG100 and RG200 types', 'Pressure-activated adhesive backing', 'Extends asphalt service life 2–3×'], src: 'images/img_p19_1.jpg' },
+    ].map((c, i) => ({ ...c, name: P[c.key].name, kicker: P[c.key].kicker, intro: P[c.key].tagline, slot: 'rg-solcard-' + c.key, go: () => this.show(c.key, { faq: 0 }), row: { display: 'flex', flexWrap: 'wrap', flexDirection: i % 2 ? 'row-reverse' : 'row' } }));
+    const d = P[view] || P.mat;
+    const prod = { ...d, heroSlot: 'rg-land-hero-' + (P[view] ? view : 'mat'), diagramSlot: 'rg-land-diag-' + (P[view] ? view : 'mat'),
+      stats: d.stats, steps: d.steps.map((t, i) => ({ n: i + 1, t })), otherName: P[d.other].name, goOther: () => this.show(d.other, { faq: 0 }),
+      curType: d.types[this.state.ty || 0] || {},
+      typeTabs: d.types.map((t, i) => { const on = (this.state.ty || 0) === i; return { label: t.code + ' · ' + t.type, go: () => this.setState({ ty: i }),
+        style: { border: '2px solid #E52C1A', background: on ? '#E52C1A' : 'transparent', color: on ? '#fff' : '#2C2E35', padding: '18px 28px', cursor: 'pointer', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, letterSpacing: '0.04em', fontSize: 20 } }; }),
+      goTypeResources: () => this.show('resources', { resP: view }) };
+    const prodFaqs = d.faqs.map(([q, a], i) => { const open = this.state.faq === i; return { q, a, open, sign: open ? '–' : '+', toggle: () => this.setState({ faq: open ? -1 : i }) }; });
+    return { prod, prodFaqs, solutionCards };
+  }
+  contact() {
+    const { form, errors, sent } = this.state;
+    const keys = ['first', 'last', 'company', 'email', 'phone', 'product', 'sector', 'location', 'message'];
+    const val = {}, on = {}, err = {}, box = {};
+    keys.forEach(k => {
+      val[k] = form[k] ?? '';
+      on[k] = (e) => { const v = e.target.value; this.setState(s => ({ form: { ...s.form, [k]: v }, errors: { ...s.errors, [k]: undefined } })); };
+      err[k] = errors[k] || '';
+      box[k] = { width: '100%', padding: '14px 16px', border: '1px solid ' + (errors[k] ? '#E52C1A' : '#CECFD1'), background: '#fff', fontFamily: "'Barlow',sans-serif", fontSize: 16, color: '#2C2E35', outline: 'none', borderRadius: 0 };
+    });
+    const submit = (e) => {
+      e && e.preventDefault && e.preventDefault();
+      const f = this.state.form, er = {};
+      if (!f.first) er.first = 'Required';
+      if (!f.last) er.last = 'Required';
+      if (!f.email) er.email = 'Required'; else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email)) er.email = 'Enter a valid email';
+      if (!f.message) er.message = 'Required';
+      if (Object.keys(er).length) this.setState({ errors: er }); else this.setState({ sent: true, errors: {} });
+    };
+    return { fv: val, fon: on, ferr: err, fbox: box, submit, sent, notSent: !sent, resetForm: () => this.setState({ sent: false, form: {} }),
+      sectorOpts: ['Interstate Highways & High-Volume Corridors', 'Heavy Trucking Routes & Freight Terminals', 'Airports, Taxiways, and Runways', 'Municipal Roads & Urban Transit Ways', 'Commercial Parking Lots & Retail Centers', 'Industrial & Logistics Facilities'] };
+  }
+  kit(id, keys, req) {
+    const f = (this.state.f2 || {})[id] || {}, er = (this.state.e2 || {})[id] || {};
+    const v = {}, on = {}, err = {}, box = {};
+    keys.forEach(k => {
+      v[k] = f[k] ?? (/^agree/.test(k) ? false : '');
+      on[k] = (e) => { const x = e.target.type === 'checkbox' ? e.target.checked : e.target.value; this.setState(s => ({ f2: { ...s.f2, [id]: { ...(s.f2 || {})[id], [k]: x } }, e2: { ...s.e2, [id]: { ...(s.e2 || {})[id], [k]: undefined } } })); };
+      err[k] = er[k] || '';
+      box[k] = { width: '100%', padding: '14px 16px', border: '1px solid ' + (er[k] ? '#E52C1A' : '#CECFD1'), background: '#fff', fontFamily: "'Barlow',sans-serif", fontSize: 16, color: '#2C2E35', outline: 'none', borderRadius: 0 };
+    });
+    const submit = (e) => {
+      e && e.preventDefault && e.preventDefault();
+      const cur = (this.state.f2 || {})[id] || {}, x = {};
+      req.forEach(k => { if (!cur[k]) x[k] = /^agree/.test(k) ? 'Please confirm to continue' : 'Required'; });
+      keys.filter(k => /email/.test(k)).forEach(k => { if (cur[k] && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cur[k])) x[k] = 'Enter a valid email'; });
+      if (Object.keys(x).length) this.setState(s => ({ e2: { ...s.e2, [id]: x } })); else this.setState(s => ({ s2: { ...s.s2, [id]: true }, e2: { ...s.e2, [id]: {} } }));
+    };
+    const sent = !!(this.state.s2 || {})[id];
+    return { v, on, err, box, submit, sent, notSent: !sent, reset: () => this.setState(s => ({ s2: { ...s.s2, [id]: false }, f2: { ...s.f2, [id]: {} } })) };
+  }
+  supportVals(view) {
+    const pre = (p, o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [p + k, v]));
+    const l = this.kit('lunch', ["first","last","title","company","phone","email","country","state","city","attending","date","products","notes"], ["first","last","title","company","phone","email","country","attending"]);
+    const c = this.kit('credit', ["company","salesperson","address","products","country","state","city","zip","county","started","maddress","mcity","mstate","mzip","phone","fax","owners","taxid","duns","accounting","email","btype","amount","po","r1","r1email","r1phone","r2","r2email","r2phone","r3","r3email","r3phone","bank","bankphone","bankacct","bankcontact","bankaddr","bankcity","bankstate","bankzip","taxbiz","exall","exsome","agreeTerms","gname","gtitle","agreeGuaranty","agreeSale","pname","sig","stitle"], ["company","address","country","state","city","zip","county","phone","owners","taxid","accounting","email","btype","amount","po","r1","bank","agreeTerms","gname","agreeGuaranty","agreeSale","pname","sig","stitle"]);
+    const cr = {}; ['po', 'exall', 'exsome'].forEach(k => { cr[k + 'Yes'] = c.v[k] === 'Yes'; cr[k + 'No'] = c.v[k] === 'No'; });
+    const on = ['contact', 'credit', 'lunch'].includes(view);
+    return {
+      ...pre('l', l), ...pre('c', c),
+      isLunch: view === 'lunch', isCredit: view === 'credit',
+      supShown: !!this.state.sup,
+      supOpen: () => this.setState({ sup: true }), supClose: () => this.setState({ sup: false }), supToggle: () => this.setState(s => ({ sup: !s.sup })),
+      supStyle: { background: 'none', border: 0, cursor: 'pointer', font: 'inherit', letterSpacing: 'inherit', textTransform: 'inherit', whiteSpace: 'nowrap', padding: '28px 0 25px', color: on ? '#0E3692' : '#2C2E35', borderBottom: '3px solid ' + (on ? '#E52C1A' : 'transparent') },
+      supItems: [['contact', 'Contact Us'], ['lunch', 'Lunch & Learn'], ['credit', 'Apply for Credit']].map(([k, label]) => ({
+        label, go: () => { this.setState({ sup: false }); this.show(k); },
+        style: { background: view === k ? '#ECECED' : '#fff', border: 0, borderBottom: '1px solid #ECECED', textAlign: 'left', padding: '16px 20px', cursor: 'pointer', font: 'inherit', letterSpacing: 'inherit', textTransform: 'inherit', whiteSpace: 'nowrap', color: view === k ? '#E52C1A' : '#2C2E35' },
+      })),
+      cr, lunchRef: this.lunchRef || (this.lunchRef = React.createRef()),
+      toLunchForm: () => { const el = this.lunchRef && this.lunchRef.current; if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 100, behavior: 'smooth' }); },
+      showSale: !!this.state.sale, saleLabel: this.state.sale ? 'Hide full Terms & General Conditions of Sale' : 'Show full Terms & General Conditions of Sale',
+      toggleSale: () => this.setState(s => ({ sale: !s.sale })),
+      lunchFaq: [
+        { n: '01', t: 'Who Can Participate?', d: "Engineers, designers, and anyone looking to learn more about IFI's geosynthetic products can participate — including anyone who would like to continue their education and earn Professional Development Hours (PDHs)." },
+        { n: '02', t: 'When Can I Schedule an Event?', d: 'Programs are typically scheduled over the lunch hour, but exceptions can be made for breakfast or dinner, depending on what works best for your company.' },
+        { n: '03', t: 'How Do I Request One?', d: "Complete and submit the Lunch & Learn Request Form. Once we receive your request, we'll contact you and begin working on securing a speaker." },
+      ],
+      creditTerms: [{"b":"","t":"This application is submitted by the undersigned (\"Applicant\") to obtain a credit account with Industrial Fabrics, Inc. All representations are accurate, complete, and truthful to the best of the Applicant's knowledge."},{"b":"","t":"The Applicant authorizes any credit reference listed to disclose to Industrial Fabrics, Inc., orally or in writing, any information pertinent to this application."},{"b":"","t":"If the Applicant is a corporation, the undersigned affirms they are authorized to make this application on the corporation's behalf and to obligate it for any credit extended as a result."},{"b":"","t":"Any Financial Statement submitted with this application, or as later requested, will be accurate, complete, and truthful."},{"b":"","t":"Credit extended is due when billed. Amounts unpaid after thirty (30) days are subject to a finance charge of 1.5% per month (18% annual rate), to the extent permitted by law."},{"b":"","t":"If an unpaid account is placed with an attorney for collection, Applicant agrees to pay an additional twenty-five percent (25%) of principal and interest as attorney's fees, plus court costs."},{"b":"","t":"Industrial Fabrics, Inc. disclaims all warranties, express or implied, including merchantability and fitness for purpose. Materials and equipment are sold \"as is, where as,\" except as expressly stated in a separate written limited warranty."},{"b":"","t":"Venue: for goods sold in Texas, Houston, Harris County, Texas; for all other transactions, East Baton Rouge Parish, Louisiana."},{"b":"","t":"The laws of Louisiana and Texas govern the construction of any transaction between Industrial Fabrics, Inc., Applicant, and Guarantor."},{"b":"","t":"Applicant grants Industrial Fabrics, Inc. a purchase money security interest in all materials and equipment sold, and authorizes it to file a financing statement evidencing that interest."},{"b":"Notice to Applicant: do not sign this agreement until you have read it. You are entitled to a copy of the signed agreement.","t":""}],
+      saleTerms: [{"b":"Quotations:","t":"Price lists and quotations are valid for thirty (30) days and subject to change without notice thereafter. Special-order quotations are firm for acceptance within forty-five (45) days. Accepted Purchase Order pricing is firm for shipment within ninety (90) days, after which unshipped units are subject to invoicing and 5% per month storage charges."},{"b":"Payment Terms:","t":"Purchases other than cash are subject to credit approval. Open account payments are due Net 30 from invoice date. No retainage is allowed. Amounts unpaid after the due date accrue interest at 18% APR, plus collection costs."},{"b":"Deliveries:","t":"Delivery requests should be placed at least 24 working hours in advance. Deliveries are scheduled first-come, first-served."},{"b":"Taxes:","t":"All applicable taxes at time of shipment are paid by Buyer. Buyer is responsible for providing a tax-exemption certificate with its Purchase Order if a project is tax exempt."},{"b":"Transportation:","t":"Transportation costs not included in FOB destination pricing are paid by Buyer. Unloading time is limited to one hour; additional time is billed at $65.00/hour. Buyer or its representative must be present to sign the delivery ticket."},{"b":"Returns:","t":"Returned products are subject to inspection; credit is issued only for standard stock items in resalable condition, less a 25% restocking charge, within ninety (90) days of purchase. No credit is allowed on custom or special-order products."},{"b":"Estimates:","t":"Industrial Fabrics, Inc. assumes no responsibility for the accuracy of Buyer's requirement estimates; Buyer must supply exact order quantities."},{"b":"Special and Custom Orders:","t":"Signed Purchase Orders with exact quantities are required and, once accepted, are not cancelable. Quoted prices are based on estimated quantities; orders for lesser total quantities are subject to price adjustment."},{"b":"Quality and Claims:","t":"Products are guaranteed to conform only to specifications quoted or published at time of shipment. Buyer must inspect products on delivery and note visible damage on the carrier's Bill of Lading. Industrial Fabrics, Inc. must be notified of any dissatisfaction before installation begins; use of the product constitutes acceptance."},{"b":"Force Majeure:","t":"Industrial Fabrics, Inc. is not liable for failure or delay in performance due to causes beyond its control (acts of God, war, strikes, shortages, and similar events), and shall not be liable for incidental or consequential damages under any circumstances."},{"b":"Preliminary Notices:","t":"Buyer agrees to furnish all information Industrial Fabrics, Inc. needs to timely file a Preliminary Notice on any construction project for which it is furnishing labor and/or materials."}],
+    };
+  }
+  projectVals(view) {
+    const P = '(Placeholder)';
+    const list = [
+      { title: 'Reflective Cracking Mitigation', prod: 'mat', location: 'Location ' + P, year: 'Year ' + P, owner: 'Client / Owner ' + P, products: 'RoadGlas® Composite Interlayer',
+        challengeTitle: 'Reflective Cracking & Structural Distress',
+        challenge: 'Reflective cracking remains one of the most critical accelerators of pavement degradation. As subgrade shifts and seasonal thermal contractions stress the asphalt matrix, untreated pavement inevitably yields to debilitating linear cracks.',
+        solution: 'While the standard unreinforced shoulder exhibits prominent structural cracking that migrates directly toward the main roadway, the stress-absorbing properties of the RoadGlas® composite interlayer successfully arrest the crack propagation at the joint line.',
+        imgs: ['images/img_p5_2.jpg', 'images/img_p15_2.jpg', 'images/img_p22_1.jpg', 'images/img_p16_1.jpg'] },
+      { title: 'Case Study Title ' + P, prod: 'grid', location: 'Location ' + P, year: 'Year ' + P, owner: 'Client / Owner ' + P, products: 'RoadGlas® RG200',
+        challengeTitle: 'Challenge Title ' + P,
+        challenge: 'Describe the site challenge, pavement conditions and limitations faced by the client. ' + P,
+        solution: 'Describe the specified RoadGlas® solution, construction methods and quantifiable project benefits. ' + P,
+        imgs: ['images/img_p19_1.jpg', 'images/img_p22_2.jpg', 'images/img_p17_1.jpg', 'images/img_p27_1.jpg'] },
+      { title: 'Case Study Title ' + P, prod: 'mat', location: 'Location ' + P, year: 'Year ' + P, owner: 'Client / Owner ' + P, products: 'ROADGLAS® Paving Mat',
+        challengeTitle: 'Challenge Title ' + P,
+        challenge: 'Describe the site challenge, pavement conditions and limitations faced by the client. ' + P,
+        solution: 'Describe the specified RoadGlas® solution, construction methods and quantifiable project benefits. ' + P,
+        imgs: ['images/img_p6_1.jpg', 'images/img_p6_2.jpg', 'images/img_p16_1.jpg', 'images/img_p5_1.jpg'] },
+    ].map((p, i) => ({ ...p, i, img: p.imgs[0], go: () => this.show('project', { proj: i, gi: 0, ptab: 'c' }) }));
+    const f = this.state.pf || 'all', mode = this.state.pm || 'grid', isList = mode === 'list';
+    const projFilters = [['all', 'All'], ['mat', 'Paving Mat'], ['grid', 'Reinforcement Grid']].map(([k, label]) => ({ label, go: () => this.setState({ pf: k }),
+      style: { border: 0, borderBottom: '3px solid ' + (k === f ? '#E52C1A' : 'transparent'), marginBottom: -1, background: 'none', padding: '22px 18px 20px', cursor: 'pointer', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', fontSize: 17, whiteSpace: 'nowrap', flexShrink: 0, color: k === f ? '#E52C1A' : '#5A5B60' } }));
+    const vb = on => ({ width: 40, height: 40, border: '1px solid ' + (on ? '#E52C1A' : '#CECFD1'), background: on ? '#E52C1A' : '#fff', color: on ? '#fff' : '#5A5B60', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 });
+    const shown = list.filter(p => f === 'all' || p.prod === f).map(p => ({ ...p,
+      card: { border: '1px solid #ECECED', display: 'flex', flexDirection: isList ? 'row' : 'column', flexWrap: 'wrap', cursor: 'pointer', background: '#fff' },
+      media: { position: 'relative', overflow: 'hidden', background: '#ECECED', height: isList ? 'auto' : 230, minHeight: isList ? 200 : 0, flex: isList ? '0 1 340px' : 'none', width: isList ? 'auto' : '100%' } }));
+    const n = list.length, cur = list[Math.min(this.state.proj || 0, n - 1)], gi = (this.state.gi || 0) % cur.imgs.length, m = cur.imgs.length;
+    return {
+      isProject: view === 'project', goProjects: () => this.show('projects'),
+      projFilters, projList: shown, projNone: shown.length === 0,
+      projWrap: isList ? { display: 'grid', gap: 20 } : { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,340px),1fr))', gap: 24 },
+      setGrid: () => this.setState({ pm: 'grid' }), setList: () => this.setState({ pm: 'list' }), gridBtn: vb(!isList), listBtn: vb(isList),
+      pj: { ...cur, main: cur.imgs[gi], counter: (gi + 1) + ' / ' + m,
+        ...(() => { const pt = this.state.ptab || 'c'; return {
+          tabTitle: pt === 'c' ? cur.challengeTitle : 'RoadGlas® Engineered Solution', tabText: pt === 'c' ? cur.challenge : cur.solution,
+          tabs: [['c', "Client's Challenge"], ['s', 'RoadGlas® Solution']].map(([k, label]) => ({ label, go: () => this.setState({ ptab: k }),
+            style: { border: '2px solid #E52C1A', background: k === pt ? '#E52C1A' : 'transparent', color: k === pt ? '#fff' : '#2C2E35', padding: '18px 28px', cursor: 'pointer', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, letterSpacing: '0.04em', fontSize: 20 } })) }; })(),
+        prevImg: () => this.setState({ gi: (gi - 1 + m) % m }), nextImg: () => this.setState({ gi: (gi + 1) % m }),
+        thumbs: cur.imgs.map((src, k) => ({ src, go: () => this.setState({ gi: k }), style: { position: 'relative', aspectRatio: '1 / 1', border: 0, padding: 0, cursor: 'pointer', overflow: 'hidden', background: '#ECECED', outline: k === gi ? '3px solid #E52C1A' : 'none', outlineOffset: -3, opacity: k === gi ? 1 : 0.7 } })) },
+    };
+  }
+  resources() {
+    const cur = this.state.res;
+    const tabs = [['downloads', 'Downloads'], ['datasheets', 'Technical Datasheets'], ['webinars', 'Webinars'], ['videos', 'Videos'], ['blog', 'Blog Posts'], ['notes', 'Technical Notes']].map(([k, label]) => ({
+      label, go: () => this.setState({ res: k }),
+      style: { border: 0, borderBottom: '3px solid ' + (k === cur ? '#E52C1A' : 'transparent'), marginBottom: -1, background: 'none', padding: '26px 18px 24px', cursor: 'pointer', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', fontSize: 17, whiteSpace: 'nowrap', flexShrink: 0, color: k === cur ? '#E52C1A' : '#5A5B60' },
+    }));
+    const defs = [
+      ['mat', 'Data Sheet', 'Product Data Sheet', 'ROADGLAS® Paving Mat properties and coating test method.', 'images/img_p5_1.jpg'],
+      ['mat', 'Application Guide', 'Product Application Guide', 'Tack coat selection and application rates for existing, milled and new surfaces.', 'images/img_p6_2.jpg'],
+      ['mat', 'Installation', 'Installation Procedures', 'Surface preparation, tack coat and method of placement.', 'images/img_p15_2.jpg'],
+      ['mat', 'Q&A', 'Installation Mat Q&A', 'Construction traffic, daily production, repairs and rain.', 'images/img_p16_1.jpg'],
+      ['mat', 'Specification', 'Project Specification', 'Description, materials, installation, measurement and payment.', 'images/img_p6_1.jpg'],
+      ['grid', 'Data Sheet', 'Product Data Sheet', 'RoadGlas® RG100 and RG200 properties per ASTM D6637.', 'images/img_p19_1.jpg'],
+      ['grid', 'Application Guide', 'Product Application Guide', 'Tack coat rates and recommended hot applied track free tack coats.', 'images/img_p17_1.jpg'],
+      ['grid', 'Installation', 'Installation Procedures', 'Preparing the surface, tack coat and grid placement.', 'images/img_p22_1.jpg'],
+      ['grid', 'Q&A', 'Installation Grid Q&A', 'Traffic, daily production, repairs and minimum overlay thickness.', 'images/img_p27_1.jpg'],
+      ['grid', 'Specification', 'Project Specification', 'Materials, equipment, construction, measurement and payment.', 'images/img_p26_1-upright.jpg'],
+    ];
+    const pick = { downloads: () => true, datasheets: d => d[1] === 'Data Sheet', notes: d => d[1] !== 'Data Sheet' }[cur] || (() => false);
+    const cp = this.state.resP || 'all';
+    const products = [['all', 'All Products', 'images/img_p0_1.jpg'], ['mat', 'ROADGLAS® Paving Mat', 'images/img_p5_1.jpg'], ['grid', 'ROADGLAS® Reinforcement Grid', 'images/img_p19_1.jpg']].map(([k, label, src]) => {
+      const on = k === cp, n = defs.filter(d => k === 'all' || d[0] === k).length;
+      return {
+        label, src, count: n + ' documents', go: () => this.setState({ resP: k }),
+        style: { position: 'relative', overflow: 'hidden', border: 0, outline: on ? '3px solid #E52C1A' : '0', outlineOffset: -3, background: '#2C2E35', minHeight: 150, padding: '24px 24px 28px', cursor: 'pointer', display: 'flex', alignItems: 'flex-end', opacity: on ? 1 : 0.85, transition: 'opacity .2s' },
+        bar: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 6, background: on ? '#E52C1A' : 'transparent' },
+      };
+    });
+    const resourceList = defs.filter(d => cp === 'all' || d[0] === cp).filter(pick).map(([p, type, title, text, src], i) => ({
+      type, title, text, src, product: p === 'mat' ? 'ROADGLAS® Paving Mat' : 'ROADGLAS® Reinforcement Grid', slot: 'rg-res-' + p + '-' + type.replace(/\W/g, ''),
+    }));
+    return { resProducts: products, resPTitle: ({ all: 'All Products', mat: 'Paving Mat', grid: 'Reinforcement Grid' })[cp], resTabs: tabs, resourceList, resCount: resourceList.length, resEmpty: resourceList.length === 0, resEmptyTitle: ({ webinars: 'Webinars coming soon', videos: 'Videos coming soon', blog: 'Blog posts coming soon' })[cur] || 'Coming soon' };
+  }
+  renderVals() {
+    const { view, slide, app, sel } = this.state;
+    const nav = [['home', 'Home'], ['solutions', 'Solutions'], ['applications', 'Applications'], ['projects', 'Project Highlights'], ['resources', 'Resources']].map(([k, label]) => ({
+      label, go: () => this.show(k),
+      style: { background: 'none', border: 0, cursor: 'pointer', font: 'inherit', letterSpacing: 'inherit', textTransform: 'inherit', whiteSpace: 'nowrap', padding: '28px 0 25px', color: (view === k || (k === 'projects' && view === 'project') || (k === 'solutions' && (view === 'mat' || view === 'grid'))) ? '#0E3692' : '#2C2E35', borderBottom: '3px solid ' + ((view === k || (k === 'projects' && view === 'project') || (k === 'solutions' && (view === 'mat' || view === 'grid'))) ? '#E52C1A' : 'transparent') },
+    }));
+    const slides = [
+      { eyebrow: 'High-Performance Fiberglass Reinforcement', title: 'Engineered to Perform.', text: 'Reinforcement solutions that extend pavement life and maximize value.' },
+      { eyebrow: 'Why Stop at Mill & Fill?', title: 'Enhance Pavement Life', text: 'Interlayer design solutions that provide a more economical and durable alternative to thick asphalt overlays.' },
+      { eyebrow: 'Proven Performance', title: '300% Extensions in Maintenance Cycles', text: 'Backed by roughly 50 to 60 years of proven field performance.' },
+    ].map((s, i) => ({ ...s, src: ['images/img_p15_1.jpg','images/img_p22_1.jpg','images/img_p2_1.jpg'][i], slot: 'rg-hero-' + (i + 1), ph: 'Hero photo ' + (i + 1), wrap: { position: 'absolute', inset: 0, opacity: i === slide ? 1 : 0, transition: 'opacity 700ms', pointerEvents: i === slide ? 'auto' : 'none', zIndex: i === slide ? 2 : 1 } }));
+    const dots = [0, 1, 2].map(i => ({ go: () => this.setState({ slide: i }), style: { width: i === slide ? 36 : 12, height: 12, border: 0, cursor: 'pointer', background: i === slide ? '#E52C1A' : 'rgba(255,255,255,0.6)', transition: 'width 300ms' } }));
+    const products = [
+      { name: 'ROADGLAS® Paving Mat', text: 'A hybrid geosynthetic that integrates fiberglass mesh within a high-performance polyester mat to seal the pavement and delay reflective cracking.', src: 'images/img_p5_1.jpg', go: () => this.show('mat', { faq: 0 }), slot: 'rg-prod-mat', ph: 'Paving Mat product shot' },
+      { name: 'ROADGLAS® Reinforcement Grid', text: 'Fiberglass strands coated with an elastomeric polymer and pressure-activated adhesive. Extends the service life of asphalt two to three times longer.', src: 'images/img_p19_1.jpg', go: () => this.show('grid', { faq: 0 }), slot: 'rg-prod-grid', ph: 'Reinforcement Grid product shot' },
+    ];
+    const appDefs = [
+      ['Highways', 'Interstate Highways & High-Volume Corridors', 'Transportation authorities integrated fiberglass reinforcement into master specifications for high-volume interstate highways.'],
+      ['Trucking', 'Heavy Trucking Routes & Freight Terminals', 'High tensile strength fiberglass resists fatigue cracking, severe rutting, shoving, and traffic-induced mechanical stress. Ideal for heavy truck routes.'],
+      ['Airports', 'Airports, Taxiways, and Runways', 'Fiberglass reinforcement is part of master specifications for commercial airports.'],
+      ['Municipal', 'Municipal Roads & Urban Transit Ways', 'Fewer cracks and minimal pavement repairs mean fewer lane closures and fewer commuter complaints.'],
+      ['Parking', 'Commercial Parking Lots & Retail Centers', 'Achieves far more years of service from the exact same overlay investment.'],
+      ['Industrial', 'Industrial & Logistics Facilities', 'Strengthens existing structures from within rather than completely removing and rebuilding them.'],
+    ];
+    const apps = appDefs.map(([short, name, text], i) => ({
+      short, name, text, src: ['images/img_p15_2.jpg','images/img_p2_1.jpg','images/img_p22_1.jpg','images/img_p16_1.jpg','images/img_p6_1.jpg','images/img_p27_1.jpg'][i], slot: 'rg-app-' + (i + 1), ph: 'Photo: ' + name,
+      go: () => this.show('applications', { app: i }),
+      tab: { border: '2px solid #0E3692', padding: '10px 18px', cursor: 'pointer', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', fontSize: 15, background: i === app ? '#0E3692' : '#fff', color: i === app ? '#fff' : '#0E3692' },
+    }));
+    const whys = ['Extends pavement life', 'Reduces cracking', 'Lowers lifecycle costs', 'Delays reconstruction', 'Reduces disruptions', 'Manufactured in the USA'];
+    const filterDefs = [['moisture', 'Moisture Barrier'], ['milled', 'Milled Surfaces'], ['joints', 'Transverse & Longitudinal Joints'], ['adhesive', 'Self-Adhesive Backing']];
+    const filters = filterDefs.map(([k, label]) => {
+      const on = sel.includes(k);
+      return { label, check: on ? '✓' : '', toggle: () => this.setState(s => ({ sel: on ? s.sel.filter(x => x !== k) : [...s.sel, k] })), box: { flex: 'none', width: 20, height: 20, border: '2px solid #0E3692', background: on ? '#0E3692' : '#fff', color: '#fff', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' } };
+    });
+    const solutionList = [
+      { kicker: 'Waterproofing Reinforcement Mat', name: 'ROADGLAS® Paving Mat', text: 'Installs on existing, milled, or new pavement surfaces. Asphalt binder saturates the mat to form a continuous waterproof layer.', tags: ['moisture', 'milled'], src: 'images/img_p5_1.jpg' },
+      { kicker: 'Reinforcement Grid · Type I', name: 'RoadGlas® RG100', text: 'Placement over entire width of roadway.', tags: ['adhesive'], src: 'images/img_p19_1.jpg' },
+      { kicker: 'Reinforcement Grid · Type II', name: 'RoadGlas® RG200', text: 'Placement over entire width of roadway, transverse and longitudinal joints.', tags: ['adhesive', 'joints'], src: 'images/img_p27_1.jpg' },
+    ].filter(p => sel.every(k => p.tags.includes(k))).map(p => ({ ...p, slot: 'rg-sol-' + p.name.replace(/\W/g, ''), ph: p.name + ' product shot' }));
+    return {
+      ...this.resources(),
+      ...this.projectVals(view),
+      ...this.supportVals(view),
+      ...this.contact(),
+      ...this.productData(),
+      homeApps: apps.slice(0, 3),
+      benefits: [
+        ['Extends Pavement Life', 'Defers major deterioration for years compared to standard unreinforced overlays, significantly protecting the initial asset investment.'],
+        ['Reduces Cracking', 'Acts as a robust barrier against reflective cracks reappearing from old pavement below. Fewer ongoing surface repairs and reduced commuter complaints.'],
+        ['Lowers Lifecycle Costs', 'Higher initial installation cost is heavily offset by reduced total ownership costs over the lifecycle.'],
+        ['Delays Reconstruction', 'Reinforced overlays extend existing structures’ useful life to postpone reconstruction for years.'],
+        ['Heavy Traffic Performance', 'High tensile strength fiberglass resists fatigue cracking, severe rutting, shoving, and traffic-induced mechanical stress. Ideal for heavy truck routes.'],
+        ['Reduces Disruptions', 'Fewer lane closures, traffic bottlenecks, and business/transit downtime. Lower overall maintenance labor costs and public inconvenience.'],
+        ['Maximizes ROI', 'Achieves far more years of service from the exact same overlay investment, maximizing the value and efficiency of each paving cycle.'],
+        ['Sustainable Preservation', 'Strengthens existing structures from within rather than completely removing and rebuilding them, with significantly faster project completion times.'],
+        ['Proven Technology', 'Successfully deployed for decades across demanding civil applications, giving highway engineers and specifiers confidence in long-term performance.'],
+        ['Contractor Advantage', 'Offers clear market differentiation, enabling contractors to confidently bid longer warranties and reduce costly callbacks from premature cracking.'],
+      ].map(([title, text], i) => ({ num: String(i + 1).padStart(2, '0'), title, text })),
+      coating: [
+        { n: '01', t: 'Thermal Activation', d: 'Specially formulated to melt with the heat of asphalts, promoting increased bond strength between asphalt layers.' },
+        { n: '02', t: 'Strand Protection', d: 'Shields vital fiberglass reinforcement strands from damage during the installation process.' },
+        { n: '03', t: 'Superior Waterproofing', d: 'Delivers water resistance against moisture infiltration to the sub-base.' },
+      ],
+      ...(() => {
+        const S = [
+          { invest: ['Resurfacing projects on interstates and multi-lane corridors where the existing base is structurally sound.', 'Overlays where reflective cracking from old joints and cracks is the main mode of distress.', 'Corridors where lane closures are costly and longer maintenance cycles reduce traffic disruption.', 'Projects written to DOT master specifications that call for fiberglass reinforcement interlayers.'],
+            triggers: ['Overlay thickness is limited by bridge clearances, guardrails or curb heights.', 'Existing pavement shows widespread transverse and longitudinal cracking.', 'The corridor carries sustained high-volume and heavy-axle traffic.'] },
+          { invest: ['Truck routes and freight terminals where repeated heavy loads cause fatigue cracking.', 'Pavements prone to rutting and shoving under slow-moving or braking trucks.', 'Yards and access roads where a longer overlay life lowers total maintenance cost.', 'Facilities that cannot afford extended shutdowns for full-depth reconstruction.'],
+            triggers: ['Severe fatigue or alligator cracking in wheel paths.', 'Rutting and shoving at turning, stopping and loading areas.', 'Traffic made up mostly of loaded trucks and trailers.'] },
+          { invest: ['Runway, taxiway and apron rehabilitation where the existing base remains sound.', 'Airfield pavements where reflective cracking creates debris and maintenance risk.', 'Projects where short closure windows favor fast installation.', 'Commercial airports with master specifications that include fiberglass reinforcement.'],
+            triggers: ['Overlay thickness is constrained by grades and existing elevations.', 'Cracking in the old pavement threatens to reflect through a new overlay.', 'Pavement is subject to heavy aircraft loads and thermal stress.'] },
+          { invest: ['City streets and transit corridors with sound bases and recurring surface cracking.', 'Routes where fewer repairs mean fewer lane closures and commuter complaints.', 'Overlays where curb and gutter heights limit how much asphalt can be added.', 'Agencies looking to stretch preservation budgets across more lane miles.'],
+            triggers: ['Overlay thickness is limited by curbs, gutters, driveways and utility covers.', 'Reflective cracking returns quickly after standard mill and fill.', 'Bus and transit routes carry repeated heavy loads.'] },
+          { invest: ['Parking lots and retail centers where the existing base is still in good condition.', 'Surfaces where water infiltration through cracks is damaging the sub-base.', 'Owners who want more years of service from the same overlay investment.', 'Sites where keeping lots open during work matters to tenants and customers.'],
+            triggers: ['Overlay thickness is limited by curbs, drains and building entrances.', 'Cracking allows water to reach and weaken the sub-base.', 'Delivery and drive lanes see regular truck traffic.'] },
+          { invest: ['Industrial and logistics sites where existing pavement can be strengthened instead of removed.', 'Distribution yards with constant heavy equipment and truck movement.', 'Facilities where reconstruction downtime would interrupt operations.', 'Owners planning long-term pavement budgets across large paved areas.'],
+            triggers: ['Fatigue cracking and surface failure under heavy equipment.', 'Water infiltration is softening the pavement structure.', 'Operations cannot shut down for full-depth reconstruction.'] },
+        ][app] || {};
+        return { invest: S.invest || [], triggers: S.triggers || [] };
+      })(),
+      showcase: [
+        { t: 'Stress Absorption', d: 'Dissipates heavy traffic loads and thermal strains before compromising the surface overlay.' },
+        { t: 'Moisture Barrier', d: 'Forms a highly impermeable layer that prevents surface water intrusion into vulnerable subbases.' },
+        { t: 'Rapid Installation', d: 'Optimized structure allows for direct application and fast, continuous paving rollouts.' },
+        { t: 'Extended Lifespan', d: 'Extends pavement maintenance cycles by up to 300%, cutting lifetime costs.' },
+      ],
+      nav, slides, dots, products, apps, whys, filters, solutionList, app: apps[app],
+      noMatch: solutionList.length === 0,
+      isHome: view === 'home', isSolutions: view === 'solutions', isProduct: view === 'mat' || view === 'grid', isApps: view === 'applications', isProjects: view === 'projects', isResources: view === 'resources', isContact: view === 'contact',
+      goHome: () => this.show('home'), goSolutions: () => this.show('solutions'), goResources: () => this.show('resources'), goApps: () => this.show('applications'),
+      goContact: () => this.show('contact'),
+      showCta: !['contact', 'home', 'credit', 'lunch'].includes(view),
+      cta: ({
+        home: { eyebrow: 'Get Started', title: 'Ready to extend the life of your pavement?', text: 'Our team can help you select the right RoadGlas® product, review specifications and plan your installation.', btn: 'Contact Us' },
+        solutions: { eyebrow: 'Need Help Choosing?', title: 'Not sure which RoadGlas® solution fits your project?', text: 'Tell us about your pavement condition, traffic and overlay plans and we will recommend the right product.', btn: 'Talk to Our Team' },
+        mat: { eyebrow: 'Specify the Paving Mat', title: 'Seal and reinforce your next overlay', text: 'Contact us for specifications, tack coat guidance and installation support for ROADGLAS® Paving Mat.', btn: 'Request Specs' },
+        grid: { eyebrow: 'Specify the Reinforcement Grid', title: 'Add a hidden layer of strength to your asphalt', text: 'Contact us for specifications, pricing and installation support for ROADGLAS® Reinforcement Grid.', btn: 'Request Specs' },
+        applications: { eyebrow: 'Your Application', title: 'Have a road, runway or lot that needs reinforcement?', text: 'Share your project details and we will help you match RoadGlas® to your application.', btn: 'Discuss Your Project' },
+        projects: { eyebrow: 'Start Your Project', title: 'Get results like these on your pavement', text: 'Talk with us about how RoadGlas® can reduce cracking and extend maintenance cycles on your next job.', btn: 'Contact Us' },
+        project: { eyebrow: 'Start Your Project', title: 'Get results like these on your pavement', text: 'Talk with us about how RoadGlas® can reduce cracking and extend maintenance cycles on your next job.', btn: 'Contact Us' },
+        resources: { eyebrow: 'Can\'t Find a Document?', title: 'Request data sheets, specs or installation guides', text: 'Let us know what you need and our team will send the right documents for your project.', btn: 'Request Documents' },
+      })[view] || { eyebrow: 'Get in Touch', title: 'Talk with the RoadGlas® team', text: 'We are ready to help with your next pavement project.', btn: 'Contact Us' },
+      ...(() => { const pv = this.benPV(), max = 10 - pv, b = Math.min(this.state.ben || 0, max);
+        return {
+          benTrack: { display: 'flex', gap: 22, transform: 'translateX(calc(' + (-b) + ' * (100% + 22px) / ' + pv + '))', transition: 'transform 0.6s cubic-bezier(.4,0,.2,1)' },
+          benCard: { flex: '0 0 calc((100% - ' + (pv - 1) * 22 + 'px) / ' + pv + ')', minWidth: 0, borderTop: '4px solid #0E3692', padding: '24px 4px 6px', display: 'flex', flexDirection: 'column', gap: 10 },
+          benDots: Array.from({ length: max + 1 }, (_, i) => ({ go: () => this.setState({ ben: i }), style: { width: i === b ? 36 : 12, height: 12, border: 0, padding: 0, cursor: 'pointer', background: i === b ? '#E52C1A' : '#D3D4D8', transition: 'width 0.3s' } })),
+          benPrev: () => this.benStep(-1), benNext: () => this.benStep(1),
+          benPause: () => { this.bp = true; }, benResume: () => { this.bp = false; },
+        }; })(),
+      clear: () => this.setState({ sel: [] }),
+    };
+  }
+}
+</script>
+</body>
+</html>
