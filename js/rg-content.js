@@ -105,14 +105,14 @@
   });
   var stories = RGE.store({
     name: 'stories', path: 'stories',
-    toModel: function (r) { var x = storyX(r); return { id: r.id, slug: r.slug, title: r.title || '', location: r.location || '', year: x.year || '', owner: r.application || '', products: r.products_used || '', prod: normProd(x.prod || 'other'), cTitle: x.challengeTitle || '', challenge: r.challenge_text || '', solution: r.solution_text || '', images: (x.images && x.images.length ? x.images : (r.hero_image_url ? [r.hero_image_url] : [])).slice() }; },
+    toModel: function (r) { var x = storyX(r); return { id: r.id, slug: r.slug, title: r.title || '', location: r.location || '', year: x.year || '', owner: r.application || '', products: r.products_used || '', prod: normProd(x.prod || 'other'), cTitle: x.challengeTitle || '', challenge: r.challenge_text || '', solution: r.solution_text || '', file: x.file || '', images: (x.images && x.images.length ? x.images : (r.hero_image_url ? [r.hero_image_url] : [])).slice() }; },
     toBody: function (m, isNew, st) {
       var imgs = m.images.filter(Boolean);
-      var b = { title: m.title || 'Untitled', location: m.location, application: m.owner, products_used: m.products, hero_image_url: imgs[0] || '', challenge_text: m.challenge, solution_text: m.solution, result_text: JSON.stringify({ year: m.year, prod: m.prod, challengeTitle: m.cTitle, images: imgs }) };
+      var b = { title: m.title || 'Untitled', location: m.location, application: m.owner, products_used: m.products, hero_image_url: imgs[0] || '', challenge_text: m.challenge, solution_text: m.solution, result_text: JSON.stringify({ year: m.year, prod: m.prod, challengeTitle: m.cTitle, file: m.file || '', images: imgs }) };
       if (isNew) { b.slug = uniqueSlug(m.title, st.rows.map(function (x) { return x.slug; })); b.project_benefits = ''; }
       return b;
     },
-    defaults: function () { return { title: 'New project highlight', location: '', year: '', owner: '', products: '', prod: (prodList[0] && prodList[0].key) || 'other', cTitle: '', challenge: '', solution: '', images: [] }; },
+    defaults: function () { return { title: 'New project highlight', location: '', year: '', owner: '', products: '', prod: (prodList[0] && prodList[0].key) || 'other', cTitle: '', challenge: '', solution: '', file: '', images: [] }; },
   });
   var TYPES = ['Data Sheet', 'Application Guide', 'Installation', 'Q&A', 'Specification', 'Technical Note', 'Webinar', 'Video', 'Blog Post'];
   var ress = RGE.store({
@@ -248,6 +248,16 @@
       var pid = (stories.rows.filter(function (x) { return x.slug === slug; })[0] || stories.rows[0]).id, gi = 0, tab = 'c';
       var hero = $('section.rg-75'), host = dropVariants('pj'); if (!hero || !host) return;
       var PRODS = prodSel('other', 'Other');
+      // case study PDF: public = download link (the general brochure until a PDF is uploaded); edit mode = the button itself uploads / replaces the PDF
+      function caseBtn(r) {
+        if (editing()) return '<button type="button" class="rg-145 dyn-h-blue2" style="border:0;cursor:pointer" data-eact="file" data-id="' + esc(r.id) + '" data-field="file" data-accept=".pdf,application/pdf" data-folder="projects" title="Click to ' + (r.file ? 'replace' : 'upload') + ' the case study PDF">Download Case Study ↓</button>';
+        return '<a href="' + esc(r.file || 'roadglas-brochure.pdf') + '" target="_blank" rel="noopener" class="rg-145 dyn-h-blue2">Download Case Study ↓</a>';
+      }
+      function caseStrip(r) {
+        if (!editing()) return '';
+        var name = r.file ? decodeURIComponent(String(r.file).split('?')[0].split('/').pop() || '') : '';
+        return '<div class="app-strip" style="margin:14px 0 0"><span>' + (r.file ? 'Case study PDF: <b>' + esc(name || r.file) + '</b>. Click the red button to replace it.' : 'No case study PDF yet (the button opens the general brochure). Click the red button to upload one.') + '</span>' + (r.file ? '<button type="button" class="dyn-del" data-eact="clear" data-id="' + esc(r.id) + '" data-field="file">Remove PDF</button>' : '') + '</div>';
+      }
       function draw(focus) {
         var r = stories.by(pid); if (!r) { location.href = 'project-highlights.html'; return; }
         var imgs = r.images, n = imgs.length || 1; gi = Math.min(gi, Math.max(0, imgs.length - 1)); document.title = (r.title || 'Project') + ' | RoadGlas® Project Highlights';
@@ -257,7 +267,7 @@
         var strip = editing() ? '<div class="app-strip" style="margin-bottom:18px"><label>Product ' + selectF(r, 'prod', PRODS) + '</label>' + delBtn(r, 'Delete this project') + '<span>Click any text to edit it. Use the photo buttons to change, add or remove photos. Press SAVE in the bar above.</span></div>' : '';
         host.innerHTML = '<section class="rg-79"><div class="rg-131"><div class="rg-188">' + strip + '<div class="rg-189"><img src="' + esc(imgs[gi] || '') + '" alt="' + esc(r.title) + '" class="rg-63">' + (n > 1 ? '<button data-g="prev" aria-label="Previous image" class="rg-190 dyn-h-red">‹</button><button data-g="next" aria-label="Next image" class="rg-191 dyn-h-red">›</button>' : '') + '<span class="rg-192">' + (imgs.length ? gi + 1 : 0) + ' / ' + imgs.length + '</span>' + (imgs.length ? photoBtn(r, 'images', 'projects', 'Change this photo', gi) : '') + '</div>' +
           (imgs.length > 1 || editing() ? '<div class="rg-193">' + thumbs + '</div>' : '') + (editing() ? '<div>' + '<button type="button" class="dyn-add" data-eact="photo-add" data-id="' + esc(r.id) + '" data-field="images" data-folder="projects">＋ Add photo</button></div>' : '') + '</div>' +
-          '<div class="rg-194"><div class="rg-195">Project Highlights</div><h2 class="rg-196"' + ed(r, 'title') + '>' + esc(r.title) + '</h2><div class="rg-197"><span class="rg-198"></span><span' + ed(r, 'location') + '>' + esc(r.location) + '</span></div><div class="rg-199"><div><strong' + ed(r, 'year') + '>' + esc(r.year) + '</strong></div><div><strong>Owner:</strong> <span' + ed(r, 'owner') + '>' + esc(r.owner) + '</span></div><div><strong>Products Used:</strong> <span' + ed(r, 'products') + '>' + esc(r.products) + '</span></div></div><div class="rg-200"><a href="roadglas-brochure.pdf" target="_blank" class="rg-145 dyn-h-blue2">Download Case Study ↓</a></div></div></div></section>' +
+          '<div class="rg-194"><div class="rg-195">Project Highlights</div><h2 class="rg-196"' + ed(r, 'title') + '>' + esc(r.title) + '</h2><div class="rg-197"><span class="rg-198"></span><span' + ed(r, 'location') + '>' + esc(r.location) + '</span></div><div class="rg-199"><div><strong' + ed(r, 'year') + '>' + esc(r.year) + '</strong></div><div><strong>Owner:</strong> <span' + ed(r, 'owner') + '>' + esc(r.owner) + '</span></div><div><strong>Products Used:</strong> <span' + ed(r, 'products') + '>' + esc(r.products) + '</span></div></div><div class="rg-200">' + caseBtn(r) + '</div>' + caseStrip(r) + '</div></div></section>' +
           '<section class="rg-201"><div class="rg-202"><div class="rg-203">' + tabs + '</div><h3 class="rg-204"' + (tab === 'c' ? ed(r, 'cTitle') : '') + '>' + esc(tab === 'c' ? (r.cTitle || (editing() ? '' : "Client's Challenge")) : 'RoadGlas® Engineered Solution') + '</h3><p class="rg-205"' + ed(r, tab === 'c' ? 'challenge' : 'solution') + '>' + esc(tab === 'c' ? r.challenge : r.solution) + '</p></div></section>';
         reapply(); focusEnd(host, focus);
       }

@@ -112,6 +112,7 @@
       if (o.action && o.action(act, b, m) === true) return;
       if (act === 'add') { var n = o.add ? o.add() : st.add(); o.redraw(null, n); }
       else if (act === 'del' && m) { RGDialog.confirm({ title: 'Delete this item?', message: 'Delete "' + (m.title || 'this item') + '"?\nIt is removed from the website when you press SAVE.', ok: 'Delete', danger: true }).then(function (go) { if (!go) return; st.remove(m); if (o.afterDelete) o.afterDelete(m); o.redraw(); }); }
+      else if (act === 'clear' && m) { m[field] = ''; st.mark(m); o.redraw(); }
       else if (act === 'addarr' && m) { m[field].push(''); st.mark(m); o.redraw('[data-arr="' + field + '"][data-i="' + (m[field].length - 1) + '"][data-id="' + m.id + '"]'); }
       else if (act === 'rmarr' && m) { m[field].splice(i, 1); st.mark(m); o.redraw(); }
       else if ((act === 'photo' || act === 'photo-add' || act === 'file') && m) {
