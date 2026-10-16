@@ -22,3 +22,16 @@ html.rg-motion body.cms-editing .rgm,html.rg-motion .rgm[contenteditable="true"]
   html.rg-motion .rgm{opacity:1!important;transform:none!important;clip-path:none!important;filter:none!important;transition:none!important}
   #rgm-bar{display:none}
 }
+
+/* ---- home hero: the active slide's photo eases in with a soft zoom-out, its text slides in one line after another ---- */
+html.rg-motion section[data-screen-label="Home hero"] .rg-15{overflow:hidden}
+@keyframes rgm-kb{from{transform:scale(1.14)}to{transform:scale(1)}}
+@keyframes rgm-slide{from{opacity:0;transform:translateX(-60px);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+@keyframes rgm-rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+html.rg-motion .rgm-slide-on .rg-15 img{animation:rgm-kb 7.5s cubic-bezier(.2,.6,.3,1) both}
+html.rg-motion .rgm-slide-on .rg-19{animation:rgm-slide .8s cubic-bezier(.22,.61,.36,1) .15s both}
+html.rg-motion .rgm-slide-on h1{animation:rgm-slide 1s cubic-bezier(.22,.61,.36,1) .35s both}
+html.rg-motion .rgm-slide-on .rg-17 p{animation:rgm-rise .9s cubic-bezier(.22,.61,.36,1) .7s both}
+html.rg-motion .rgm-slide-on .rg-22{animation:rgm-rise .9s cubic-bezier(.22,.61,.36,1) .95s both}
+html.rg-motion body.cms-editing .rgm-slide-on *{animation:none!important}
+@media (prefers-reduced-motion:reduce){html.rg-motion .rgm-slide-on *{animation:none!important}}

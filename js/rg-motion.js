@@ -57,8 +57,34 @@
     });
   }
 
+  // home hero: mark the visible slide (class restarts the CSS animations each time a slide comes round)
+  function heroMotion() {
+    var hero = document.querySelector('section[data-screen-label="Home hero"]'); if (!hero) return;
+    var slides = [].filter.call(hero.children, function (c) { return c.style && c.style.position === 'absolute'; });
+    function sync() {
+      slides.forEach(function (sl) {
+        var on = sl.style.opacity === '1';
+        if (on && !sl.classList.contains('rgm-slide-on')) { void sl.offsetWidth; sl.classList.add('rgm-slide-on'); }
+        else if (!on) sl.classList.remove('rgm-slide-on');
+      });
+    }
+    function go() {
+      sync();
+      var mo = new MutationObserver(sync);
+      slides.forEach(function (sl) { mo.observe(sl, { attributes: true, attributeFilter: ['style'] }); });
+    }
+    // wait until the page loader has gone so the first slide's entrance is actually seen
+    if (!root.classList.contains('rg-loading') && !document.getElementById('rg-loader')) { go(); return; }
+    slides.forEach(function (sl) { sl.classList.remove('rgm-slide-on'); });
+    var started = false;
+    function begin() { if (started) return; started = true; setTimeout(go, 200); }
+    new MutationObserver(function (m, o) { if (!root.classList.contains('rg-loading')) { o.disconnect(); begin(); } }).observe(root, { attributes: true, attributeFilter: ['class'] });
+    setTimeout(begin, 6000);
+  }
+
   function start() {
     root.classList.add('rg-motion');
+    heroMotion();
     scan();
     // content that appears later (CMS content, tabs, filters): pick up new nodes
     var t = 0;
