@@ -41,6 +41,50 @@
     });
   };
 
+  /* Link / file dialog (same look as the link editor): paste a link address OR upload a file.
+   * RGE.fileLink({ title, url, accept, folder, hint }) -> Promise<{ url } | { clear: true } | null> */
+  RGE.fileLink = function (o) {
+    return new Promise(function (resolve) {
+      var old = document.getElementById('cms-linked'); if (old) old.remove();
+      var esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+      var nameOf = function (u) { try { return decodeURIComponent(String(u).split('?')[0].split('/').pop() || ''); } catch (e) { return String(u); } };
+      var m = document.createElement('div'); m.id = 'cms-linked'; m.className = 'cms-filelink';
+      m.innerHTML = '<div class="card" role="dialog" aria-modal="true"><div class="hd"><h3>' + esc(o.title || 'Edit link') + '</h3><button type="button" class="x" aria-label="Close">×</button></div><div class="bd">' +
+        '<label><span>Link address</span><input type="text" id="fl-url" value="' + esc(o.url || '') + '" placeholder="https://… (a web page or a PDF link)"></label>' +
+        '<div class="fl-or"><i></i><b>or</b><i></i></div>' +
+        '<div class="fl-up"><button type="button" class="fl-btn">⬆ Upload a file' + (o.accept && /pdf/i.test(o.accept) ? ' (PDF)' : '') + '</button><span class="fl-name" id="fl-name">' + (o.url ? 'Current: ' + esc(nameOf(o.url)) : 'No file chosen') + '</span></div>' +
+        (o.hint ? '<p class="note">' + esc(o.hint) + '</p>' : '') +
+        '<div class="err" id="fl-err" role="alert"></div></div><div class="ft">' + (o.url ? '<button type="button" class="rm">Remove</button>' : '') + '<button type="button" class="no">Cancel</button><button type="button" class="yes">Apply</button></div></div>';
+      document.body.appendChild(m);
+      var url = m.querySelector('#fl-url'), nm = m.querySelector('#fl-name'), err = m.querySelector('#fl-err'), up = m.querySelector('.fl-btn'), busy = false;
+      url.focus(); url.select();
+      var close = function (v) { document.removeEventListener('keydown', key, true); m.remove(); resolve(v); };
+      function key(e) { if (e.key === 'Escape') { e.stopPropagation(); close(null); } else if (e.key === 'Enter' && !busy && e.target !== up) { e.preventDefault(); apply(); } }
+      document.addEventListener('keydown', key, true);
+      function apply() {
+        var u = url.value.trim();
+        if (busy) { err.textContent = 'Wait until the upload has finished.'; return; }
+        if (!u) { err.textContent = 'Enter a link address or upload a file.'; return; }
+        if (/^\s*javascript:/i.test(u)) { err.textContent = 'This address is not allowed.'; return; }
+        close({ url: u });
+      }
+      up.onclick = function () {
+        err.textContent = '';
+        RGE.pickFile(o.accept || '').then(function (file) {
+          if (!file) return;
+          busy = true; up.disabled = true; nm.textContent = 'Uploading ' + file.name + '…';
+          return RGE.upload(file, o.folder || 'OTHERS').then(function (u) { url.value = u; nm.textContent = 'Uploaded: ' + file.name; })
+            .catch(function (e) { nm.textContent = o.url ? 'Current: ' + nameOf(o.url) : 'No file chosen'; err.textContent = e.message; })
+            .then(function () { busy = false; up.disabled = false; });
+        });
+      };
+      m.querySelector('.x').onclick = function () { close(null); }; m.querySelector('.no').onclick = function () { close(null); };
+      m.querySelector('.yes').onclick = apply;
+      var rm = m.querySelector('.rm'); if (rm) rm.onclick = function () { close({ clear: true }); };
+      m.addEventListener('mousedown', function (e) { if (e.target === m) close(null); });
+    });
+  };
+
   // change history of a list (shown in the dashboard under Change History): one entry per save with the items that were added / updated / deleted
   RGE.history = function (slug, changes) {
     var keys = Object.keys(changes); if (!keys.length) return Promise.resolve(); var snap = {}; keys.forEach(function (k) { snap[k] = { type: 'text', value: changes[k] }; });
@@ -113,6 +157,7 @@
       if (act === 'add') { var n = o.add ? o.add() : st.add(); o.redraw(null, n); }
       else if (act === 'del' && m) { RGDialog.confirm({ title: 'Delete this item?', message: 'Delete "' + (m.title || 'this item') + '"?\nIt is removed from the website when you press SAVE.', ok: 'Delete', danger: true }).then(function (go) { if (!go) return; st.remove(m); if (o.afterDelete) o.afterDelete(m); o.redraw(); }); }
       else if (act === 'clear' && m) { m[field] = ''; st.mark(m); o.redraw(); }
+      else if (act === 'filelink' && m) { RGE.fileLink({ title: b.getAttribute('data-title') || 'Edit link', url: m[field], accept: b.getAttribute('data-accept') || '', folder: b.getAttribute('data-folder') || 'OTHERS', hint: b.getAttribute('data-hint') || '' }).then(function (r) { if (!r) return; m[field] = r.clear ? '' : r.url; st.mark(m); o.redraw(); }); }
       else if (act === 'addarr' && m) { m[field].push(''); st.mark(m); o.redraw('[data-arr="' + field + '"][data-i="' + (m[field].length - 1) + '"][data-id="' + m.id + '"]'); }
       else if (act === 'rmarr' && m) { m[field].splice(i, 1); st.mark(m); o.redraw(); }
       else if ((act === 'photo' || act === 'photo-add' || act === 'file') && m) {

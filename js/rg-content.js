@@ -250,13 +250,13 @@
       var PRODS = prodSel('other', 'Other');
       // case study PDF: public = download link (the general brochure until a PDF is uploaded); edit mode = the button itself uploads / replaces the PDF
       function caseBtn(r) {
-        if (editing()) return '<button type="button" class="rg-145 dyn-h-blue2" style="border:0;cursor:pointer" data-eact="file" data-id="' + esc(r.id) + '" data-field="file" data-accept=".pdf,application/pdf" data-folder="projects" title="Click to ' + (r.file ? 'replace' : 'upload') + ' the case study PDF">Download Case Study ↓</button>';
+        if (editing()) return '<button type="button" class="rg-145 dyn-h-blue2" style="border:0;cursor:pointer" data-eact="filelink" data-id="' + esc(r.id) + '" data-field="file" data-title="Case study" data-hint="This is what the Download Case Study button opens. Without one it opens the general brochure." data-accept=".pdf,application/pdf" data-folder="projects" title="Click to set the link or upload the case study PDF">Download Case Study ↓</button>';
         return '<a href="' + esc(r.file || 'roadglas-brochure.pdf') + '" target="_blank" rel="noopener" class="rg-145 dyn-h-blue2">Download Case Study ↓</a>';
       }
       function caseStrip(r) {
         if (!editing()) return '';
         var name = r.file ? decodeURIComponent(String(r.file).split('?')[0].split('/').pop() || '') : '';
-        return '<div class="app-strip" style="margin:14px 0 0"><span>' + (r.file ? 'Case study PDF: <b>' + esc(name || r.file) + '</b>. Click the red button to replace it.' : 'No case study PDF yet (the button opens the general brochure). Click the red button to upload one.') + '</span>' + (r.file ? '<button type="button" class="dyn-del" data-eact="clear" data-id="' + esc(r.id) + '" data-field="file">Remove PDF</button>' : '') + '</div>';
+        return '<div class="app-strip" style="margin:14px 0 0"><span>' + (r.file ? 'Case study: <b>' + esc(name || r.file) + '</b>. Click the button to change the link or upload another file.' : 'No case study yet (the button opens the general brochure). Click the button to add a link or upload a PDF.') + '</span>' + (r.file ? '<button type="button" class="dyn-del" data-eact="clear" data-id="' + esc(r.id) + '" data-field="file">Remove</button>' : '') + '</div>';
       }
       function draw(focus) {
         var r = stories.by(pid); if (!r) { location.href = 'project-highlights.html'; return; }

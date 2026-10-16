@@ -167,3 +167,14 @@ body.cms-editing [data-cms-link]:hover{outline:2px dashed #0E3692;outline-offset
 .tp-x:hover{background:#b01f11}
 .tp-add{margin:4px}
 body.cms-editing [data-ttab]{cursor:text}
+
+/* link / file dialog (RGE.fileLink): link address or upload */
+#cms-linked .fl-or{display:flex;align-items:center;gap:12px;color:#6b6c72;font:700 14px/1 'Barlow Condensed',Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase}
+#cms-linked .fl-or i{flex:1;height:1px;background:#E1E2E5}
+#cms-linked .fl-up{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#cms-linked .fl-btn{padding:10px 16px;cursor:pointer;font:700 15px/1 'Barlow Condensed',Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;border:2px dashed #E52C1A;background:#fff;color:#E52C1A}
+#cms-linked .fl-btn:hover:not(:disabled){background:#E52C1A;color:#fff}
+#cms-linked .fl-btn:disabled{opacity:.6;cursor:progress}
+#cms-linked .fl-name{font-size:14px;color:#4a4c53;word-break:break-all;min-width:0;flex:1}
+#cms-linked .ft .rm{margin-right:auto;border-color:#E52C1A;color:#E52C1A}
+#cms-linked .ft .rm:hover{background:#E52C1A;color:#fff}

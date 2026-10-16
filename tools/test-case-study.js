@@ -21,15 +21,34 @@ async function waitFor(fn, label, t) { t = t || 25000; const s = Date.now(); whi
     out.publicLink = d.querySelector('.rg-200 a').getAttribute('href'); out.publicIsAnchor = d.querySelector('.rg-200 a').tagName;
     // edit mode (faked): the button becomes an upload button
     w.RGCMS = Object.assign(w.RGCMS || {}, { editing: true }); d.dispatchEvent(new Event('rg-edit-mode'));
-    const btn = await waitFor(() => d.querySelector('.rg-200 button[data-eact="file"]'), 'edit button');
-    out.editButtonAccept = btn.getAttribute('data-accept'); out.stripBefore = (d.querySelector('.rg-194 .app-strip') || {}).textContent;
+    const btn = await waitFor(() => d.querySelector('.rg-200 button[data-eact="filelink"]'), 'edit button');
+    out.editButtonAction = btn.getAttribute('data-eact'); out.stripBefore = (d.querySelector('.rg-194 .app-strip') || {}).textContent;
     let picked = 0; w.RGE.pickFile = (acc) => { picked++; out.pickAccept = acc; return Promise.resolve(new w.File(['%PDF-1.4'], 'My Case Study.pdf', { type: 'application/pdf' })); };
     w.RGE.upload = (file, folder) => { out.uploadFolder = folder; out.uploadName = file.name; return Promise.resolve('https://files.example.com/projects/My%20Case%20Study.pdf'); };
-    btn.click(); await sleep(400);
+    btn.click(); await sleep(300);
+    out.pickedOnButtonClick = picked;                                   // must stay 0: the dialog opens first, the file picker only on "Upload"
+    const dlg = d.querySelector('#cms-linked'); out.dialogOpen = !!dlg; out.dialogHasUrlInput = !!d.querySelector('#fl-url'); out.dialogHasUpload = !!d.querySelector('.fl-btn');
+    // 1) upload from the dialog
+    d.querySelector('.fl-btn').click(); await sleep(400);
+    out.urlAfterUpload = d.querySelector('#fl-url').value; out.pickedAfterUploadClick = picked; out.nameLabel = d.querySelector('#fl-name').textContent;
+    d.querySelector('#cms-linked .yes').click(); await sleep(300);
+    out.dialogClosed = !d.querySelector('#cms-linked');
     out.stripAfterUpload = (d.querySelector('.rg-194 .app-strip') || {}).textContent; out.removeBtn = !!d.querySelector('[data-eact="clear"]');
     // back to public view: the link must now point to the uploaded PDF
     w.RGCMS.editing = false; d.dispatchEvent(new Event('rg-edit-mode')); await sleep(300);
     out.publicLinkAfter = (d.querySelector('.rg-200 a') || {}).getAttribute && d.querySelector('.rg-200 a').getAttribute('href');
+    // edit again: type a link by hand
+    w.RGCMS.editing = true; d.dispatchEvent(new Event('rg-edit-mode')); await sleep(300);
+    d.querySelector('.rg-200 button[data-eact="filelink"]').click(); await sleep(250);
+    out.urlPrefilled = d.querySelector('#fl-url').value; const u = d.querySelector('#fl-url'); u.value = 'https://example.com/case-study.pdf';
+    d.querySelector('#cms-linked .yes').click(); await sleep(300);
+    w.RGCMS.editing = false; d.dispatchEvent(new Event('rg-edit-mode')); await sleep(300);
+    out.publicLinkTyped = d.querySelector('.rg-200 a').getAttribute('href');
+    // empty address is refused, Cancel changes nothing
+    w.RGCMS.editing = true; d.dispatchEvent(new Event('rg-edit-mode')); await sleep(300);
+    d.querySelector('.rg-200 button[data-eact="filelink"]').click(); await sleep(250);
+    d.querySelector('#fl-url').value = ''; d.querySelector('#cms-linked .yes').click(); await sleep(100); out.emptyError = d.querySelector('#fl-err').textContent; out.stillOpen = !!d.querySelector('#cms-linked');
+    d.querySelector('#cms-linked .no').click(); await sleep(200);
     // edit again and remove
     w.RGCMS.editing = true; d.dispatchEvent(new Event('rg-edit-mode')); await sleep(300);
     d.querySelector('[data-eact="clear"]').click(); await sleep(300);
