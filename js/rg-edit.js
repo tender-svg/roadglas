@@ -111,7 +111,7 @@
       var act = b.getAttribute('data-eact'), id = b.getAttribute('data-id'), m = id ? st.by(id) : null, field = b.getAttribute('data-field'), i = parseInt(b.getAttribute('data-i'), 10);
       if (o.action && o.action(act, b, m) === true) return;
       if (act === 'add') { var n = o.add ? o.add() : st.add(); o.redraw(null, n); }
-      else if (act === 'del' && m) { if (!confirm('Delete "' + (m.title || 'this item') + '"?\nIt is removed from the website when you press SAVE.')) return; st.remove(m); if (o.afterDelete) o.afterDelete(m); o.redraw(); }
+      else if (act === 'del' && m) { RGDialog.confirm({ title: 'Delete this item?', message: 'Delete "' + (m.title || 'this item') + '"?\nIt is removed from the website when you press SAVE.', ok: 'Delete', danger: true }).then(function (go) { if (!go) return; st.remove(m); if (o.afterDelete) o.afterDelete(m); o.redraw(); }); }
       else if (act === 'addarr' && m) { m[field].push(''); st.mark(m); o.redraw('[data-arr="' + field + '"][data-i="' + (m[field].length - 1) + '"][data-id="' + m.id + '"]'); }
       else if (act === 'rmarr' && m) { m[field].splice(i, 1); st.mark(m); o.redraw(); }
       else if ((act === 'photo' || act === 'photo-add' || act === 'file') && m) {
@@ -121,7 +121,7 @@
             if (act === 'photo-add') m[field].push(url); else if (!isNaN(i)) m[field][i] = url; else m[field] = url;
             st.mark(m); o.redraw();
           });
-        }).catch(function (err) { alert(err.message); o.redraw(); });
+        }).catch(function (err) { RGDialog.alert(err.message, { title: 'Upload failed', danger: true }); o.redraw(); });
       }
     });
   };

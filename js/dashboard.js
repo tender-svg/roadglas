@@ -292,9 +292,11 @@
   }
   function remove(key, id) {
     var m = MODS[key], row = (m.rows || []).filter(function (r) { return String(r.id) === String(id); })[0]; if (!row) return;
-    if (!confirm('Delete "' + row.title + '"?\nThis removes it from the website and cannot be undone.')) return;
+    RGDialog.confirm({ title: 'Delete this item?', message: 'Delete "' + row.title + '"?\nThis removes it from the website and cannot be undone.', ok: 'Delete', danger: true }).then(function (go) {
+    if (!go) return;
     pendingFlag = false; api('DELETE', m.url + '/' + id).then(function () { var sub = pendingFlag; if (!sub) logHistory(key, row.title, 'Deleted'); toast(sub ? 'Submitted for admin approval.' : 'Deleted.'); notify(); return loadModule(key); }).then(function () { renderSide(); if (cur === key) renderList(key); })
       .catch(function (e) { toast(e.message, true); });
+    });
   }
 
   /* ---------------------------------------------------------------- settings: change history, email configuration, change password */
@@ -464,7 +466,10 @@
     }).catch(function (e) { $('#apBody').innerHTML = '<div class="db-empty">' + esc(e.message) + '</div>'; });
   }
   function decide(id, ok) {
-    if (!ok && !confirm('Reject this change?\nThe editor\'s change is discarded and will not be published.')) return;
+    if (ok) return decideNow(id, true);
+    RGDialog.confirm({ title: 'Reject this change?', message: 'The editor\'s change is discarded and will not be published.', ok: 'Reject', danger: true }).then(function (go) { if (go) decideNow(id, false); });
+  }
+  function decideNow(id, ok) {
     api('POST', '/api/v2/approvals/' + id + (ok ? '/approve' : '/reject'), ok ? undefined : {}).then(function () { toast(ok ? 'Approved and published.' : 'Change rejected.'); if (ok) { notify(); logHistory('approvals', 'Approved change', 'Published'); } renderApprovals(); })
       .catch(function (e) { toast(e.message, true); });
   }
@@ -511,8 +516,10 @@
     });
   }
   function removeUser(u) {
-    if (!confirm('Remove ' + (u.username || u.email) + '?\nThis permanently removes their account and login access.')) return;
-    api('DELETE', '/api/v2/team-access/users/' + u.id).then(function () { toast('User removed.'); renderTeam(); }).catch(function (e) { toast(e.message, true); });
+    RGDialog.confirm({ title: 'Remove this user?', message: 'Remove ' + (u.username || u.email) + '?\nThis permanently removes their account and login access.', ok: 'Remove', danger: true }).then(function (go) {
+      if (!go) return;
+      api('DELETE', '/api/v2/team-access/users/' + u.id).then(function () { toast('User removed.'); renderTeam(); }).catch(function (e) { toast(e.message, true); });
+    });
   }
   var userById = function (id) { return teamUsers.filter(function (u) { return String(u.id) === String(id); })[0]; };
 

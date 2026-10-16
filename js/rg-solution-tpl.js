@@ -100,7 +100,7 @@
   function act(btn) {
     var a = btn.getAttribute('data-tact'), n = btn.getAttribute('data-tp'), d = state[n], i = +btn.getAttribute('data-ti'), focus = null;
     if (a === 'add') { d.push(NEW[n](d)); if (n === 'types') cur = d.length - 1; focus = '[data-tp="' + n + '"][data-ti="' + (d.length - 1) + '"]'; }
-    else if (a === 'del') { if (!confirm('Remove this item?\nIt is removed from the page when you press SAVE.')) return; d.splice(i, 1); if (n === 'types' && cur >= d.length) cur = Math.max(0, d.length - 1); }
+    else if (a === 'del') { RGDialog.confirm({ title: 'Remove this item?', message: 'It is removed from the page when you press SAVE.', ok: 'Remove', danger: true }).then(function (go) { if (!go) return; d.splice(i, 1); if (n === 'types' && cur >= d.length) cur = Math.max(0, d.length - 1); mark(n); draw(n); }); return; }
     else if (a === 'addrow') { d.rows.push(d.cols.map(function (c, j) { return j === 0 ? 'Row label' : 'Value'; })); }
     else if (a === 'delrow') { d.rows.splice(+btn.getAttribute('data-tr'), 1); }
     else if (a === 'addcol') { d.cols.push('Column ' + (d.cols.length + 1)); d.rows.forEach(function (r) { r.push('Value'); }); }

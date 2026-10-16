@@ -490,7 +490,7 @@
             if (!sel.rangeCount || !box.contains(sel.anchorNode)) { var rg = document.createRange(); rg.selectNodeContents(box); rg.collapse(false); sel.removeAllRanges(); sel.addRange(rg); }
             document.execCommand('insertText', false, '\n\n[image: ' + url + ' | ]\n\n'); b.textContent = '＋ Insert image in the text';
           });
-        }).catch(function (err) { alert(err.message); b.textContent = '＋ Insert image in the text'; });
+        }).catch(function (err) { RGDialog.alert(err.message, { title: 'Upload failed', danger: true }); b.textContent = '＋ Insert image in the text'; });
       });
       ress.onSaved = function () { if (ress.deleted || !ress.by(pid)) { location.href = 'resources.html'; return; } draw(); }; onEditMode(function () { draw(); }); draw();
     }).catch(function () { });
