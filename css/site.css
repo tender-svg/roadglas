@@ -343,3 +343,10 @@ section.rg-26 + section.rg-52{padding-top:36px}
   .rf-main{padding-bottom:18px}
   .rf-totop{margin-top:-30px;padding:0 0 16px}
 }
+/* home: smaller gap between the grey Applications section and "Why choose RoadGlas" (was 100 + 100 px) */
+section.rg-38:has(+ section.rg-26){padding-bottom:52px}
+section.rg-38 + section.rg-26{padding-top:52px}
+@media (max-width:1100px){
+  section.rg-38:has(+ section.rg-26){padding-bottom:36px}
+  section.rg-38 + section.rg-26{padding-top:36px}
+}
