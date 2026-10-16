@@ -7,7 +7,7 @@
   var root = document.documentElement;
   if (document.body.getAttribute('data-page') === 'login') return;
 
-  var SKIP = 'header, footer, nav, #rg-loader, .sl-arr, button, [data-screen-label="Home hero"], .rg-25, [contenteditable]';
+  var SKIP = 'header, footer, nav, #rg-loader, .sl-arr, button, [data-screen-label="Home hero"], .rg-25';
   var seen = new WeakSet();
 
   function skip(el) { return !!el.closest(SKIP); }
@@ -22,9 +22,13 @@
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
 
-  function add(el, cls, delay) {
+  function inView(el) { var r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; }
+
+  // late = content (re)drawn after load (CMS text/cards, tabs, edits): what is already on screen must never hide and re-animate
+  function add(el, cls, delay, late) {
     if (seen.has(el) || skip(el)) return;
     seen.add(el);
+    if (late && inView(el)) return;
     el.classList.add('rgm', cls);
     if (delay) el.style.setProperty('--rgm-d', delay + 'ms');
     io.observe(el);
@@ -37,18 +41,18 @@
     var i = sibs.indexOf(el); return i < 0 ? 0 : Math.min(i, 5) * 110;
   }
 
-  function scan(scope) {
+  function scan(scope, late) {
     scope = scope || document;
-    [].forEach.call(scope.querySelectorAll('h1, h2, h3'), function (el) { add(el, 'rgm-head', 0); });
+    [].forEach.call(scope.querySelectorAll('h1, h2, h3'), function (el) { add(el, 'rgm-head', 0, late); });
     [].forEach.call(scope.querySelectorAll('p, li, form, table'), function (el) {
       if (el.closest('.sl-view, [data-vgroup][hidden]')) { if (!el.closest('.sl-view')) return; }
-      add(el, 'rgm-up', Math.min(stagger(el), 330));
+      add(el, 'rgm-up', Math.min(stagger(el), 330), late);
     });
     [].forEach.call(scope.querySelectorAll('main img, section img, article img'), function (img) {
       if (img.closest('.sl-view')) return;                 // carousels move their own cards
       var frame = img.parentElement, clipped = false;
       try { var o = getComputedStyle(frame).overflow; clipped = o === 'hidden'; } catch (e) {}
-      add(img, 'rgm-img', stagger(img));
+      add(img, 'rgm-img', stagger(img), late);
       if (clipped) img.classList.add('rgm-zoom');
     });
   }
@@ -58,7 +62,7 @@
     scan();
     // content that appears later (CMS content, tabs, filters): pick up new nodes
     var t = 0;
-    new MutationObserver(function () { clearTimeout(t); t = setTimeout(function () { scan(); }, 120); })
+    new MutationObserver(function () { clearTimeout(t); t = setTimeout(function () { scan(document, true); }, 120); })
       .observe(document.body, { childList: true, subtree: true });
 
     // top progress bar

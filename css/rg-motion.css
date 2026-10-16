@@ -16,6 +16,8 @@ html.rg-motion .rgm.rgm-in{opacity:1;transform:none;clip-path:inset(0 0 0 0);fil
 }
 /* thin progress bar at the top while scrolling */
 #rgm-bar{position:fixed;left:0;top:0;height:3px;width:100%;z-index:2147482000;background:#E52C1A;transform:scaleX(0);transform-origin:0 50%;pointer-events:none}
+/* CMS edit mode / any text being edited: always fully visible and still, so typing never flickers or hides */
+html.rg-motion body.cms-editing .rgm,html.rg-motion .rgm[contenteditable="true"],html.rg-motion [contenteditable="true"] .rgm{opacity:1!important;transform:none!important;clip-path:none!important;filter:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){
   html.rg-motion .rgm{opacity:1!important;transform:none!important;clip-path:none!important;filter:none!important;transition:none!important}
   #rgm-bar{display:none}
