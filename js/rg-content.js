@@ -51,6 +51,13 @@
   var PROD_RE = /^\[product:([a-z0-9\-]+)\]\s*/;
   var prodOf = function (d) { var m = PROD_RE.exec(d || ''); return m ? m[1] : 'all'; };
   var textOf = function (d) { return String(d || '').replace(PROD_RE, ''); };
+  var isArt = function (t) { return t === 'Blog Post' || t === 'Webinar'; };
+  // the description holds two texts: the short one (the card on the Resources page) and, for a blog post / webinar, the text of its own page after a line "[page]"
+  var splitDesc = function (text, type) {
+    text = String(text || ''); var m = /(^|\n)[ \t]*\[page\][ \t]*(\n|$)/.exec(text);
+    if (m) return { desc: text.slice(0, m.index).trim(), body: text.slice(m.index + m[0].length).trim() };
+    return isArt(type) ? { desc: '', body: text.trim() } : { desc: text.trim(), body: '' };   // an old blog / webinar has only the page text
+  };
 
   /* ---------- products = the solutions made in the Dashboard (the filters of Project Highlights and Resources, the product selects) ---------- */
   var prodList = [];   // [{ key: slug of the solution, full: its title, name: title without "ROADGLAS® ", image, family }]
@@ -110,9 +117,9 @@
   var TYPES = ['Data Sheet', 'Application Guide', 'Installation', 'Q&A', 'Specification', 'Technical Note', 'Webinar', 'Video', 'Blog Post'];
   var ress = RGE.store({
     name: 'resources', path: 'resources', live: live,
-    toModel: function (r) { return { id: r.id, title: r.title || '', slug: slugOf(r.title), type: r.document_type || 'Data Sheet', product: normProd(prodOf(r.description)), desc: textOf(r.description), file: r.file_url || '', thumb: r.thumbnail_url || '', date: r.published_date || '' }; },
-    toBody: function (m, isNew) { var b = { title: m.title || 'Untitled', document_type: m.type, description: '[product:' + m.product + '] ' + m.desc, file_url: m.file, thumbnail_url: m.thumb, is_active: true }; if (isNew) b.published_date = new Date().toISOString(); return b; },
-    defaults: function () { return { title: 'New resource', type: 'Data Sheet', product: 'all', desc: '', file: '', thumb: '' }; },
+    toModel: function (r) { return { id: r.id, title: r.title || '', slug: slugOf(r.title), type: r.document_type || 'Data Sheet', product: normProd(prodOf(r.description)), desc: splitDesc(textOf(r.description), r.document_type).desc, body: splitDesc(textOf(r.description), r.document_type).body, file: r.file_url || '', thumb: r.thumbnail_url || '', date: r.published_date || '' }; },
+    toBody: function (m, isNew) { var b = { title: m.title || 'Untitled', document_type: m.type, description: '[product:' + m.product + '] ' + m.desc + (m.body && isArt(m.type) ? '\n\n[page]\n\n' + m.body : ''), file_url: m.file, thumbnail_url: m.thumb, is_active: true }; if (isNew) b.published_date = new Date().toISOString(); return b; },
+    defaults: function () { return { title: 'New resource', type: 'Data Sheet', product: 'all', desc: '', body: '', file: '', thumb: '' }; },
   });
 
   /* ---------- shared: replace the shipped variants of a part of the page by one live host ---------- */
@@ -278,21 +285,58 @@
       if (prod !== 'all' && !prodList.some(function (p) { return p.key === prod; })) prod = 'all';
       var TILES = [['all', 'All Products', 'images/img_p0_1.webp']].concat(prodList.map(function (p) { return [p.key, p.full, p.image || 'images/img_p5_1.webp']; }));   // one card per solution
       var PSEL = prodSel('all', 'All products');
+      // search: 2+ letters filter the cards of the current tab and list suggestions from every tab
+      var cardsOf, emptyOf, q = '', sugOpen = false, SEARCH_ICON = '<svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>';
+      var qn = function () { var t = q.trim().toLowerCase(); return t.length >= 2 ? t : ''; };
+      var hay = function (r) { return (String(r.title || '') + ' ' + String(r.desc || '') + ' ' + String(r.type || '') + ' ' + prodFull(r.product)).toLowerCase(); };
+      var hl = function (txt, t) { var i = String(txt).toLowerCase().indexOf(t); if (i < 0) return esc(txt); return esc(txt.slice(0, i)) + '<mark>' + esc(txt.slice(i, i + t.length)) + '</mark>' + esc(txt.slice(i + t.length)); };
+      var getList = function () { var t = qn(); return ress.rows.filter(function (r) { return (prod === 'all' || r.product === prod) && inTab[tab](r) && (!t || hay(r).indexOf(t) >= 0); }); };
+      var sugHtml = function () {
+        var t = qn(); if (!sugOpen || !t) return '';
+        var m = ress.rows.filter(function (r) { return hay(r).indexOf(t) >= 0; });
+        m.sort(function (a, b) { return (String(b.title || '').toLowerCase().indexOf(t) >= 0) - (String(a.title || '').toLowerCase().indexOf(t) >= 0); });
+        if (!m.length) return '<div class="rs-sug"><div class="rs-none">No resources match “' + esc(q.trim()) + '”</div></div>';
+        return '<div class="rs-sug" role="listbox">' + m.slice(0, 6).map(function (r) { return '<button type="button" class="rs-it" role="option" data-sug="' + esc(r.id) + '"><b>' + hl(String(r.title || ''), t) + '</b><span>' + esc(r.type) + ' · ' + esc(prodFull(r.product)) + '</span></button>'; }).join('') + '</div>';
+      };
+      var searchBox = function () { return '<div class="rs-box">' + SEARCH_ICON + '<input type="text" data-rsq value="' + esc(q) + '" placeholder="Search resources…" autocomplete="off" spellcheck="false" aria-label="Search resources"><button type="button" class="rs-x" data-rsx aria-label="Clear search"' + (q ? '' : ' hidden') + '>×</button><div class="rs-sugbox">' + sugHtml() + '</div></div>'; };
       function draw(focus) {
-        var list = ress.rows.filter(function (r) { return (prod === 'all' || r.product === prod) && inTab[tab](r); });
+        var list = getList();
         var tiles = TILES.map(function (t) { var on = t[0] === prod, n = ress.rows.filter(function (r) { return t[0] === 'all' || r.product === t[0]; }).length;
           return '<button data-p="' + t[0] + '" style="position:relative;overflow:hidden;border:0;outline:' + (on ? '3px solid #E52C1A' : '0') + ';outline-offset:-3px;background:#2C2E35;min-height:150px;padding:24px 24px 28px;cursor:pointer;display:flex;align-items:flex-end;opacity:' + (on ? 1 : 0.85) + ';transition:opacity .2s"><img src="' + t[2] + '" alt="" class="rg-63"><span class="rg-219"></span><span class="rg-220"><span class="rg-221">' + n + ' documents</span><span class="rg-222">' + t[1] + '</span></span><span style="position:absolute;left:0;right:0;bottom:0;height:6px;background:' + (on ? '#E52C1A' : 'transparent') + '"></span></button>'; }).join('');
         var tabs = RES_TABS.map(function (t) { var on = t[0] === tab; return '<button data-tab="' + t[0] + '" style="border:0;border-bottom:3px solid ' + (on ? '#E52C1A' : 'transparent') + ';margin-bottom:-1px;background:none;padding:26px 18px 24px;cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;font-size:17px;white-space:nowrap;flex-shrink:0;color:' + (on ? '#E52C1A' : '#5A5B60') + '">' + t[1] + '</button>'; }).join('');
-        var cards = list.map(function (r) { var f = r.file || '', pdf = /\.pdf(\?|$)/i.test(f), has = !!f, own = r.type === 'Blog Post' ? 'blog-' + r.slug + '.html' : r.type === 'Webinar' ? 'webinar-' + r.slug + '.html' : '';
+        cardsOf = function (list) { return list.map(function (r) { var f = r.file || '', pdf = /\.pdf(\?|$)/i.test(f), has = !!f, own = r.type === 'Blog Post' ? 'blog-' + r.slug + '.html' : r.type === 'Webinar' ? 'webinar-' + r.slug + '.html' : '';
           var strip = editing() ? '<div class="app-strip" style="margin:10px 0 0"><label>Type ' + selectF(r, 'type', TYPES.map(function (x) { return [x, x]; })) + '</label><label>Product ' + selectF(r, 'product', PSEL) + '</label><button type="button" class="dyn-add" data-eact="file" data-id="' + esc(r.id) + '" data-field="file" data-folder="resources">⬆ ' + (has ? 'Replace file' : 'Upload file') + '</button><label>or link ' + inputF(r, 'file', 'text', 'https://… or file link') + '</label>' + delBtn(r, 'Delete') + '</div>' : '';
           return '<article class="rg-32"><div class="rg-229"><div class="rg-230"><span class="rg-231">' + esc(r.type) + '</span><span class="rg-232">' + (pdf ? 'PDF' : has ? 'LINK' : '') + '</span></div><div class="rg-183">' + esc(prodFull(r.product)) + '</div><h3 class="rg-233"' + ed(r, 'title') + '>' + esc(r.title) + '</h3>' +
-            ((r.desc || editing()) ? '<p class="rg-36" style="margin:0"' + ed(r, 'desc') + '>' + esc(r.desc) + '</p>' : '') + (own && !r.isNew ? '<a href="' + esc(own) + '" class="rg-234 dyn-h-red-text">' + (r.type === 'Blog Post' ? 'Read article →' : 'View webinar →') + '</a>' : has ? '<a href="' + esc(f) + '" target="_blank" rel="noopener" class="rg-234 dyn-h-red-text">' + (pdf ? 'Download PDF ↓' : 'Open ↗') + '</a>' : '') + strip + '</div></article>'; }).join('');
-        var empty = list.length ? '' : '<div class="rg-225"><h3 class="rg-226">' + ({ webinars: 'Webinars coming soon', videos: 'Videos coming soon', blog: 'Blog posts coming soon' }[tab] || 'Coming soon') + '</h3><p class="rg-227">Contact the RoadGlas® team to request this content or be notified when it is published.</p><button data-href="contact.html" aria-label="Contact Us" class="rg-72 dyn-h-lift"><img src="images/contact-shield.webp" alt="Contact Us" class="rg-73"><span aria-hidden="true" class="rg-74">→</span></button></div>';
+            ((r.desc || editing()) ? '<p class="rg-36" style="margin:0"' + ed(r, 'desc') + '>' + esc(r.desc) + '</p>' : '') + (own && !r.isNew ? '<a href="' + esc(own) + '" class="rg-234 dyn-h-red-text">' + (r.type === 'Blog Post' ? 'Read article →' : 'View webinar →') + '</a>' : has ? '<a href="' + esc(f) + '" target="_blank" rel="noopener" class="rg-234 dyn-h-red-text">' + (pdf ? 'Download PDF ↓' : 'Open ↗') + '</a>' : '') + strip + '</div></article>'; }).join(''); };
+        emptyOf = function (list) { if (list.length) return ''; if (qn()) return '<div class="rg-225"><h3 class="rg-226">No results</h3><p class="rg-227">Nothing in this tab matches “' + esc(q.trim()) + '”. Try another tab or product, or clear the search.</p></div>'; return '<div class="rg-225"><h3 class="rg-226">' + ({ webinars: 'Webinars coming soon', videos: 'Videos coming soon', blog: 'Blog posts coming soon' }[tab] || 'Coming soon') + '</h3><p class="rg-227">Contact the RoadGlas® team to request this content or be notified when it is published.</p><button data-href="contact.html" aria-label="Contact Us" class="rg-72 dyn-h-lift"><img src="images/contact-shield.webp" alt="Contact Us" class="rg-73"><span aria-hidden="true" class="rg-74">→</span></button></div>'; };
+        var cards = cardsOf(list), empty = emptyOf(list);
         host.innerHTML = '<section class="rg-206"><div class="rg-27"><div class="rg-207"><img src="images/img_p0_3.webp" alt="RoadGlas" class="rg-208"><div class="rg-209"><div class="rg-210" data-cms="resources-brochure-eyebrow" data-cms-type="text">Full Brochure</div><h2 class="rg-211" data-cms="resources-brochure-title" data-cms-type="text">Engineered to Perform.</h2><p class="rg-212" data-cms="resources-brochure-text" data-cms-type="text">Reinforcement solutions that extend pavement life and maximize value.</p></div><a href="roadglas-brochure.pdf" target="_blank" class="rg-213 dyn-h-blue2" data-cms="resources-brochure-button" data-cms-type="text">Download PDF ↓</a></div>' +
-          '<div class="rg-214"><div class="rg-215"><div><div class="rg-210" data-cms="resources-browse-eyebrow" data-cms-type="text">Browse by Product</div><h2 class="rg-216">' + esc(prodName(prod)) + '</h2></div></div><div class="rg-218">' + tiles + '</div><div class="rg-223"><div class="rg-224">' + tabs + '</div>' + (editing() ? '<div style="margin:0 0 18px">' + addBtn('New resource') + '</div>' : '') + empty + '<div class="rg-228">' + cards + '</div></div></div></div></section>';
+          '<div class="rg-214"><div class="rg-215"><div><div class="rg-210" data-cms="resources-browse-eyebrow" data-cms-type="text">Browse by Product</div><h2 class="rg-216">' + esc(prodName(prod)) + '</h2></div></div><div class="rg-218">' + tiles + '</div><div class="rg-223"><div class="rs-bar"><div class="rg-224">' + tabs + '</div>' + searchBox() + '</div>' + (editing() ? '<div style="margin:0 0 18px">' + addBtn('New resource') + '</div>' : '') + '<div class="rs-res">' + empty + '<div class="rg-228">' + cards + '</div></div></div></div></div></section>';
         reapply(); focusEnd(host, focus);
       }
-      host.addEventListener('click', function (e) { var p = e.target.closest('[data-p]'), t = e.target.closest('[data-tab]'); if (p) prod = p.getAttribute('data-p'); else if (t) tab = t.getAttribute('data-tab'); else return; draw(); });
+      // typing only refreshes the cards + suggestion list (the rest of the page is not redrawn, so the input keeps focus)
+      function refresh() {
+        var l = getList(), res = $('.rs-res', host), sb = $('.rs-sugbox', host), x = $('[data-rsx]', host);
+        if (res) res.innerHTML = emptyOf(l) + '<div class="rg-228">' + cardsOf(l) + '</div>';
+        if (sb) sb.innerHTML = sugHtml();
+        if (x) x.hidden = !q;
+      }
+      host.addEventListener('input', function (e) { var i = e.target.closest && e.target.closest('[data-rsq]'); if (!i) return; q = i.value; sugOpen = true; refresh(); });
+      host.addEventListener('focusin', function (e) { if (e.target.closest && e.target.closest('[data-rsq]') && qn() && !sugOpen) { sugOpen = true; var sb = $('.rs-sugbox', host); if (sb) sb.innerHTML = sugHtml(); } });
+      host.addEventListener('keydown', function (e) {
+        var i = e.target.closest && e.target.closest('[data-rsq]'); if (!i) return;
+        var items = $$('.rs-it', host), cur = items.findIndex(function (b) { return b.classList.contains('on'); });
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { if (!items.length) return; e.preventDefault(); if (cur >= 0) items[cur].classList.remove('on'); cur = e.key === 'ArrowDown' ? (cur + 1) % items.length : (cur <= 0 ? items.length - 1 : cur - 1); items[cur].classList.add('on'); items[cur].scrollIntoView({ block: 'nearest' }); }
+        else if (e.key === 'Enter') { e.preventDefault(); if (cur >= 0) items[cur].click(); else { sugOpen = false; refresh(); } }
+        else if (e.key === 'Escape') { sugOpen = false; refresh(); }
+      });
+      document.addEventListener('click', function (e) { if (sugOpen && !(e.target.closest && e.target.closest('.rs-box'))) { sugOpen = false; var sb = $('.rs-sugbox', host); if (sb) sb.innerHTML = ''; } });
+      host.addEventListener('click', function (e) {
+        var sg = e.target.closest('[data-sug]'), x = e.target.closest('[data-rsx]');
+        if (sg) { var r = ress.by(sg.getAttribute('data-sug')); if (r) { prod = 'all'; tab = (RES_TABS.filter(function (t) { return inTab[t[0]](r); })[0] || RES_TABS[0])[0]; q = String(r.title || ''); sugOpen = false; draw(); } return; }
+        if (x) { q = ''; sugOpen = false; refresh(); var i = $('[data-rsq]', host); if (i) { i.value = ''; i.focus(); } return; }
+        var p = e.target.closest('[data-p]'), t = e.target.closest('[data-tab]'); if (p) prod = p.getAttribute('data-p'); else if (t) tab = t.getAttribute('data-tab'); else return; sugOpen = false; draw();
+      });
       RGE.bind(host, ress, { redraw: draw, add: function () { return ress.add({ product: prod, type: tabType[tab] }); } });
       ress.onSaved = function () { draw(); }; onEditMode(function () { draw(); }); draw();
     }).catch(function () { });
@@ -380,6 +424,48 @@
   }
 
   // blog posts and webinars: resources of that type, one page each (address = type + title)
+  // the text of a blog post / webinar as typed (plain text) -> paragraphs; a short first line of a block = sub-heading; lines starting with "• " / "- " = a list
+  function fmtArticle(t, cards) {
+    return String(t || '').split(/\n\s*\n/).map(function (blk) {
+      var ls = blk.split('\n').map(function (l) { return l.replace(/\s+$/, ''); }).filter(function (l) { return l.trim(); }), out = '';
+      if (!ls.length) return '';
+      if (ls.length > 1 && ls[0].length <= 70 && !/[.:;!?]$/.test(ls[0].trim()) && !/^\s*([•\-*]|\d+[.)])\s/.test(ls[0]) && !/^\s*\[image:/i.test(ls[0])) { out += '<h3 class="art-h">' + esc(ls.shift().trim()) + '</h3>'; }
+      var para = [], list = [], flush = function () { if (para.length) out += '<p>' + para.join('<br>') + '</p>'; if (list.length) out += '<ul>' + list.join('') + '</ul>'; para = []; list = []; };
+      ls.forEach(function (l) {
+        var im = /^\s*\[image:\s*([^\]|]+?)\s*(?:\|\s*([^\]]*?)\s*)?\]\s*$/i.exec(l);
+        if (im) {   // a picture inside the text: only own images (/images/..., images/...) or https links
+          if (!/^(\/?images\/|\/|https:\/\/)/i.test(im[1]) || /^\s*javascript:/i.test(im[1])) return;
+          flush(); out += '<figure class="art-fig"><img src="' + esc(im[1]) + '" alt="' + esc(im[2] || '') + '" loading="lazy">' + (im[2] ? '<figcaption>' + esc(im[2]) + '</figcaption>' : '') + '</figure>'; return;
+        }
+        var m = /^\s*(?:[•\-*]|\d+[.)])\s+(.*)$/.exec(l); if (m) { if (para.length) { out += '<p>' + para.join('<br>') + '</p>'; para = []; } var tx = m[1], k = cards ? tx.indexOf(':') : -1; list.push('<li>' + (k > 0 && k <= 48 ? '<strong>' + esc(tx.slice(0, k)) + '</strong> ' + esc(tx.slice(k + 1).trim().replace(/^./, function (c) { return c.toUpperCase(); })) : esc(tx)) + '</li>'); } else { if (list.length) { out += '<ul>' + list.join('') + '</ul>'; list = []; } para.push(esc(l.trim())); } });
+      flush(); return out;
+    }).join('');
+  }
+  // the page of a webinar: hero, the text (list = numbered cards) beside a card with the photo + play button, the facts and the register button, and a contact band
+  var insBtn = function () { return editing() ? '<div class="art-ins"><button type="button" class="dyn-add" data-ins-img="1">＋ Insert image in the text</button><span>The picture is put where the cursor is in the text below (or at the end). It is a line like [image: /photo.webp | caption].</span></div>' : ''; };
+  function webinarPage(r, when) {
+    var cover = r.thumb || 'images/img_p5_1.webp', ph = '800 848 4500';
+    var hero = '<section class="rg-75 wb-hero"><img src="' + esc(cover) + '" alt="" class="rg-63"><div class="rg-16"></div><div class="rg-76"><span class="wb-pill"><i></i>Webinar</span><h1 class="rg-154"' + ed(r, 'title') + '>' + esc(r.title) + '</h1><div class="rg-168">' + crumb([['Home', 'index.html'], ['Resources', 'resources.html'], [r.title]]).replace(/class="rg-94"/g, 'class="rg-169 dyn-h-pink"') + '</div>' + (editing() ? '<div style="margin-top:16px;position:relative">' + photoBtn(r, 'thumb', 'resources', 'Cover photo') + '</div>' : '') + '</div></section>';
+    var rows = [['Product', prodFull(r.product)], ['Posted', when], ['Questions?', '<a href="tel:+18008484500">' + ph + '</a>']].filter(function (x) { return x[1]; }).map(function (x) { return '<div><dt>' + x[0] + '</dt><dd>' + (x[0] === 'Questions?' ? x[1] : esc(x[1])) + '</dd></div>'; }).join('');
+    var cta = r.file ? '<a href="' + esc(r.file) + '"' + (/^https?:/i.test(r.file) ? ' target="_blank" rel="noopener"' : '') + ' class="wb-cta">Watch / Register →</a>' : '<a href="contact.html" class="wb-cta">Contact us to register →</a>';
+    var card = '<aside class="wb-side"><div class="wb-card"><div class="wb-img"><img src="' + esc(cover) + '" alt="' + esc(r.title) + '"><span class="wb-play" aria-hidden="true"></span>' + photoBtn(r, 'thumb', 'resources', 'Change photo') + '</div><div class="wb-body"><span class="wb-badge">Webinar</span><dl class="wb-dl">' + rows + '</dl>' + cta + '</div></div></aside>';
+    var text = '<div class="wb-main">' + insBtn() + '<div class="rg-88' + (editing() ? ' ed-multi' : ' art art-cards') + '" style="font-size:18px;line-height:1.8;min-height:60px"' + (editing() ? ' contenteditable="true" spellcheck="false" data-multi="1" data-e="body" data-id="' + esc(r.id) + '"' : '') + '>' + (editing() ? esc(r.body) : fmtArticle(r.body, true)) + '</div></div>';
+    var band = '<section class="rg-342"><div class="rg-343"><img src="' + esc(cover) + '" alt="" class="rg-63"><div class="rg-64"></div><div class="rg-65"><div class="rg-66"><div class="rg-67"><span class="rg-68"></span>Bring it to your team</div><h3 class="rg-69">Want this session for your crew?</h3><p class="rg-344">Contact the RoadGlas® team to be notified of the next session or to schedule one.</p></div><div class="rg-71"><button data-href="contact.html" aria-label="Contact Us" class="rg-72 hv-6"><img src="images/contact-shield.webp" alt="Contact Us" class="rg-73"><span aria-hidden="true" class="rg-74">→</span></button></div></div></div></section>';
+    return hero + '<section class="rg-79"><div class="rg-27 wb-wrap">' + text + card + '</div></section>' + band;
+  }
+  // the page of a blog post: hero, the text (numbered lines = cards) with the cover photo on top, and a side card with the facts + a link to the resources of the product
+  function blogPage(r, when) {
+    var cover = r.thumb || 'images/img_p15_2.webp', words = String(r.body || '').split(/\s+/).filter(Boolean).length, mins = Math.max(1, Math.round(words / 200));
+    var hero = '<section class="rg-75 wb-hero"><img src="' + esc(cover) + '" alt="" class="rg-63"><div class="rg-16"></div><div class="rg-76"><span class="wb-pill"><i></i>Blog Post</span><h1 class="rg-154"' + ed(r, 'title') + '>' + esc(r.title) + '</h1><div class="rg-168">' + crumb([['Home', 'index.html'], ['Resources', 'resources.html'], [r.title]]).replace(/class="rg-94"/g, 'class="rg-169 dyn-h-pink"') + '</div>' +
+      '<div class="bl-meta">' + (when ? esc(when) + ' · ' : '') + mins + ' min read</div>' + (editing() ? '<div style="margin-top:16px;position:relative">' + photoBtn(r, 'thumb', 'resources', 'Cover photo') + '</div>' : '') + '</div></section>';
+    var more = r.product && r.product !== 'all' && r.product !== 'other' ? '<a href="resources.html?prod=' + encodeURIComponent(r.product) + '" class="wb-cta">More about ' + esc(prodName(r.product)) + ' →</a>' : '<a href="resources.html" class="wb-cta">More resources →</a>';
+    var rows = [['Product', prodFull(r.product)], ['Posted', when], ['Reading time', mins + ' min']].filter(function (x) { return x[1]; }).map(function (x) { return '<div><dt>' + x[0] + '</dt><dd>' + esc(x[1]) + '</dd></div>'; }).join('');
+    var side = '<aside class="wb-side"><div class="wb-card"><div class="wb-body"><span class="wb-badge">Blog Post</span><dl class="wb-dl">' + rows + '</dl>' + more + '</div></div>' +
+      '<div class="bl-help"><b>Need specifications or installation support?</b><span>Talk to the RoadGlas® team.</span><a href="contact.html">Contact us →</a></div></aside>';
+    var text = '<div class="wb-main">' + insBtn() + '<figure class="bl-fig"><img src="' + esc(cover) + '" alt="' + esc(r.title) + '">' + photoBtn(r, 'thumb', 'resources', 'Change photo') + '</figure><div class="rg-88' + (editing() ? ' ed-multi' : ' art art-cards') + '" style="font-size:18px;line-height:1.8;min-height:60px"' + (editing() ? ' contenteditable="true" spellcheck="false" data-multi="1" data-e="body" data-id="' + esc(r.id) + '"' : '') + '>' + (editing() ? esc(r.body) : fmtArticle(r.body, true)) + '</div></div>';
+    var band = '<section class="rg-342"><div class="rg-343"><img src="' + esc(cover) + '" alt="" class="rg-63"><div class="rg-64"></div><div class="rg-65"><div class="rg-66"><div class="rg-67"><span class="rg-68"></span>Plan your project</div><h3 class="rg-69">Talk to our team about your overlay</h3><p class="rg-344">Contact us for specifications, tack coat guidance and installation support.</p></div><div class="rg-71"><button data-href="contact.html" aria-label="Contact Us" class="rg-72 hv-6"><img src="images/contact-shield.webp" alt="Contact Us" class="rg-73"><span aria-hidden="true" class="rg-74">→</span></button></div></div></div></section>';
+    return hero + '<section class="rg-79"><div class="rg-27 wb-wrap">' + text + side + '</div></section>' + band;
+  }
   function articleRef(kind) {
     var host = refHost(); if (!host) return; var type = kind === 'blog' ? 'Blog Post' : 'Webinar';
     Promise.all([get('resources'), getProducts()]).then(function (res) {
@@ -390,13 +476,22 @@
         var r = ress.by(pid); if (!r) { location.href = 'resources.html'; return; } document.title = r.title + ' | RoadGlas®';
         var d = r.date ? new Date(r.date) : null, when = d && !isNaN(d) ? d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
         var link = r.file ? '<a href="' + esc(r.file) + '" target="_blank" rel="noopener" class="rg-145 dyn-h-blue2" style="margin-top:28px;display:inline-block">' + (kind === 'webinar' ? 'Watch / Register →' : 'Download ↓') + '</a>' : '';
-        host.innerHTML = stripBox('<label>Product ' + selectF(r, 'product', PSEL) + '</label><label>Link (video / registration / file) ' + inputF(r, 'file', 'text', 'https://…') + '</label><button type="button" class="dyn-add" data-eact="file" data-id="' + esc(r.id) + '" data-field="file" data-folder="resources">⬆ Upload file</button>' + delBtn(r, 'Delete') + '<span>The text below keeps your line breaks (a blank line starts a new paragraph).</span>') +
-          '<section class="rg-75">' + (r.thumb ? '<img src="' + esc(r.thumb) + '" alt="" class="rg-63">' : '') + '<div class="rg-16"></div><div class="rg-76"><h1 class="rg-154"' + ed(r, 'title') + '>' + esc(r.title) + '</h1><div class="rg-168">' + crumb([['Home', 'index.html'], ['Resources', 'resources.html'], [r.title]]).replace(/class="rg-94"/g, 'class="rg-169 dyn-h-pink"') + '</div>' + (editing() ? '<div style="margin-top:16px;position:relative">' + photoBtn(r, 'thumb', 'resources', 'Cover photo') + '</div>' : '') + '</div></section>' +
-          '<section class="rg-79"><div class="rg-27" style="max-width:860px"><div class="rg-183" style="margin-bottom:14px">' + esc(type) + (when ? ' · ' + esc(when) : '') + ' · ' + esc(prodFull(r.product)) + '</div>' +
-          '<div class="rg-88 ed-multi" style="font-size:18px;line-height:1.8;min-height:60px"' + (editing() ? ' contenteditable="true" spellcheck="false" data-multi="1" data-e="desc" data-id="' + esc(r.id) + '"' : '') + '>' + esc(r.desc) + '</div>' + link + '</div></section>';
+        host.innerHTML = kind === 'webinar' ? webinarPage(r, when) : blogPage(r, when);
         reapply(); focusEnd(host, focus);
       }
       RGE.bind(host, ress, { redraw: draw, afterDelete: function () { ress.deleted = true; } });
+      host.addEventListener('click', function (e) {   // "Insert image in the text": pick a photo, upload it, put its line at the cursor
+        var b = e.target.closest('[data-ins-img]'); if (!b || !editing()) return; e.preventDefault();
+        var box = host.querySelector('[data-e="body"][contenteditable]'); if (!box) return;
+        RGE.pickFile('image/*').then(function (file) {
+          if (!file) return; b.textContent = 'Uploading…';
+          return RGE.upload(file, 'resources').then(function (url) {
+            box.focus(); var sel = window.getSelection();
+            if (!sel.rangeCount || !box.contains(sel.anchorNode)) { var rg = document.createRange(); rg.selectNodeContents(box); rg.collapse(false); sel.removeAllRanges(); sel.addRange(rg); }
+            document.execCommand('insertText', false, '\n\n[image: ' + url + ' | ]\n\n'); b.textContent = '＋ Insert image in the text';
+          });
+        }).catch(function (err) { alert(err.message); b.textContent = '＋ Insert image in the text'; });
+      });
       ress.onSaved = function () { if (ress.deleted || !ress.by(pid)) { location.href = 'resources.html'; return; } draw(); }; onEditMode(function () { draw(); }); draw();
     }).catch(function () { });
   }

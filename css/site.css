@@ -258,3 +258,71 @@ section.rg-26 + section.rg-52{padding-top:36px}
 .art .art-h:first-child{margin-top:0}
 .art ul{margin:0 0 18px;padding-left:22px;display:grid;gap:8px}
 .art li::marker{color:#E52C1A}
+
+/* webinar page (js/rg-content.js webinarPage) */
+.wb-hero .wb-pill{display:inline-flex;align-items:center;gap:9px;margin-bottom:14px;padding:7px 14px;background:#E52C1A;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:15px}
+.wb-pill i{width:9px;height:9px;border-radius:50%;background:#fff;animation:wbpulse 1.6s ease-in-out infinite}
+@keyframes wbpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.7)}}
+.wb-wrap{max-width:1180px;display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:56px;align-items:start}
+.wb-side{position:sticky;top:110px}
+.wb-card{background:#fff;border:1px solid #E1E2E5;box-shadow:0 14px 40px rgba(14,54,146,.14)}
+.wb-img{position:relative;aspect-ratio:16 / 10;overflow:hidden;background:#2C2E35}
+.wb-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+.wb-card:hover .wb-img img{transform:scale(1.05)}
+.wb-img:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(14,54,146,.55),rgba(14,54,146,0) 60%)}
+.wb-play{position:absolute;left:50%;top:50%;z-index:2;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;background:#E52C1A;box-shadow:0 0 0 10px rgba(229,44,26,.28)}
+.wb-play:before{content:"";position:absolute;left:30px;top:22px;border-style:solid;border-width:16px 0 16px 26px;border-color:transparent transparent transparent #fff}
+.wb-body{padding:26px 26px 28px;display:grid;gap:18px}
+.wb-badge{justify-self:start;padding:5px 12px;background:#0E3692;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:14px}
+.wb-dl{margin:0;display:grid;gap:0}
+.wb-dl>div{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid #ECECED;font-size:15.5px}
+.wb-dl dt{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:14px;color:#5A5B60}
+.wb-dl dd{margin:0;text-align:right;font-weight:600}
+.wb-cta{display:flex;align-items:center;justify-content:center;padding:17px 22px;background:#E52C1A;color:#fff!important;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:18px;text-decoration:none!important}
+.wb-cta:hover{background:#c42312}
+/* bullet lists of the webinar text as numbered cards */
+.art-cards ul{list-style:none;padding:0;margin:0 0 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:14px;counter-reset:wb}
+.art-cards li{counter-increment:wb;background:#F5F6F8;border-top:3px solid #0E3692;padding:16px 18px;font-size:16px;line-height:1.55}
+.art-cards li:before{content:counter(wb,decimal-leading-zero);display:block;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;line-height:1;color:#E52C1A}
+.art-cards li strong{display:block;margin-bottom:3px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:19px;letter-spacing:.03em;text-transform:uppercase;color:#0E3692}
+@media (max-width:980px){.wb-wrap{grid-template-columns:1fr;gap:34px}.wb-side{position:static;order:-1}}
+
+/* blog page (js/rg-content.js blogPage) */
+.bl-meta{margin-top:14px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:15px;color:rgba(255,255,255,.85)}
+.bl-fig{position:relative;margin:0 0 34px;aspect-ratio:16 / 8;overflow:hidden;background:#2C2E35}
+.bl-fig img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bl-help{margin-top:22px;padding:22px 24px;background:#0E3692;color:#fff;display:grid;gap:6px}
+.bl-help b{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:23px;line-height:1.1;text-transform:uppercase}
+.bl-help span{opacity:.85;font-size:15.5px}
+.bl-help a{margin-top:8px;justify-self:start;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:16px;border-bottom:2px solid #E52C1A;padding-bottom:2px;text-decoration:none}
+@media (max-width:980px){.wb-wrap .wb-side{order:0}}
+
+/* pictures inside the text of a blog post / webinar */
+.art-fig{margin:30px 0}
+.art-fig img{display:block;width:100%;aspect-ratio:16 / 9;object-fit:cover;background:#ECECED}
+.art-fig figcaption{margin-top:10px;font-size:14.5px;line-height:1.4;color:#5A5B60;padding-left:12px;border-left:3px solid #E52C1A}
+.art-ins{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:0 0 16px;padding:12px 14px;background:#FFF3F1;border:1px dashed #E52C1A;font-size:14px;color:#5A5B60}
+
+/* resources: search box beside the tabs (js/rg-content.js) */
+.rs-bar{display:flex;align-items:center;gap:20px;border-top:1px solid #ECECED;border-bottom:1px solid #ECECED;margin-bottom:36px}
+.rs-bar .rg-224{border:0;margin:0;flex:1 1 auto;min-width:0}
+.rs-box{position:relative;flex:0 0 320px;max-width:100%;display:flex;align-items:center}
+.rs-box input{width:100%;height:46px;border:1px solid #D3D4D8;background:#fff;padding:0 40px 0 44px;font-family:inherit;font-weight:500;font-size:16px;color:#2C2E35;outline:0;transition:border-color .2s,box-shadow .2s}
+.rs-box input:focus{border-color:#0E3692;box-shadow:0 0 0 3px rgba(14,54,146,.15)}
+.rs-ic{position:absolute;left:14px;top:50%;margin-top:-10px;width:20px;height:20px;color:#5A5B60;pointer-events:none}
+.rs-x{position:absolute;right:6px;top:50%;margin-top:-16px;width:32px;height:32px;border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:#5A5B60}
+.rs-x:hover{color:#E52C1A}
+.rs-sugbox{position:absolute;left:0;right:0;top:100%;z-index:30}
+.rs-sug{margin-top:4px;background:#fff;border:1px solid #D3D4D8;box-shadow:0 14px 30px rgba(44,46,53,.16);max-height:340px;overflow:auto}
+.rs-it{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid #ECECED;background:#fff;padding:11px 14px;cursor:pointer;font:inherit}
+.rs-it:last-child{border-bottom:0}
+.rs-it:hover,.rs-it.on{background:#F3F5FA}
+.rs-it b{display:block;font-weight:700;color:#2C2E35;font-size:15px;line-height:1.3}
+.rs-it span{display:block;font-size:12.5px;color:#5A5B60;letter-spacing:.04em;text-transform:uppercase;margin-top:2px}
+.rs-it mark{background:#FFE9E5;color:#E52C1A;padding:0}
+.rs-none{padding:12px 14px;color:#5A5B60;font-size:15px}
+@media (max-width:760px){
+  .rs-bar{flex-direction:column-reverse;align-items:stretch;gap:0;border:0}
+  .rs-bar .rg-224{border-top:1px solid #ECECED;border-bottom:1px solid #ECECED}
+  .rs-box{flex:none;margin-bottom:14px}
+}
