@@ -327,5 +327,3 @@ section.rg-26 + section.rg-52{padding-top:36px}
   .rs-box{flex:none;margin-bottom:14px}
 }
 
-/* banner / hero headings (the h1 of every page and of the three home slides) are brand red; a colour set in the CMS text toolbar still wins */
-body h1[class]{color:#E52C1A;text-shadow:0 2px 16px rgba(0,0,0,.35)}
