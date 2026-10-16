@@ -125,3 +125,5 @@
 - Dashboard (2026-10-16): the Product dropdowns of Resources and Project Highlights list only the solutions (no "All products / other" / "Other" option: the "All" filter on the site shows everything anyway). An old item that was saved without a product keeps its old value, shown only in that item.
 
 - `netlify.toml` was removed (2026-10-16): the site is deployed on Vercel; the routing (API proxy, item pages) lives in `vercel.json`. Netlify is not used.
+
+- Email Configuration (2026-10-16): saving failed with "manufacturer: choose a product or a region for ..." when the saved config had CC rows of a form this site does not have (e.g. Manufacturer, copied from ind-fab): they were not shown in any tab but were still checked. Now every form that has rows gets its own tab (Manufacturer, Career ... appear after Contact / Lunch & Learn / Credit Application) and "a product or a region is required" is checked only for Contact and Credit Application (like the ind-fab CMS). The email address of every row is still checked. `js/dashboard.js` (`ccForms`, `saveEmail`).
