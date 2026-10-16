@@ -292,11 +292,22 @@ function page(file, title, desc, bodyHtml, defaults, bodyClass, extraHead) {
     '<body data-page="' + escAttr(bodyClass) + '" data-state=\'' + JSON.stringify(defaults) + '\'>\n' + (bodyClass !== 'login' ? LOADER_BODY : '') + bodyHtml + '\n<script src="js/site.js" defer></script>\n<script src="js/rg-edit.js" defer></script>\n<script src="js/rg-cache.js" defer></script>\n' + (bodyClass === 'ref-solution' ? '<script src="js/rg-solution-tpl.js" defer></script>\n' : '') + '<script src="js/rg-content.js" defer></script>\n' + (editor ? '<script src="js/cms.js" defer></script>\n<script src="js/rg-toolbar.js" defer></script>\n' : '') + '</body>\n</html>\n';
 }
 
+// the sections of a product page that can be switched off per solution in the Dashboard (see js/rg-content.js productPage / js/rg-solution-tpl.js)
+function markSections(html) {
+  const cheerio = require('cheerio');
+  const $ = cheerio.load('<div id="__r">' + html + '</div>', { _useHtmlParser2: true, decodeEntities: false });
+  $('section.rg-99').attr('data-tsec', 'stats'); $('section.rg-26').eq(0).attr('data-tsec', 'overview'); $('.rg-113, .rg-115').attr('data-tsec', 'types');
+  $('section.rg-123').attr('data-tsec', 'coating'); $('section.rg-26').eq(1).attr('data-tsec', 'guide'); $('[data-vgroup="faq"]').attr('data-tsec', 'faq');
+  return $('#__r').html();
+}
+
 // ------------------------------------------------------------------ run
 const written = [];
 for (const [key, meta] of Object.entries(PAGES)) {
   const viewKey = key;
-  const { html, defaults } = assemble(viewKey, 0);
+  const a0 = assemble(viewKey, 0), defaults = a0.defaults;
+  let html = (key === 'mat' || key === 'grid') ? markSections(a0.html) : a0.html;
+  if (key === 'resources') html = html.replace(/<p class="rg-217"[^>]*>[\s\S]*?<\/p>/g, '');   // no "Pavement Reinforcement Resources" line beside the product heading
   fs.writeFileSync(path.join(ROOT, meta.file), page(meta.file, meta.title, meta.desc, html, defaults, key));
   written.push(meta.file);
 }
@@ -339,7 +350,8 @@ function solutionTemplate() {
   let cell = 0; $('.rg-132').first().closest('section').find('span.rg-136, span.rg-138').each((i, e) => { const header = cell < 3; cell++; $(e).html(header ? 'Column ' + cell : (e.attribs.class || '').includes('rg-138') ? 'Row label' : 'Value'); });
   set('.rg-139', 'Add a note here. (Placeholder)'); set('.rg-143', 'Describe this step. (Placeholder)');
   set('.rg-67', '<span class="rg-68"></span>Specify this product'); set('.rg-69', 'Heading (Placeholder)'); set('.rg-344', 'Add your text here. (Placeholder)');
-  $('section.rg-26 img').attr('src', 'images/img_p15_2.webp');
+  // the overview photo fills its whole box (a photo uploaded later is cropped to the same box, not shrunk into it)
+  $('section.rg-26 img').attr('src', 'images/img_p27_1.webp').attr('style', 'display:block;width:100%;height:100%;object-fit:cover');
   const qa = [1, 2, 3, 4, 5, 6].map(i => '<details class="rg-150"><summary class="rg-151"><span>Question ' + i + ' (Placeholder)</span><span class="rg-152"></span></summary><p class="rg-153">Answer ' + i + '. (Placeholder)</p></details>').join('');
   const faq = '<section class="rg-38" data-tsec="faq"><div class="rg-146"><div class="rg-147">Q&amp;A</div><h2 class="rg-148">Frequently Asked <span class="rg-30">Questions</span></h2><div class="rg-149" data-tpl="faq"></div></div></section>';
   const faqs = $('[data-vgroup="faq"]'); faqs.slice(1).remove(); faqs.first().replaceWith(faq);

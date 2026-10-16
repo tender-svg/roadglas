@@ -31,7 +31,7 @@
   }
 
   /* ---------------------------------------------------------------- small helpers for the stored formats */
-  var PRODUCT_RE = /^\[product:(all|mat|grid)\]\s*/;
+  var PRODUCT_RE = /^\[product:([a-z0-9\-]+)\]\s*/;
   var parseProduct = function (d) { var m = PRODUCT_RE.exec(d || ''); return { product: m ? m[1] : 'all', text: String(d || '').replace(PRODUCT_RE, '') }; };
   var stripImages = function (s) { return String(s || '').replace(/\s*\[Images:\d+\]/g, '').trim(); };
   var lines = function (s) { return String(s || '').split(/\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean); };
@@ -41,8 +41,17 @@
   var pageNameOf = function (slug) { return ('product-detail-' + slug).toLowerCase().replace(/[^a-z0-9\-_]/g, '-'); };   // the page of a solution made from the template
   var thumb = function (u) { return u ? '<img class="db-thumb" src="' + esc(u) + '" alt="" loading="lazy">' : '<span class="db-thumb none">no photo</span>'; };
   var pill = function (on) { return '<span class="db-pill ' + (on ? 'on' : 'off') + '">' + (on ? 'Live' : 'Hidden') + '</span>'; };
-  var PRODUCTS = [['mat', 'ROADGLAS® Paving Mat'], ['grid', 'ROADGLAS® Reinforcement Grid'], ['all', 'All products / other']];
-  var productName = function (k) { var p = PRODUCTS.filter(function (x) { return x[0] === k; })[0]; return p ? p[1] : 'All products'; };
+  // products = the solutions (their slug is the value): the product selects of Resources and Project Highlights list every solution made here
+  var solRows = function () { return ((MODS.solutions && MODS.solutions.rows) || []).filter(function (r) { return r.is_active !== false; }); };
+  var productOptions = function (noneKey, noneLabel) { var o = solRows().map(function (r) { return [r.slug, r.title]; }); return o.length ? o : [[noneKey, noneLabel]]; };   // only the solutions: "All" is the filter that shows everything
+  // old saved values mat / grid -> the solution of that family
+  var normProd = function (v) {
+    v = String(v || ''); if (!v || v === 'all' || v === 'other') return v || 'all';
+    if (solRows().some(function (r) { return r.slug === v; })) return v;
+    var s = solRows().filter(function (r) { return r.product_family === v; })[0]; return s ? s.slug : v;
+  };
+  var productName = function (k) { k = normProd(k); var s = solRows().filter(function (r) { return r.slug === k; })[0]; return s ? s.title : 'All products / other'; };
+  var firstProduct = function (none) { var r = solRows()[0]; return r ? r.slug : none; };
 
   /* ---------------------------------------------------------------- the four sections */
   var MODS = {
@@ -112,7 +121,7 @@
         { name: 'location', label: 'Location', type: 'text' },
         { name: 'year', label: 'Year', type: 'text' },
         { name: 'owner', label: 'Client / owner', type: 'text' },
-        { name: 'product', label: 'Product used (for the filter)', type: 'select', options: [['mat', 'Paving Mat'], ['grid', 'Reinforcement Grid'], ['other', 'Other']] },
+        { name: 'product', label: 'Product used (for the filter)', type: 'select', legacy: 'Other', options: function () { return productOptions('other', 'Other'); } },
         { name: 'products_used', label: 'Products used (text shown on the page)', type: 'text', full: true },
         { name: 'challenge_title', label: "Client's challenge: heading", type: 'text', full: true },
         { name: 'challenge_text', label: "Client's challenge: text", type: 'textarea', full: true },
@@ -121,7 +130,7 @@
       ],
       columns: [['', function (r) { return thumb(r.hero_image_url); }], ['Project', function (r) { return '<div class="db-title">' + esc(r.title) + '</div><div class="db-sub">' + esc(r.location || '') + '</div>'; }], ['Product', function (r) { return esc(productName(extras(r).prod === 'other' ? 'all' : extras(r).prod)); }], ['Year', function (r) { return esc(extras(r).year || ''); }], ['Page', function (r) { return '<span class="db-sub">project-highlight-' + esc(r.slug || '') + '.html</span>'; }]],
       toForm: function (r) {
-        var x = extras(r); return { title: r.title, location: r.location || '', year: x.year || '', owner: r.application || '', product: x.prod || 'other', products_used: r.products_used || '', challenge_title: x.challengeTitle || '',
+        var x = extras(r); return { title: r.title, location: r.location || '', year: x.year || '', owner: r.application || '', product: normProd(x.prod || 'other'), products_used: r.products_used || '', challenge_title: x.challengeTitle || '',
           challenge_text: r.challenge_text || '', solution_text: r.solution_text || '', images: (x.images && x.images.length ? x.images : (r.hero_image_url ? [r.hero_image_url] : [])) };
       },
       toBody: function (v, row, all) {
@@ -130,7 +139,7 @@
         if (!row) { var s = slugify(v.title) || 'project'; var taken = (all || []).map(function (a) { return a.slug; }); if (taken.indexOf(s) >= 0) s += '-' + Date.now().toString(36).slice(-4); body.slug = s; body.project_benefits = ''; }
         return body;
       },
-      defaults: function () { return { product: 'mat' }; },
+      defaults: function () { return { product: firstProduct('other') }; },
     },
 
     resources: {
@@ -139,20 +148,20 @@
       fields: [
         { name: 'title', label: 'Title', type: 'text', req: true, full: true },
         { name: 'document_type', label: 'Type', type: 'select', options: ['Data Sheet', 'Application Guide', 'Installation', 'Q&A', 'Specification', 'Technical Note', 'Webinar', 'Video', 'Blog Post'].map(function (x) { return [x, x]; }) },
-        { name: 'product', label: 'Product', type: 'select', options: PRODUCTS },
+        { name: 'product', label: 'Product', type: 'select', legacy: 'All products / other', options: function () { return productOptions('all', 'All products / other'); } },
         { name: 'description', label: 'Short description', type: 'textarea', full: true, help: 'For a Blog Post or a Webinar this is the text of its own page (a blank line starts a new paragraph).' },
         { name: 'file_url', label: 'File (PDF or other document) or link', type: 'file', folder: 'resources', full: true },
         { name: 'thumbnail_url', label: 'Cover photo', type: 'image', folder: 'resources', full: true },
         { name: 'is_active', label: 'Show on the website', type: 'checkbox' },
       ],
       columns: [['', function (r) { return thumb(r.thumbnail_url); }], ['Resource', function (r) { return '<div class="db-title">' + esc(r.title) + '</div><div class="db-sub">' + esc(parseProduct(r.description).text) + '</div>'; }], ['Type', function (r) { return esc(r.document_type || ''); }], ['Page', function (r) { var k = r.document_type === 'Blog Post' ? 'blog' : r.document_type === 'Webinar' ? 'webinar' : ''; return k ? '<span class="db-sub">' + k + '-' + esc(slugify(r.title)) + '.html</span>' : '<span class="db-sub">—</span>'; }], ['Product', function (r) { return esc(productName(parseProduct(r.description).product)); }], ['Status', function (r) { return pill(r.is_active !== false); }]],
-      toForm: function (r) { var p = parseProduct(r.description); return { title: r.title, document_type: r.document_type || 'Data Sheet', product: p.product, description: p.text, file_url: r.file_url || '', thumbnail_url: r.thumbnail_url || '', is_active: r.is_active !== false }; },
+      toForm: function (r) { var p = parseProduct(r.description); return { title: r.title, document_type: r.document_type || 'Data Sheet', product: normProd(p.product), description: p.text, file_url: r.file_url || '', thumbnail_url: r.thumbnail_url || '', is_active: r.is_active !== false }; },
       toBody: function (v, row) {
         var b = { title: v.title, document_type: v.document_type, description: '[product:' + v.product + '] ' + v.description, file_url: v.file_url, thumbnail_url: v.thumbnail_url, is_active: v.is_active };
         if (!row) b.published_date = new Date().toISOString();
         return b;
       },
-      defaults: function () { return { is_active: true, document_type: 'Data Sheet', product: 'mat' }; },
+      defaults: function () { return { is_active: true, document_type: 'Data Sheet', product: firstProduct('all') }; },
     },
   };
   function tabs(r) { var o = {}; (Array.isArray(r.application_tabs) ? r.application_tabs : []).forEach(function (t) { if (t && t.type) o[t.type] = t.items || t; }); return o; }
@@ -207,12 +216,17 @@
 
   /* ---------------------------------------------------------------- editor form */
   var editing = null; // { key, row }
+  // the options of a select; an old item that has no product keeps its old value (shown only for that item)
+  function withLegacy(f, val) {
+    var o = typeof f.options === 'function' ? f.options() : f.options;
+    return f.legacy && val && !o.some(function (x) { return String(x[0]) === String(val); }) ? o.concat([[val, f.legacy]]) : o;
+  }
   function fieldHtml(f, val) {
     var id = 'f_' + f.name, cls = 'db-field' + (f.full ? ' full' : ''), help = f.help ? '<small>' + esc(f.help) + '</small>' : '', label = '<span>' + esc(f.label) + (f.req ? ' <b>*</b>' : '') + '</span>';
     if (f.type === 'sections') return '<div class="db-field full" data-f="sections"><span>' + esc(f.label) + '</span><div class="db-checks2">' + SECTIONS.map(function (x) { return '<label><input type="checkbox" data-sec="' + x[0] + '" checked> ' + esc(x[1]) + '</label>'; }).join('') + '</div>' + help + '</div>';
     if (f.type === 'checkbox') return '<label class="db-field chk"><input type="checkbox" name="' + f.name + '"' + (val ? ' checked' : '') + '><span>' + esc(f.label) + '</span></label>';
     if (f.type === 'textarea' || f.type === 'lines') return '<label class="' + cls + '" data-f="' + f.name + '">' + label + '<textarea name="' + f.name + '" rows="' + (f.type === 'lines' ? 6 : 4) + '">' + esc(val) + '</textarea>' + help + '</label>';
-    if (f.type === 'select') return '<label class="' + cls + '" data-f="' + f.name + '">' + label + '<select name="' + f.name + '">' + f.options.map(function (o) { return '<option value="' + esc(o[0]) + '"' + (String(val) === String(o[0]) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select>' + help + '</label>';
+    if (f.type === 'select') return '<label class="' + cls + '" data-f="' + f.name + '">' + label + '<select name="' + f.name + '">' + withLegacy(f, val).map(function (o) { return '<option value="' + esc(o[0]) + '"' + (String(val) === String(o[0]) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select>' + help + '</label>';
     if (f.type === 'number') return '<label class="' + cls + '" data-f="' + f.name + '">' + label + '<input type="number" name="' + f.name + '" value="' + esc(val) + '">' + help + '</label>';
     if (f.type === 'image' || f.type === 'file') return uploader(f, f.name, val, cls, label, help);
     if (f.type === 'images') { var arr = Array.isArray(val) ? val : []; var out = ''; for (var i = 0; i < f.count; i++) out += uploader({ type: 'image', folder: f.folder, label: 'Photo ' + (i + 1) }, f.name + '__' + i, arr[i] || '', 'db-field full', '<span>Photo ' + (i + 1) + (i === 0 ? ' (main)' : '') + '</span>', ''); return '<div class="' + cls + '" data-multi="' + f.name + '"><span>' + esc(f.label) + '</span></div>' + out; }

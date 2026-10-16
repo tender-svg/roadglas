@@ -111,3 +111,17 @@
 - Home solutions slider: the arrows now sit in the free space at the left and right side of the cards (the slider has a side margin), not over the photos (`css/site.css`).
 
 - Home (2026-10-16): the white gap between "Why choose RoadGlas" and "Top 10 benefits" is smaller (200 px -> 72 px, `css/site.css`). The home applications now use the same slider as the solutions (all applications, arrows at the sides, 4 s auto move).
+
+- Sections on/off also on the real product pages (2026-10-16): `paving-mat.html` and `reinforcement-grid.html` now have the same section names (`data-tsec`, `markSections()` in `tools/build-pages.js`) and `js/rg-content.js` (`productPage`) hides the sections that the Dashboard switched off for the solution whose "View Solution" button opens that page (page element `tpl-sections` of `product-detail-<solution slug>`). Works with the data cache (no loader on later visits). Before this the switches only worked on the template page (`product-detail-<name>.html`).
+
+- Solution template, Overview photo (2026-10-16): the photo now fills its whole box (`object-fit: cover`, default photo `images/img_p27_1.webp`) instead of a thin strip inside a white box; a photo uploaded from the CMS ("Change image") is cropped to the same box. (`solutionTemplate()` in `tools/build-pages.js`; the real product pages keep their diagram.)
+
+## Products = the solutions (2026-10-16)
+- Every solution made in the Dashboard is a product everywhere (the value is the solution's slug): **Project Highlights** filter tabs (All + one tab per solution), **Resources** "Browse by Product" cards (All + one card per solution with its photo and document count) and the product selects of Dashboard > Resources and Dashboard > Project Highlights (+ the selects of the inline editor / blog and webinar pages). Old saved values `mat` / `grid` (and `?prod=mat` links on the product pages) are mapped to the solutions whose product family is mat / grid. `js/rg-content.js` (`prodList`, `normProd`, `getProducts`), `js/dashboard.js` (`productOptions`, `normProd`). Resources keep `[product:<slug>]` in their description, project highlights `prod` in their JSON; nothing in the DB had to be changed.
+- Not yet connected to the solutions: the product list of the contact form (static) and the Products of the Email Configuration CC rows.
+
+- Resources page (2026-10-16): the line "Pavement Reinforcement Resources" beside the "Browse by Product" heading was removed from `resources.html` (build) and from the drawn page (`js/rg-content.js`).
+
+- Dashboard (2026-10-16): the Product dropdowns of Resources and Project Highlights list only the solutions (no "All products / other" / "Other" option: the "All" filter on the site shows everything anyway). An old item that was saved without a product keeps its old value, shown only in that item.
+
+- `netlify.toml` was removed (2026-10-16): the site is deployed on Vercel; the routing (API proxy, item pages) lives in `vercel.json`. Netlify is not used.

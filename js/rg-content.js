@@ -48,9 +48,26 @@
   /* ---------- how the CMS rows are read / written (the dashboard uses the same formats) ---------- */
   var appMeta = function (r) { var t = Array.isArray(r.application_tabs) ? r.application_tabs : []; var o = {}; t.forEach(function (x) { if (x && x.type) o[x.type] = x; }); return { short: (o.meta && o.meta.short) || r.title, invest: (o.invest && o.invest.items) || [], triggers: (o.triggers && o.triggers.items) || [] }; };
   var storyX = function (r) { try { var j = JSON.parse(r.result_text || '{}'); return j && typeof j === 'object' ? j : {}; } catch (e) { return {}; } };
-  var PROD_RE = /^\[product:(all|mat|grid)\]\s*/;
+  var PROD_RE = /^\[product:([a-z0-9\-]+)\]\s*/;
   var prodOf = function (d) { var m = PROD_RE.exec(d || ''); return m ? m[1] : 'all'; };
   var textOf = function (d) { return String(d || '').replace(PROD_RE, ''); };
+
+  /* ---------- products = the solutions made in the Dashboard (the filters of Project Highlights and Resources, the product selects) ---------- */
+  var prodList = [];   // [{ key: slug of the solution, full: its title, name: title without "ROADGLAS® ", image, family }]
+  function setProducts(rows) {
+    prodList = (rows || []).filter(function (r) { return r.is_active !== false && r.is_deleted !== true; }).sort(function (a, b) { return (a.display_order || 0) - (b.display_order || 0); })
+      .map(function (r) { return { key: r.slug, full: r.title || r.slug, name: String(r.title || r.slug).replace(/^ROADGLAS®\s*/i, ''), image: r.icon_image_url || '', family: r.product_family || '' }; });
+  }
+  function getProducts() { return get('solutions').then(setProducts).catch(function () { }); }
+  // old saved values: mat / grid (the first two products) -> the solution of that family; all / other / empty = no product
+  var normProd = function (v) {
+    v = String(v || ''); if (!v || v === 'all' || v === 'other') return v || 'all';
+    if (prodList.some(function (p) { return p.key === v; })) return v;
+    var p = prodList.filter(function (x) { return x.family === v; })[0]; return p ? p.key : v;
+  };
+  var prodFull = function (k) { var p = prodList.filter(function (x) { return x.key === k; })[0]; return p ? p.full : (!k || k === 'all' || k === 'other' ? 'All Products' : ''); };
+  var prodName = function (k) { var p = prodList.filter(function (x) { return x.key === k; })[0]; return p ? p.name : (!k || k === 'all' ? 'All Products' : 'Other'); };
+  var prodSel = function (noneKey, noneLabel) { return prodList.map(function (p) { return [p.key, p.name]; }).concat([[noneKey, noneLabel]]); };
   var solutionText = function (r) {   // first lines = text, lines starting with "- " = ticked points
     var ls = String(r.short_description || '').replace(/\s*\[Images:\d+\]/g, '').split(/\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean);
     return { text: ls.filter(function (l) { return !/^[-•]\s+/.test(l); }).join(' '), bullets: ls.filter(function (l) { return /^[-•]\s+/.test(l); }).map(function (l) { return l.replace(/^[-•]\s+/, ''); }) };
@@ -81,19 +98,19 @@
   });
   var stories = RGE.store({
     name: 'stories', path: 'stories',
-    toModel: function (r) { var x = storyX(r); return { id: r.id, slug: r.slug, title: r.title || '', location: r.location || '', year: x.year || '', owner: r.application || '', products: r.products_used || '', prod: x.prod || 'other', cTitle: x.challengeTitle || '', challenge: r.challenge_text || '', solution: r.solution_text || '', images: (x.images && x.images.length ? x.images : (r.hero_image_url ? [r.hero_image_url] : [])).slice() }; },
+    toModel: function (r) { var x = storyX(r); return { id: r.id, slug: r.slug, title: r.title || '', location: r.location || '', year: x.year || '', owner: r.application || '', products: r.products_used || '', prod: normProd(x.prod || 'other'), cTitle: x.challengeTitle || '', challenge: r.challenge_text || '', solution: r.solution_text || '', images: (x.images && x.images.length ? x.images : (r.hero_image_url ? [r.hero_image_url] : [])).slice() }; },
     toBody: function (m, isNew, st) {
       var imgs = m.images.filter(Boolean);
       var b = { title: m.title || 'Untitled', location: m.location, application: m.owner, products_used: m.products, hero_image_url: imgs[0] || '', challenge_text: m.challenge, solution_text: m.solution, result_text: JSON.stringify({ year: m.year, prod: m.prod, challengeTitle: m.cTitle, images: imgs }) };
       if (isNew) { b.slug = uniqueSlug(m.title, st.rows.map(function (x) { return x.slug; })); b.project_benefits = ''; }
       return b;
     },
-    defaults: function () { return { title: 'New project highlight', location: '', year: '', owner: '', products: '', prod: 'mat', cTitle: '', challenge: '', solution: '', images: [] }; },
+    defaults: function () { return { title: 'New project highlight', location: '', year: '', owner: '', products: '', prod: (prodList[0] && prodList[0].key) || 'other', cTitle: '', challenge: '', solution: '', images: [] }; },
   });
   var TYPES = ['Data Sheet', 'Application Guide', 'Installation', 'Q&A', 'Specification', 'Technical Note', 'Webinar', 'Video', 'Blog Post'];
   var ress = RGE.store({
     name: 'resources', path: 'resources', live: live,
-    toModel: function (r) { return { id: r.id, title: r.title || '', slug: slugOf(r.title), type: r.document_type || 'Data Sheet', product: prodOf(r.description), desc: textOf(r.description), file: r.file_url || '', thumb: r.thumbnail_url || '', date: r.published_date || '' }; },
+    toModel: function (r) { return { id: r.id, title: r.title || '', slug: slugOf(r.title), type: r.document_type || 'Data Sheet', product: normProd(prodOf(r.description)), desc: textOf(r.description), file: r.file_url || '', thumb: r.thumbnail_url || '', date: r.published_date || '' }; },
     toBody: function (m, isNew) { var b = { title: m.title || 'Untitled', document_type: m.type, description: '[product:' + m.product + '] ' + m.desc, file_url: m.file, thumbnail_url: m.thumb, is_active: true }; if (isNew) b.published_date = new Date().toISOString(); return b; },
     defaults: function () { return { title: 'New resource', type: 'Data Sheet', product: 'all', desc: '', file: '', thumb: '' }; },
   });
@@ -193,13 +210,13 @@
 
   /* ================================================================= PROJECT HIGHLIGHTS (list) */
   function projects() {
-    get('stories').then(function (rows) {
-      stories.load(rows); if (!stories.rows.length) return;
+    Promise.all([get('stories'), getProducts()]).then(function (res) {
+      var rows = res[0]; stories.load(rows); if (!stories.rows.length) return;
       var f = 'all', mode = 'grid', host = dropVariants('pf'); if (!host) return;
-      var PRODS = [['mat', 'Paving Mat'], ['grid', 'Reinforcement Grid'], ['other', 'Other']];
+      var PRODS = prodSel('other', 'Other');
       function draw(focus) {
         var shown = stories.rows.filter(function (m) { return f === 'all' || m.prod === f || m.isNew; }), isList = mode === 'list';
-        var filters = [['all', 'All'], ['mat', 'Paving Mat'], ['grid', 'Reinforcement Grid']].map(function (p) { var on = p[0] === f; return '<button data-f="' + p[0] + '" style="border:0;border-bottom:3px solid ' + (on ? '#E52C1A' : 'transparent') + ';margin-bottom:-1px;background:none;padding:22px 18px 20px;cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;font-size:17px;white-space:nowrap;flex-shrink:0;color:' + (on ? '#E52C1A' : '#5A5B60') + '">' + p[1] + '</button>'; }).join('');
+        var filters = [['all', 'All']].concat(prodList.map(function (p) { return [p.key, p.name]; })).map(function (p) { var on = p[0] === f; return '<button data-f="' + p[0] + '" style="border:0;border-bottom:3px solid ' + (on ? '#E52C1A' : 'transparent') + ';margin-bottom:-1px;background:none;padding:22px 18px 20px;cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;font-size:17px;white-space:nowrap;flex-shrink:0;color:' + (on ? '#E52C1A' : '#5A5B60') + '">' + p[1] + '</button>'; }).join('');
         var vb = function (on) { return 'width:40px;height:40px;border:1px solid ' + (on ? '#E52C1A' : '#CECFD1') + ';background:' + (on ? '#E52C1A' : '#fff') + ';color:' + (on ? '#fff' : '#5A5B60') + ';cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0'; };
         var cards = shown.map(function (m) {
           var strip = editing() ? '<div class="app-strip" style="margin:0;border-width:1px 0 0">' + selectF(m, 'prod', PRODS) + delBtn(m, 'Delete') + '</div>' : '';
@@ -218,12 +235,12 @@
 
   /* ================================================================= ONE PROJECT HIGHLIGHT (project-highlight.html?slug=...) */
   function project() {
-    get('stories').then(function (rows) {
-      stories.load(rows); if (!stories.rows.length) return;
+    Promise.all([get('stories'), getProducts()]).then(function (res) {
+      var rows = res[0]; stories.load(rows); if (!stories.rows.length) return;
       var slug = routeSlug('project-highlight');
       var pid = (stories.rows.filter(function (x) { return x.slug === slug; })[0] || stories.rows[0]).id, gi = 0, tab = 'c';
       var hero = $('section.rg-75'), host = dropVariants('pj'); if (!hero || !host) return;
-      var PRODS = [['mat', 'Paving Mat'], ['grid', 'Reinforcement Grid'], ['other', 'Other']];
+      var PRODS = prodSel('other', 'Other');
       function draw(focus) {
         var r = stories.by(pid); if (!r) { location.href = 'project-highlights.html'; return; }
         var imgs = r.images, n = imgs.length || 1; gi = Math.min(gi, Math.max(0, imgs.length - 1)); document.title = (r.title || 'Project') + ' | RoadGlas® Project Highlights';
@@ -255,12 +272,12 @@
   var inTab = { downloads: function (r) { return MEDIA.indexOf(r.type) < 0; }, datasheets: function (r) { return r.type === 'Data Sheet'; }, webinars: function (r) { return r.type === 'Webinar'; }, videos: function (r) { return r.type === 'Video'; }, blog: function (r) { return r.type === 'Blog Post'; }, notes: function (r) { return MEDIA.indexOf(r.type) < 0 && r.type !== 'Data Sheet'; } };
   var tabType = { downloads: 'Data Sheet', datasheets: 'Data Sheet', webinars: 'Webinar', videos: 'Video', blog: 'Blog Post', notes: 'Technical Note' };
   function resources() {
-    get('resources').then(function (rows) {
-      ress.load(rows); if (!ress.rows.length) return;
-      var tab = 'downloads', prod = (/[?&]prod=(all|mat|grid)\b/.exec(location.search) || [])[1] || 'all', host = dropVariants('res'); if (!host) return;
-      var TILES = [['all', 'All Products', 'images/img_p0_1.webp'], ['mat', 'ROADGLAS® Paving Mat', 'images/img_p5_1.webp'], ['grid', 'ROADGLAS® Reinforcement Grid', 'images/img_p19_1.webp']];
-      var PNAME = { all: 'All Products', mat: 'Paving Mat', grid: 'Reinforcement Grid' }, PFULL = { mat: 'ROADGLAS® Paving Mat', grid: 'ROADGLAS® Reinforcement Grid', all: 'All Products' };
-      var PSEL = [['all', 'All products'], ['mat', 'Paving Mat'], ['grid', 'Reinforcement Grid']];
+    Promise.all([get('resources'), getProducts()]).then(function (res) {
+      var rows = res[0]; ress.load(rows); if (!ress.rows.length) return;
+      var tab = 'downloads', prod = normProd((/[?&]prod=([a-z0-9\-]+)/.exec(location.search) || [])[1] || 'all'), host = dropVariants('res'); if (!host) return;
+      if (prod !== 'all' && !prodList.some(function (p) { return p.key === prod; })) prod = 'all';
+      var TILES = [['all', 'All Products', 'images/img_p0_1.webp']].concat(prodList.map(function (p) { return [p.key, p.full, p.image || 'images/img_p5_1.webp']; }));   // one card per solution
+      var PSEL = prodSel('all', 'All products');
       function draw(focus) {
         var list = ress.rows.filter(function (r) { return (prod === 'all' || r.product === prod) && inTab[tab](r); });
         var tiles = TILES.map(function (t) { var on = t[0] === prod, n = ress.rows.filter(function (r) { return t[0] === 'all' || r.product === t[0]; }).length;
@@ -268,11 +285,11 @@
         var tabs = RES_TABS.map(function (t) { var on = t[0] === tab; return '<button data-tab="' + t[0] + '" style="border:0;border-bottom:3px solid ' + (on ? '#E52C1A' : 'transparent') + ';margin-bottom:-1px;background:none;padding:26px 18px 24px;cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;font-size:17px;white-space:nowrap;flex-shrink:0;color:' + (on ? '#E52C1A' : '#5A5B60') + '">' + t[1] + '</button>'; }).join('');
         var cards = list.map(function (r) { var f = r.file || '', pdf = /\.pdf(\?|$)/i.test(f), has = !!f, own = r.type === 'Blog Post' ? 'blog-' + r.slug + '.html' : r.type === 'Webinar' ? 'webinar-' + r.slug + '.html' : '';
           var strip = editing() ? '<div class="app-strip" style="margin:10px 0 0"><label>Type ' + selectF(r, 'type', TYPES.map(function (x) { return [x, x]; })) + '</label><label>Product ' + selectF(r, 'product', PSEL) + '</label><button type="button" class="dyn-add" data-eact="file" data-id="' + esc(r.id) + '" data-field="file" data-folder="resources">⬆ ' + (has ? 'Replace file' : 'Upload file') + '</button><label>or link ' + inputF(r, 'file', 'text', 'https://… or file link') + '</label>' + delBtn(r, 'Delete') + '</div>' : '';
-          return '<article class="rg-32"><div class="rg-229"><div class="rg-230"><span class="rg-231">' + esc(r.type) + '</span><span class="rg-232">' + (pdf ? 'PDF' : has ? 'LINK' : '') + '</span></div><div class="rg-183">' + esc(PFULL[r.product]) + '</div><h3 class="rg-233"' + ed(r, 'title') + '>' + esc(r.title) + '</h3>' +
+          return '<article class="rg-32"><div class="rg-229"><div class="rg-230"><span class="rg-231">' + esc(r.type) + '</span><span class="rg-232">' + (pdf ? 'PDF' : has ? 'LINK' : '') + '</span></div><div class="rg-183">' + esc(prodFull(r.product)) + '</div><h3 class="rg-233"' + ed(r, 'title') + '>' + esc(r.title) + '</h3>' +
             ((r.desc || editing()) ? '<p class="rg-36" style="margin:0"' + ed(r, 'desc') + '>' + esc(r.desc) + '</p>' : '') + (own && !r.isNew ? '<a href="' + esc(own) + '" class="rg-234 dyn-h-red-text">' + (r.type === 'Blog Post' ? 'Read article →' : 'View webinar →') + '</a>' : has ? '<a href="' + esc(f) + '" target="_blank" rel="noopener" class="rg-234 dyn-h-red-text">' + (pdf ? 'Download PDF ↓' : 'Open ↗') + '</a>' : '') + strip + '</div></article>'; }).join('');
         var empty = list.length ? '' : '<div class="rg-225"><h3 class="rg-226">' + ({ webinars: 'Webinars coming soon', videos: 'Videos coming soon', blog: 'Blog posts coming soon' }[tab] || 'Coming soon') + '</h3><p class="rg-227">Contact the RoadGlas® team to request this content or be notified when it is published.</p><button data-href="contact.html" aria-label="Contact Us" class="rg-72 dyn-h-lift"><img src="images/contact-shield.webp" alt="Contact Us" class="rg-73"><span aria-hidden="true" class="rg-74">→</span></button></div>';
         host.innerHTML = '<section class="rg-206"><div class="rg-27"><div class="rg-207"><img src="images/img_p0_3.webp" alt="RoadGlas" class="rg-208"><div class="rg-209"><div class="rg-210" data-cms="resources-brochure-eyebrow" data-cms-type="text">Full Brochure</div><h2 class="rg-211" data-cms="resources-brochure-title" data-cms-type="text">Engineered to Perform.</h2><p class="rg-212" data-cms="resources-brochure-text" data-cms-type="text">Reinforcement solutions that extend pavement life and maximize value.</p></div><a href="roadglas-brochure.pdf" target="_blank" class="rg-213 dyn-h-blue2" data-cms="resources-brochure-button" data-cms-type="text">Download PDF ↓</a></div>' +
-          '<div class="rg-214"><div class="rg-215"><div><div class="rg-210" data-cms="resources-browse-eyebrow" data-cms-type="text">Browse by Product</div><h2 class="rg-216">' + PNAME[prod] + '</h2></div><p class="rg-217" data-cms="resources-browse-text" data-cms-type="text">Pavement Reinforcement Resources</p></div><div class="rg-218">' + tiles + '</div><div class="rg-223"><div class="rg-224">' + tabs + '</div>' + (editing() ? '<div style="margin:0 0 18px">' + addBtn('New resource') + '</div>' : '') + empty + '<div class="rg-228">' + cards + '</div></div></div></div></section>';
+          '<div class="rg-214"><div class="rg-215"><div><div class="rg-210" data-cms="resources-browse-eyebrow" data-cms-type="text">Browse by Product</div><h2 class="rg-216">' + esc(prodName(prod)) + '</h2></div></div><div class="rg-218">' + tiles + '</div><div class="rg-223"><div class="rg-224">' + tabs + '</div>' + (editing() ? '<div style="margin:0 0 18px">' + addBtn('New resource') + '</div>' : '') + empty + '<div class="rg-228">' + cards + '</div></div></div></div></section>';
         reapply(); focusEnd(host, focus);
       }
       host.addEventListener('click', function (e) { var p = e.target.closest('[data-p]'), t = e.target.closest('[data-tab]'); if (p) prod = p.getAttribute('data-p'); else if (t) tab = t.getAttribute('data-tab'); else return; draw(); });
@@ -294,8 +311,24 @@
   var refHost = function () { return $('[data-ref]'); };
   // the saved page elements of a solution page (its lists, "tpl-..."): from the data cache when there is one, else from the CMS
   function tplRows(pname) {
-    var c = RGC.usable() ? RGC.page(pname) : null; if (c) return Promise.resolve(c);
-    return fetch('/api/v2/page-elements/' + encodeURIComponent(pname), { credentials: 'include', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
+    var net = function () { return fetch('/api/v2/page-elements/' + encodeURIComponent(pname), { credentials: 'include', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }).then(function (rows) { RGC.setPage(pname, rows); return rows; }); };
+    var c = RGC.usable() ? RGC.page(pname) : null;
+    if (c) { net(); return Promise.resolve(c); }   // from the cache at once; the newer data is kept for the next visit
+    if (window.RGL && RGL.miss) RGL.miss();       // not cached yet: the loader stays until it is here
+    return net();
+  }
+  // the sections that are switched off for a solution (page element "tpl-sections" of its page, set in the Dashboard under Solutions > Edit)
+  function applySections(rows) {
+    var off = {}; (rows || []).forEach(function (r) { if (r.element_id === 'tpl-sections') { try { off = JSON.parse(r.content_value) || {}; } catch (e) { /* all shown */ } } });
+    $$('[data-tsec]').forEach(function (el) { el.style.display = off[el.getAttribute('data-tsec')] === false ? 'none' : ''; });
+  }
+  // paving-mat.html / reinforcement-grid.html: the sections the Dashboard switched off for THIS solution are hidden (the solution is found by the page its "View Solution" button opens)
+  function productPage() {
+    var file = location.pathname.split('/').pop() || ''; if (window.RGL) RGL.hold();
+    get('solutions').then(function (rows) {
+      sols.load(rows); var m = sols.rows.filter(function (x) { return String(x.link || '').split('/').pop().split('?')[0] === file; })[0]; if (!m) return;
+      return tplRows(('product-detail-' + m.slug).toLowerCase().replace(/[^a-z0-9\-_]/g, '-')).then(applySections);
+    }).catch(function () { }).then(function () { if (window.RGL) RGL.release(); });
   }
   function notFound(host, what, back) { host.innerHTML = '<section class="rg-26" style="text-align:center"><div class="rg-27"><h2 class="rg-29">' + what + ' not found</h2><p class="rg-82">This page does not exist (any more).</p><button data-href="' + back + '" class="rg-98" style="margin-top:20px">Go back</button></div></section>'; }
   var crumb = function (items) { return items.map(function (c, i) { return i === items.length - 1 ? '<span>' + esc(c[0]) + '</span>' : '<button data-href="' + c[1] + '" class="rg-94">' + c[0] + '</button><span>/</span>'; }).join(''); };
@@ -349,17 +382,17 @@
   // blog posts and webinars: resources of that type, one page each (address = type + title)
   function articleRef(kind) {
     var host = refHost(); if (!host) return; var type = kind === 'blog' ? 'Blog Post' : 'Webinar';
-    get('resources').then(function (rows) {
-      ress.load(rows); var slug = routeSlug(kind), m = ress.rows.filter(function (x) { return x.type === type && x.slug === slug; })[0];
+    Promise.all([get('resources'), getProducts()]).then(function (res) {
+      var rows = res[0]; ress.load(rows); var slug = routeSlug(kind), m = ress.rows.filter(function (x) { return x.type === type && x.slug === slug; })[0];
       if (!m) { notFound(host, kind === 'blog' ? 'Blog post' : 'Webinar', 'resources.html'); return; } var pid = m.id;
-      var PFULL = { mat: 'ROADGLAS® Paving Mat', grid: 'ROADGLAS® Reinforcement Grid', all: 'RoadGlas®' }, PSEL = [['all', 'All products'], ['mat', 'Paving Mat'], ['grid', 'Reinforcement Grid']];
+      var PSEL = prodSel('all', 'All products');
       function draw(focus) {
         var r = ress.by(pid); if (!r) { location.href = 'resources.html'; return; } document.title = r.title + ' | RoadGlas®';
         var d = r.date ? new Date(r.date) : null, when = d && !isNaN(d) ? d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
         var link = r.file ? '<a href="' + esc(r.file) + '" target="_blank" rel="noopener" class="rg-145 dyn-h-blue2" style="margin-top:28px;display:inline-block">' + (kind === 'webinar' ? 'Watch / Register →' : 'Download ↓') + '</a>' : '';
         host.innerHTML = stripBox('<label>Product ' + selectF(r, 'product', PSEL) + '</label><label>Link (video / registration / file) ' + inputF(r, 'file', 'text', 'https://…') + '</label><button type="button" class="dyn-add" data-eact="file" data-id="' + esc(r.id) + '" data-field="file" data-folder="resources">⬆ Upload file</button>' + delBtn(r, 'Delete') + '<span>The text below keeps your line breaks (a blank line starts a new paragraph).</span>') +
           '<section class="rg-75">' + (r.thumb ? '<img src="' + esc(r.thumb) + '" alt="" class="rg-63">' : '') + '<div class="rg-16"></div><div class="rg-76"><h1 class="rg-154"' + ed(r, 'title') + '>' + esc(r.title) + '</h1><div class="rg-168">' + crumb([['Home', 'index.html'], ['Resources', 'resources.html'], [r.title]]).replace(/class="rg-94"/g, 'class="rg-169 dyn-h-pink"') + '</div>' + (editing() ? '<div style="margin-top:16px;position:relative">' + photoBtn(r, 'thumb', 'resources', 'Cover photo') + '</div>' : '') + '</div></section>' +
-          '<section class="rg-79"><div class="rg-27" style="max-width:860px"><div class="rg-183" style="margin-bottom:14px">' + esc(type) + (when ? ' · ' + esc(when) : '') + ' · ' + esc(PFULL[r.product]) + '</div>' +
+          '<section class="rg-79"><div class="rg-27" style="max-width:860px"><div class="rg-183" style="margin-bottom:14px">' + esc(type) + (when ? ' · ' + esc(when) : '') + ' · ' + esc(prodFull(r.product)) + '</div>' +
           '<div class="rg-88 ed-multi" style="font-size:18px;line-height:1.8;min-height:60px"' + (editing() ? ' contenteditable="true" spellcheck="false" data-multi="1" data-e="desc" data-id="' + esc(r.id) + '"' : '') + '>' + esc(r.desc) + '</div>' + link + '</div></section>';
         reapply(); focusEnd(host, focus);
       }
@@ -368,6 +401,6 @@
     }).catch(function () { });
   }
 
-  var run = { home: home, solutions: solutions, applications: applications, projects: projects, 'project-dyn': project, resources: resources, 'ref-solution': solutionRef, 'ref-application': applicationRef, 'ref-blog': function () { articleRef('blog'); }, 'ref-webinar': function () { articleRef('webinar'); } }[page];
+  var run = { home: home, solutions: solutions, applications: applications, projects: projects, 'project-dyn': project, resources: resources, 'ref-solution': solutionRef, mat: productPage, grid: productPage, 'ref-application': applicationRef, 'ref-blog': function () { articleRef('blog'); }, 'ref-webinar': function () { articleRef('webinar'); } }[page];
   if (run) run();
 })();
