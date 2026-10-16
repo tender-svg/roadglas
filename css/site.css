@@ -338,3 +338,8 @@ section.rg-26 + section.rg-52{padding-top:36px}
 .rf-totop a.rf-top{display:inline-flex;align-items:center;gap:8px;line-height:1;text-decoration:none}
 .rf-totop a.rf-top svg{flex:none;display:block}
 .rf-totop a.rf-top:hover span{text-decoration:underline}
+/* desktop: "Back to top" sits on the right of the Build America logo (no extra empty row); smaller screens keep it in its own row */
+@media (min-width:1101px){
+  .rf-main{padding-bottom:18px}
+  .rf-totop{margin-top:-30px;padding:0 0 16px}
+}
