@@ -327,3 +327,11 @@ section.rg-26 + section.rg-52{padding-top:36px}
   .rs-box{flex:none;margin-bottom:14px}
 }
 
+
+/* footer: "Back to top" sits above the divider line (right); the credit line takes its old place on the right of the copyright row */
+.rf-totop{max-width:1280px;margin:0 auto;padding:0 0 14px;text-align:right}
+.rf-totop a{color:#ECECED;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:14px}
+.rf-totop a:hover{color:#fff;text-decoration:underline}
+.rf-bottom .rf-credit{margin:0;padding:0;max-width:none;text-align:right}
+@media (max-width:760px){.rf-bottom .rf-credit{text-align:left}}
+.rf .rf-bottom{padding-bottom:24px}
