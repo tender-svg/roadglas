@@ -239,13 +239,16 @@ function assemble(viewKey, projIndex) {
 
 // one footer for every page (tools/footer.html): link columns, contact details, CMS login
 const FOOTER = fs.readFileSync(path.join(__dirname, 'footer.html'), 'utf8').replace('__YEAR__', String(new Date().getFullYear())).trim();
-const withFooter = html => html.replace(/<footer[\s\S]*<\/footer>/, () => FOOTER);
+const withFooter = html => /<footer/.test(html) ? html.replace(/<footer[\s\S]*<\/footer>/, () => FOOTER) : html + '\n' + FOOTER;   // the reference pages (blog, webinar, application) have no footer in their shell: it is added at the end
 
 // stable CMS keys (see tools/cms-tag.js); the registry file keeps every key that was ever handed out
 const { tagPage } = require('./cms-tag');
 const REG_FILE = path.join(__dirname, 'cms-keys.json');
 const registry = fs.existsSync(REG_FILE) ? JSON.parse(fs.readFileSync(REG_FILE, 'utf8')) : {};
 const tagStats = {};
+
+// hero / banner text is held invisible from the first paint until js/rg-motion.js starts its entrance animation (css/rg-motion.css, html.rgm-pre)
+const PRE_HOLD = '<script>(function(){var d=document.documentElement;if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("rgm-pre");setTimeout(function(){d.classList.remove("rgm-pre")},9000)})();</script>' + '\n';
 
 // page loader: visible from the first paint until the CMS data (page texts + lists) has been applied; js/cms.js and js/rg-content.js hold / release it (window.RGL)
 const LOADER_HEAD = '<style>' +
@@ -288,7 +291,7 @@ function page(file, title, desc, bodyHtml, defaults, bodyClass, extraHead) {
     '<title>' + esc(title) + '</title>\n<meta name="description" content="' + escAttr(desc) + '">\n' +
     '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
     '<link rel="icon" type="image/png" sizes="64x64" href="images/favicon.png">\n<link rel="apple-touch-icon" href="images/apple-touch-icon.png">\n' +
-    (extraHead || '') + (bodyClass !== 'login' ? LOADER_HEAD : '') + '<link rel="stylesheet" href="css/styles.css">\n<link rel="stylesheet" href="css/site.css">\n<link rel="stylesheet" href="css/rg-motion.css">\n' + (editor ? '<link rel="stylesheet" href="css/cms.css">\n' : '') + '</head>\n' +
+    (extraHead || '') + (bodyClass !== 'login' ? LOADER_HEAD : '') + '<link rel="stylesheet" href="css/styles.css">\n<link rel="stylesheet" href="css/site.css">\n' + (bodyClass !== 'login' ? PRE_HOLD : '') + '<link rel="stylesheet" href="css/rg-motion.css">\n' + (editor ? '<link rel="stylesheet" href="css/cms.css">\n' : '') + '</head>\n' +
     '<body data-page="' + escAttr(bodyClass) + '" data-state=\'' + JSON.stringify(defaults) + '\'>\n' + (bodyClass !== 'login' ? LOADER_BODY : '') + bodyHtml + '\n<script src="js/site.js" defer></script>\n<script src="js/rg-edit.js" defer></script>\n<script src="js/rg-cache.js" defer></script>\n<script src="js/rg-motion.js" defer></script>\n' + (bodyClass === 'ref-solution' ? '<script src="js/rg-solution-tpl.js" defer></script>\n' : '') + '<script src="js/rg-content.js" defer></script>\n' + (editor ? '<script src="js/cms.js" defer></script>\n<script src="js/rg-toolbar.js" defer></script>\n' : '') + '</body>\n</html>\n';
 }
 

@@ -2,10 +2,9 @@
  * Only touches classes (no text is split or rewritten), so the CMS / editor keep working on the same elements. */
 (function () {
   'use strict';
-  if (!('IntersectionObserver' in window)) return;
-  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var root = document.documentElement;
-  if (document.body.getAttribute('data-page') === 'login') return;
+  if (!('IntersectionObserver' in window) || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) { root.classList.remove('rgm-pre'); return; }
+  if (document.body.getAttribute('data-page') === 'login') { root.classList.remove('rgm-pre'); return; }
 
   var SKIP = 'header, footer, nav, #rg-loader, .sl-arr, button, [data-screen-label="Home hero"], .rg-25';
   var seen = new WeakSet();
@@ -66,14 +65,24 @@
     setTimeout(begin, 6000);
   }
 
+  // The hero / banner text is held invisible by css (html.rgm-pre, set in <head>) from the very first paint, so it never
+  // shows and then vanishes: release() starts the entrance animations and lifts that hold in the same frame.
+  var ready = false, heroPlay = null;
+  function release() {
+    ready = true;
+    if (heroPlay) heroPlay();
+    [].forEach.call(document.querySelectorAll('.rgm-banner:not(.rgm-banner-on)'), function (s) { void s.offsetWidth; s.classList.add('rgm-banner-on'); });
+    root.classList.remove('rgm-pre');
+  }
+
   // inner pages: the title banner (photo + h1 + breadcrumb / text / buttons) gets the same entrance as the home hero
-  function bannerMotion() {
+  function markBanner() {
     if (document.querySelector('section[data-screen-label="Home hero"]')) return;
     var h = document.querySelector('main h1, section h1'); if (!h) return;
     var sec = h.closest('section'); if (!sec || sec.classList.contains('rgm-banner')) return;
     if (sec.getBoundingClientRect().top > innerHeight * 0.8) return;   // only a banner at the top of the page
     sec.classList.add('rgm-banner');
-    afterLoader(function () { void sec.offsetWidth; sec.classList.add('rgm-banner-on'); });
+    if (ready) { void sec.offsetWidth; sec.classList.add('rgm-banner-on'); }
   }
 
   // home hero: mark the visible slide (class restarts the CSS animations each time a slide comes round)
@@ -87,28 +96,23 @@
         else if (!on) sl.classList.remove('rgm-slide-on');
       });
     }
-    function go() {
+    slides.forEach(function (sl) { sl.classList.remove('rgm-slide-on'); });
+    heroPlay = function () {
       sync();
       var mo = new MutationObserver(sync);
       slides.forEach(function (sl) { mo.observe(sl, { attributes: true, attributeFilter: ['style'] }); });
-    }
-    // wait until the page loader has gone so the first slide's entrance is actually seen
-    if (!root.classList.contains('rg-loading') && !document.getElementById('rg-loader')) { go(); return; }
-    slides.forEach(function (sl) { sl.classList.remove('rgm-slide-on'); });
-    var started = false;
-    function begin() { if (started) return; started = true; setTimeout(go, 200); }
-    new MutationObserver(function (m, o) { if (!root.classList.contains('rg-loading')) { o.disconnect(); begin(); } }).observe(root, { attributes: true, attributeFilter: ['class'] });
-    setTimeout(begin, 6000);
+    };
   }
 
   function start() {
     root.classList.add('rg-motion');
     heroMotion();
-    bannerMotion();
+    markBanner();
     scan();
+    afterLoader(release);
     // content that appears later (CMS content, tabs, filters): pick up new nodes
     var t = 0;
-    new MutationObserver(function () { clearTimeout(t); t = setTimeout(function () { bannerMotion(); scan(document, true); }, 120); })
+    new MutationObserver(function () { clearTimeout(t); t = setTimeout(function () { markBanner(); scan(document, true); }, 120); })
       .observe(document.body, { childList: true, subtree: true });
 
     // top progress bar
