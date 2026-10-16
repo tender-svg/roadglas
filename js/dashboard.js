@@ -32,6 +32,8 @@
 
   /* ---------------------------------------------------------------- small helpers for the stored formats */
   var PRODUCT_RE = /^\[product:([a-z0-9\-]+)\]\s*/;
+  // list rows show only the start of a long text (the article body after "[page]" and its [image: ...] markers never belong in a table cell)
+  var clipText = function (t, n) { t = String(t || '').split(/[page]/)[0].replace(/[image:[^]]*]/g, ' ').replace(/s+/g, ' ').trim(); return t.length > n ? t.slice(0, n).replace(/s+S*$/, '') + '…' : t; };
   var parseProduct = function (d) { var m = PRODUCT_RE.exec(d || ''); return { product: m ? m[1] : 'all', text: String(d || '').replace(PRODUCT_RE, '') }; };
   var stripImages = function (s) { return String(s || '').replace(/\s*\[Images:\d+\]/g, '').trim(); };
   var lines = function (s) { return String(s || '').split(/\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean); };
@@ -69,7 +71,7 @@
         { name: 'triggers', label: 'Primary structural triggers for use', type: 'lines', full: true, help: 'One point per line.' },
         { name: 'is_active', label: 'Show on the website', type: 'checkbox' },
       ],
-      columns: [['', function (r) { return thumb(r.image_url); }], ['Application', function (r) { return '<div class="db-title">' + esc(r.title) + '</div><div class="db-sub">' + esc(meta(r).short || '') + '</div>'; }], ['Page', function (r) { return '<span class="db-sub">application-' + esc(r.slug || '') + '.html</span>'; }], ['Order', function (r) { return esc(r.display_order || 0); }], ['Status', function (r) { return pill(r.is_active !== false); }]],
+      columns: [['', function (r) { return thumb(r.image_url); }], ['Application', function (r) { return '<div class="db-title">' + esc(r.title) + '</div><div class="db-sub">' + esc(clipText(meta(r).short, 110)) + '</div>'; }], ['Page', function (r) { return '<span class="db-sub">application-' + esc(r.slug || '') + '.html</span>'; }], ['Order', function (r) { return esc(r.display_order || 0); }], ['Status', function (r) { return pill(r.is_active !== false); }]],
       toForm: function (r) {
         var t = tabs(r); return { title: r.title, short: meta(r).short || '', display_order: r.display_order || 0, description: r.description || '', image: r.image_url || '',
           invest: (t.invest || []).join('\n'), triggers: (t.triggers || []).join('\n'), is_active: r.is_active !== false };
@@ -155,7 +157,7 @@
         { name: 'thumbnail_url', label: 'Cover photo', type: 'image', folder: 'resources', full: true },
         { name: 'is_active', label: 'Show on the website', type: 'checkbox' },
       ],
-      columns: [['', function (r) { return thumb(r.thumbnail_url); }], ['Resource', function (r) { return '<div class="db-title">' + esc(r.title) + '</div><div class="db-sub">' + esc(parseProduct(r.description).text) + '</div>'; }], ['Type', function (r) { return esc(r.document_type || ''); }], ['Page', function (r) { var k = r.document_type === 'Blog Post' ? 'blog' : r.document_type === 'Webinar' ? 'webinar' : ''; return k ? '<span class="db-sub">' + k + '-' + esc(slugify(r.title)) + '.html</span>' : '<span class="db-sub">—</span>'; }], ['Product', function (r) { return esc(productName(parseProduct(r.description).product)); }], ['Status', function (r) { return pill(r.is_active !== false); }]],
+      columns: [['', function (r) { return thumb(r.thumbnail_url); }], ['Resource', function (r) { return '<div class="db-title">' + esc(r.title) + '</div><div class="db-sub">' + esc(clipText(parseProduct(r.description).text, 110)) + '</div>'; }], ['Type', function (r) { return esc(r.document_type || ''); }], ['Page', function (r) { var k = r.document_type === 'Blog Post' ? 'blog' : r.document_type === 'Webinar' ? 'webinar' : ''; return k ? '<span class="db-sub">' + k + '-' + esc(slugify(r.title)) + '.html</span>' : '<span class="db-sub">—</span>'; }], ['Product', function (r) { return esc(productName(parseProduct(r.description).product)); }], ['Status', function (r) { return pill(r.is_active !== false); }]],
       toForm: function (r) { var p = parseProduct(r.description); return { title: r.title, document_type: r.document_type || 'Data Sheet', product: normProd(p.product), description: p.text, file_url: r.file_url || '', thumbnail_url: r.thumbnail_url || '', is_active: r.is_active !== false }; },
       toBody: function (v, row) {
         var b = { title: v.title, document_type: v.document_type, description: '[product:' + v.product + '] ' + v.description, file_url: v.file_url, thumbnail_url: v.thumbnail_url, is_active: v.is_active };
