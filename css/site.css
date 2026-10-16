@@ -234,7 +234,7 @@ body.nav-open .rg-burger span:nth-child(3){transform:translateY(-7px) rotate(-45
 
 /* footer: smaller gap above the line, credit line at the very bottom */
 .rf-credit{max-width:1280px;margin:0 auto;padding:0 0 22px;text-align:center;font-size:14px;color:#A9ABB0}
-.rf .rf-credit a{color:#5B9CFF;font-weight:600;font-family:'Barlow',sans-serif;letter-spacing:.02em;text-transform:uppercase;font-size:12px}
+.rf .rf-credit a{color:#5B9CFF;font-weight:600;font-family:'Barlow',sans-serif;letter-spacing:0;text-transform:none;font-size:14px}
 .rf .rf-credit a:hover{color:#8DBAFF;text-decoration:underline}
 
 /* home: solutions + applications slider (js/rg-content.js): the arrows sit beside the cards, not over the photos */
