@@ -285,6 +285,8 @@ function page(file, title, desc, bodyHtml, defaults, bodyClass, extraHead) {
   // top bar (phone + address): one text for all pages; "g-" keys are stored with the home page and shown everywhere (js/cms.js)
   bodyHtml = bodyHtml.replace(/(<div class="rg-3"><span)(>[^<]*<\/span><\/div>\s*<span)(>[^<]*<\/span>)/, '$1 data-cms="g-topbar-phone" data-cms-type="text"$2 data-cms="g-topbar-address" data-cms-type="text"$3');
   bodyHtml = bodyHtml.replace(/<img([^>]*?)class="rg-7">/, '<img$1class="rg-7" data-cms="site-logo" data-cms-type="image">');   // header logo: the backend's global key
+  // the product-type tabs ("PM · Type I") are editable texts too: data-edit-label lets the tagger key a tab button (it normally skips tabs)
+  bodyHtml = bodyHtml.replace(/<button data-set=(["'])\{(?:&quot;|")ty(?:&quot;|"):\d+\}\1/g, m => m + ' data-edit-label="1"');
   const tagged = tagPage(bodyHtml, bodyClass, registry); bodyHtml = tagged.html; tagStats[file] = tagged.tagged + (tagged.created ? ' (' + tagged.created + ' new keys)' : '');
   const editor = bodyClass !== 'login';   // the live editor (admin bar, inline editing) is on every page except the login page
   return '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
