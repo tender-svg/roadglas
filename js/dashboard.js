@@ -32,6 +32,13 @@
 
   /* ---------------------------------------------------------------- small helpers for the stored formats */
   var PRODUCT_RE = /^\[product:([a-z0-9\-]+)\]\s*/;
+  // the description holds two texts: the short one (card on the Resources page) and, for a blog post / webinar, the text of its page after a line "[page]"
+  var isArticle = function (t) { return t === 'Blog Post' || t === 'Webinar'; };
+  var splitDesc = function (text, type) {
+    text = String(text || ''); var m = /(^|\n)[ \t]*\[page\][ \t]*(\n|$)/.exec(text);
+    if (m) return { desc: text.slice(0, m.index).trim(), body: text.slice(m.index + m[0].length).trim() };
+    return isArticle(type) ? { desc: '', body: text.trim() } : { desc: text.trim(), body: '' };
+  };
   // list rows show only the start of a long text (the article body after "[page]" and its [image: ...] markers never belong in a table cell)
   var clipText = function (t, n) { t = String(t || '').split(/[page]/)[0].replace(/[image:[^]]*]/g, ' ').replace(/s+/g, ' ').trim(); return t.length > n ? t.slice(0, n).replace(/s+S*$/, '') + '…' : t; };
   var parseProduct = function (d) { var m = PRODUCT_RE.exec(d || ''); return { product: m ? m[1] : 'all', text: String(d || '').replace(PRODUCT_RE, '') }; };
@@ -152,19 +159,20 @@
         { name: 'title', label: 'Title', type: 'text', req: true, full: true },
         { name: 'document_type', label: 'Type', type: 'select', options: ['Data Sheet', 'Application Guide', 'Installation', 'Q&A', 'Specification', 'Technical Note', 'Webinar', 'Video', 'Blog Post'].map(function (x) { return [x, x]; }) },
         { name: 'product', label: 'Product', type: 'select', legacy: 'All products / other', options: function () { return productOptions('all', 'All products / other'); } },
-        { name: 'description', label: 'Short description', type: 'textarea', full: true, help: 'For a Blog Post or a Webinar this is the text of its own page (a blank line starts a new paragraph).' },
+        { name: 'description', label: 'Short description', type: 'textarea', full: true, help: 'The short text on the card of the Resources page.' },
+        { name: 'body', label: 'Text of its own page', type: 'textarea', full: true, rows: 12, help: 'Only for a Blog Post or a Webinar: the text of its page. A blank line starts a new paragraph; a short first line of a block is a sub-heading; lines starting with • are a list; a line [image: /images/photo.webp | caption] puts a picture there (or use "Insert image" on the page itself).' },
         { name: 'file_url', label: 'File (PDF or other document) or link', type: 'file', folder: 'resources', full: true },
         { name: 'thumbnail_url', label: 'Cover photo', type: 'image', folder: 'resources', full: true },
         { name: 'is_active', label: 'Show on the website', type: 'checkbox' },
       ],
       columns: [['', function (r) { return thumb(r.thumbnail_url); }], ['Resource', function (r) { return '<div class="db-title">' + esc(r.title) + '</div>'; }], ['Type', function (r) { return esc(r.document_type || ''); }], ['Page', function (r) { var k = r.document_type === 'Blog Post' ? 'blog' : r.document_type === 'Webinar' ? 'webinar' : ''; return k ? '<span class="db-sub">' + k + '-' + esc(slugify(r.title)) + '.html</span>' : '<span class="db-sub">—</span>'; }], ['Product', function (r) { return esc(productName(parseProduct(r.description).product)); }], ['Status', function (r) { return pill(r.is_active !== false); }]],
-      toForm: function (r) { var p = parseProduct(r.description); return { title: r.title, document_type: r.document_type || 'Data Sheet', product: normProd(p.product), description: p.text, file_url: r.file_url || '', thumbnail_url: r.thumbnail_url || '', is_active: r.is_active !== false }; },
+      toForm: function (r) { var p = parseProduct(r.description), sp = splitDesc(p.text, r.document_type); return { title: r.title, document_type: r.document_type || 'Data Sheet', product: normProd(p.product), description: sp.desc, body: sp.body, file_url: r.file_url || '', thumbnail_url: r.thumbnail_url || '', is_active: r.is_active !== false }; },
       toBody: function (v, row) {
-        var b = { title: v.title, document_type: v.document_type, description: '[product:' + v.product + '] ' + v.description, file_url: v.file_url, thumbnail_url: v.thumbnail_url, is_active: v.is_active };
+        var b = { title: v.title, document_type: v.document_type, description: '[product:' + v.product + '] ' + v.description + (v.body && isArticle(v.document_type) ? '\n\n[page]\n\n' + v.body : ''), file_url: v.file_url, thumbnail_url: v.thumbnail_url, is_active: v.is_active };
         if (!row) b.published_date = new Date().toISOString();
         return b;
       },
-      defaults: function () { return { is_active: true, document_type: 'Data Sheet', product: firstProduct('all') }; },
+      defaults: function () { return { is_active: true, document_type: RES_NEW_TYPE[resTab] || 'Data Sheet', product: resProd !== 'all' ? resProd : firstProduct('all') }; },
     },
   };
   function tabs(r) { var o = {}; (Array.isArray(r.application_tabs) ? r.application_tabs : []).forEach(function (t) { if (t && t.type) o[t.type] = t.items || t; }); return o; }
@@ -174,6 +182,20 @@
 
   /* ---------------------------------------------------------------- ui state */
   var cur = 'overview', search = '';
+  // Resources: the same tabs as the Resources page (+ All) and a product filter; "Add resource" starts with the type / product that is selected
+  var resTab = 'all', resProd = 'all';
+  var RES_TABS = [['all', 'All'], ['downloads', 'Downloads'], ['datasheets', 'Technical Datasheets'], ['webinars', 'Webinars'], ['videos', 'Videos'], ['blog', 'Blog Posts'], ['notes', 'Technical Notes']];
+  var RES_MEDIA = ['Webinar', 'Video', 'Blog Post'];
+  var RES_IN = { all: function () { return true; }, downloads: function (t) { return RES_MEDIA.indexOf(t) < 0; }, datasheets: function (t) { return t === 'Data Sheet'; }, webinars: function (t) { return t === 'Webinar'; }, videos: function (t) { return t === 'Video'; }, blog: function (t) { return t === 'Blog Post'; }, notes: function (t) { return RES_MEDIA.indexOf(t) < 0 && t !== 'Data Sheet'; } };
+  var RES_NEW_TYPE = { downloads: 'Data Sheet', datasheets: 'Data Sheet', webinars: 'Webinar', videos: 'Video', blog: 'Blog Post', notes: 'Technical Note' };
+  var resProduct = function (r) { return normProd(parseProduct(r.description).product); };
+  var resType = function (r) { return r.document_type || 'Data Sheet'; };
+  function resBar(all) {
+    var inProd = function (r) { return resProd === 'all' || resProduct(r) === resProd; }, inTab = function (r) { return RES_IN[resTab](resType(r)); };
+    var tabs = RES_TABS.map(function (t) { var n = all.filter(function (r) { return inProd(r) && RES_IN[t[0]](resType(r)); }).length; return '<button type="button" class="' + (resTab === t[0] ? 'on' : '') + '" data-rtab="' + t[0] + '">' + esc(t[1]) + ' <i>' + n + '</i></button>'; }).join('');
+    var prodOpts = [['all', 'All products']].concat(solRows().map(function (s) { return [s.slug, s.title]; })).map(function (p) { var n = all.filter(function (r) { return inTab(r) && (p[0] === 'all' || resProduct(r) === p[0]); }).length; return '<option value="' + esc(p[0]) + '"' + (resProd === p[0] ? ' selected' : '') + '>' + esc(p[1]) + '  (' + n + ')</option>'; }).join('');
+    return '<div class="db-filters"><div class="db-frow"><span>Type</span><div class="db-tabs">' + tabs + '</div></div><div class="db-frow"><span>Product</span><select class="db-fsel" data-rprodsel="1" aria-label="Filter by product">' + prodOpts + '</select></div></div>';
+  }
   function toast(msg, bad) { var t = $('#toast'); t.textContent = msg; t.className = 'db-toast show' + (bad ? ' bad' : ''); clearTimeout(toast.t); toast.t = setTimeout(function () { t.className = 'db-toast' + (bad ? ' bad' : ''); }, 3200); }
 
   function loadModule(k) {
@@ -196,12 +218,14 @@
   }
   function renderList(k) {
     var m = MODS[k], rows = (m.rows || []).filter(function (r) { return !search || JSON.stringify([r.title, r.location, r.category, r.description, r.document_type]).toLowerCase().indexOf(search.toLowerCase()) >= 0; });
+    var bar = '', filtered = false;
+    if (k === 'resources') { var all = m.rows || []; bar = resBar(all); rows = rows.filter(function (r) { return RES_IN[resTab](resType(r)) && (resProd === 'all' || resProduct(r) === resProd); }); filtered = resTab !== 'all' || resProd !== 'all'; }
     var head = '<tr>' + m.columns.map(function (c) { return '<th>' + esc(c[0]) + '</th>'; }).join('') + '<th></th></tr>';
     var body = rows.map(function (r) {
       return '<tr>' + m.columns.map(function (c) { return '<td>' + c[1](r) + '</td>'; }).join('') + '<td><div class="db-actions"><button class="db-btn db-btn-ghost db-btn-sm" data-edit="' + esc(r.id) + '">Edit</button><button class="db-btn db-btn-danger db-btn-sm" data-del="' + esc(r.id) + '">Delete</button></div></td></tr>';
     }).join('');
     $('#main').innerHTML = '<div class="db-head"><div><h1>' + esc(m.label) + '</h1><p>' + esc(m.blurb) + '</p></div><div class="db-tools"><input class="db-search" id="q" type="search" placeholder="Search…" value="' + esc(search) + '"><button class="db-btn db-btn-red" data-add="' + k + '">+ Add ' + esc(m.one) + '</button></div></div>' +
-      '<div class="db-table-wrap">' + (rows.length ? '<table class="db-table"><thead>' + head + '</thead><tbody>' + body + '</tbody></table>' : '<div class="db-empty">' + (m.rows && m.rows.length ? 'Nothing matches your search.' : 'Nothing here yet. Press <b>+ Add ' + esc(m.one) + '</b> to create the first one.') + '</div>') + '</div>';
+      bar + '<div class="db-table-wrap">' + (rows.length ? '<table class="db-table"><thead>' + head + '</thead><tbody>' + body + '</tbody></table>' : '<div class="db-empty">' + (filtered && !search ? 'No resource in this filter yet. Press <b>+ Add ' + esc(m.one) + '</b>: it starts with the selected type and product.' : m.rows && m.rows.length ? 'Nothing matches your search.' : 'Nothing here yet. Press <b>+ Add ' + esc(m.one) + '</b> to create the first one.') + '</div>') + '</div>';
     var q = $('#q'); if (q) q.addEventListener('input', function () { search = q.value; var pos = q.selectionStart; renderList(k); var n = $('#q'); n.focus(); n.setSelectionRange(pos, pos); });
   }
   function show(k) {
@@ -228,7 +252,7 @@
     var id = 'f_' + f.name, cls = 'db-field' + (f.full ? ' full' : ''), help = f.help ? '<small>' + esc(f.help) + '</small>' : '', label = '<span>' + esc(f.label) + (f.req ? ' <b>*</b>' : '') + '</span>';
     if (f.type === 'sections') return '<div class="db-field full" data-f="sections"><span>' + esc(f.label) + '</span><div class="db-checks2">' + SECTIONS.map(function (x) { return '<label><input type="checkbox" data-sec="' + x[0] + '" checked> ' + esc(x[1]) + '</label>'; }).join('') + '</div>' + help + '</div>';
     if (f.type === 'checkbox') return '<label class="db-field chk"><input type="checkbox" name="' + f.name + '"' + (val ? ' checked' : '') + '><span>' + esc(f.label) + '</span></label>';
-    if (f.type === 'textarea' || f.type === 'lines') return '<label class="' + cls + '" data-f="' + f.name + '">' + label + '<textarea name="' + f.name + '" rows="' + (f.type === 'lines' ? 6 : 4) + '">' + esc(val) + '</textarea>' + help + '</label>';
+    if (f.type === 'textarea' || f.type === 'lines') return '<label class="' + cls + '" data-f="' + f.name + '">' + label + '<textarea name="' + f.name + '" rows="' + (f.rows || (f.type === 'lines' ? 6 : 4)) + '">' + esc(val) + '</textarea>' + help + '</label>';
     if (f.type === 'select') return '<label class="' + cls + '" data-f="' + f.name + '">' + label + '<select name="' + f.name + '">' + withLegacy(f, val).map(function (o) { return '<option value="' + esc(o[0]) + '"' + (String(val) === String(o[0]) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select>' + help + '</label>';
     if (f.type === 'number') return '<label class="' + cls + '" data-f="' + f.name + '">' + label + '<input type="number" name="' + f.name + '" value="' + esc(val) + '">' + help + '</label>';
     if (f.type === 'image' || f.type === 'file') return uploader(f, f.name, val, cls, label, help);
@@ -250,8 +274,10 @@
     $('#formMsg').textContent = ''; $('#saveBtn').disabled = false; $('#saveBtn').textContent = 'Save';
     $('#modal').hidden = false; document.body.style.overflow = 'hidden';
     if (key === 'solutions' && row) loadSections(row);
+    if (key === 'resources') syncResForm();
     var first = $('#editorBody input[type=text],#editorBody textarea'); if (first) first.focus();
   }
+  function syncResForm() { var t = $('#editor [name=document_type]'), box = $('#editor [data-f="body"]'); if (t && box) box.hidden = !isArticle(t.value); }
   function loadSections(row) {
     api('GET', '/api/v2/page-elements/' + encodeURIComponent(pageNameOf(row.slug))).then(function (rows) {
       var off = {}; (rows || []).forEach(function (r) { if (r.element_id === 'tpl-sections') { try { off = JSON.parse(r.content_value) || {}; } catch (e) { /* all shown */ } } });
@@ -527,8 +553,9 @@
   var userById = function (id) { return teamUsers.filter(function (u) { return String(u.id) === String(id); })[0]; };
 
   /* ---------------------------------------------------------------- wiring */
+  document.addEventListener('change', function (e) { var sel = e.target.closest && e.target.closest('[data-rprodsel]'); if (sel) { resProd = sel.value; renderList('resources'); } });   // Resources: product filter
   document.addEventListener('click', function (e) {
-    var t = e.target.closest('[data-go],[data-add],[data-edit],[data-del],[data-clear],[data-pw],[data-close],[data-eye],[data-ccform],[data-ccadd],[data-ccdel],[data-emailtest],[data-apok],[data-apno],[data-teamadd],[data-uedit],[data-ureset],[data-udel]'); if (!t) return;
+    var t = e.target.closest('[data-go],[data-add],[data-edit],[data-del],[data-clear],[data-pw],[data-close],[data-eye],[data-ccform],[data-ccadd],[data-ccdel],[data-emailtest],[data-apok],[data-apno],[data-teamadd],[data-uedit],[data-ureset],[data-udel],[data-rtab],[data-rprod]'); if (!t) return;
     if (t.hasAttribute('data-go')) show(t.getAttribute('data-go'));
     else if (t.hasAttribute('data-pw')) { document.body.classList.remove('menu-open'); openPw(); }
     else if (t.hasAttribute('data-close')) { var ov = document.getElementById(t.getAttribute('data-close')); if (ov) ov.remove(); }
@@ -537,6 +564,8 @@
     else if (t.hasAttribute('data-ccadd')) { ccAll.push({ name: '', email: '', form: ccForm, type: 'none', values: [], products: [] }); drawEmail(); var ins = document.querySelectorAll('#ccList [data-cc="name"]'); if (ins.length) ins[ins.length - 1].focus(); }
     else if (t.hasAttribute('data-ccdel')) { ccAll.splice(parseInt(t.getAttribute('data-ccdel'), 10), 1); drawEmail(); }
     else if (t.hasAttribute('data-emailtest')) testEmail();
+    else if (t.hasAttribute('data-rtab')) { resTab = t.getAttribute('data-rtab'); renderList('resources'); }
+    else if (t.hasAttribute('data-rprod')) { resProd = t.getAttribute('data-rprod'); renderList('resources'); }
     else if (t.hasAttribute('data-apok')) decide(t.getAttribute('data-apok'), true);
     else if (t.hasAttribute('data-apno')) decide(t.getAttribute('data-apno'), false);
     else if (t.hasAttribute('data-teamadd')) userModal(null);
@@ -548,7 +577,7 @@
     else if (t.hasAttribute('data-del')) remove(cur, t.getAttribute('data-del'));
     else if (t.hasAttribute('data-clear')) { var box = t.closest('[data-up]'); $('input[name="' + t.getAttribute('data-clear') + '"]', box).value = ''; $('.pv', box).innerHTML = '<div class="ph">' + (box.getAttribute('data-kind') === 'image' ? 'no photo yet' : 'no file yet') + '</div>'; }
   });
-  document.addEventListener('change', function (e) { if (e.target.matches('#editor input[type=file]')) onUpload(e.target); });
+  document.addEventListener('change', function (e) { if (e.target.matches('#editor input[type=file]')) onUpload(e.target); else if (e.target.matches('#editor [name=document_type]')) syncResForm(); });
   document.addEventListener('input', function (e) { if (e.target.matches('[data-cc]') && e.target.getAttribute('data-cc') !== 'type' && e.target.getAttribute('data-cc') !== 'prod') readCc(e.target); });
   document.addEventListener('change', function (e) { if (e.target.matches('[data-cc]') && readCc(e.target)) drawEmail(); });
   document.addEventListener('submit', function (e) { if (e.target.id === 'emailForm') saveEmail(e); });

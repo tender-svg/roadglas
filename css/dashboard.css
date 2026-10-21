@@ -170,3 +170,13 @@ html.embed .db-modal{padding-top:16px}
 .db-checks2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px 18px;padding:12px 14px;border:1px solid #CECFD1;background:#fff}
 .db-checks2 label{display:flex;gap:9px;align-items:center;font-size:15.5px;cursor:pointer}
 .db-checks2 input{width:18px;height:18px;accent-color:#E52C1A}
+
+/* resources: filters like the Resources page of the website */
+.db-filters{display:grid;gap:12px;margin:0 0 18px;background:#fff;border:1px solid #E1E2E5;padding:14px 16px}
+.db-frow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.db-frow>span{min-width:62px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:14px;color:#8a8b90}
+.db-tabs button i{font-style:normal;margin-left:6px;padding:1px 7px;border-radius:12px;background:#E1E2E5;color:#2C2E35;font-family:'Barlow',sans-serif;font-size:12.5px;letter-spacing:0}
+.db-tabs button.on i{background:rgba(255,255,255,.28);color:#fff}
+
+.db-fsel{min-width:260px;max-width:100%;padding:9px 34px 9px 12px;border:1px solid #CECFD1;background:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-size:15px;color:#2C2E35;cursor:pointer}
+.db-fsel:focus{outline:none;border-color:#0E3692;box-shadow:0 0 0 3px rgba(14,54,146,.14)}
