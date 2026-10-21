@@ -233,9 +233,6 @@ body.nav-open .rg-burger span:nth-child(3){transform:translateY(-7px) rotate(-45
 .rg-150 .rg-152:before{content:"+"}.rg-150[open] .rg-152:before{content:"\2013"}
 
 /* footer: smaller gap above the line, credit line at the very bottom */
-.rf-credit{max-width:1280px;margin:0 auto;padding:0 0 22px;text-align:center;font-size:14px;color:#A9ABB0}
-.rf .rf-credit a{color:#5B9CFF;font-weight:600;font-family:'Barlow',sans-serif;letter-spacing:0;text-transform:none;font-size:14px}
-.rf .rf-credit a:hover{color:#8DBAFF;text-decoration:underline}
 
 /* home: solutions + applications slider (js/rg-content.js): the arrows sit beside the cards, not over the photos */
 .sl-wrap{position:relative;grid-column:1/-1;padding:0 60px}
@@ -332,8 +329,6 @@ section.rg-26 + section.rg-52{padding-top:36px}
 .rf-totop{max-width:1280px;margin:0 auto;padding:0 0 14px;text-align:right}
 .rf-totop a{color:#ECECED;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:14px}
 .rf-totop a:hover{color:#fff;text-decoration:underline}
-.rf-bottom .rf-credit{margin:0;padding:0;max-width:none;text-align:right}
-@media (max-width:760px){.rf-bottom .rf-credit{text-align:left}}
 .rf .rf-bottom{padding-bottom:24px}
 .rf-totop a.rf-top{display:inline-flex;align-items:center;gap:8px;line-height:1;text-decoration:none}
 .rf-totop a.rf-top svg{flex:none;display:block}
