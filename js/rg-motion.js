@@ -39,9 +39,18 @@
     if (seen.has(el) || skip(el, cls === 'rgm-block')) return;
     seen.add(el);
     if (late && ready && inView(el)) return;
-    el.classList.add('rgm', cls);
+    el.classList.add('rgm', cls, 'rgm-nt');
+    fresh.push(el);
     if (delay) el.style.setProperty('--rgm-d', delay + 'ms');
     io.observe(el);
+  }
+  // one reflow applies the hidden start state of every element added in this pass, then the transitions come back
+  var fresh = [];
+  function flush() {
+    if (!fresh.length) return;
+    void root.offsetWidth;
+    fresh.forEach(function (e) { e.classList.remove('rgm-nt'); });
+    fresh = [];
   }
 
   // children of the same row get a small cascade (cards, columns, list items)
@@ -73,6 +82,7 @@
       add(img, 'rgm-img', stagger(img), late);
       if (clipped) img.classList.add('rgm-zoom');
     });
+    flush();
   }
 
   // run fn once the page loader has gone, so an entrance animation is actually seen
@@ -133,7 +143,7 @@
     afterLoader(release);
     // content that appears later (CMS content, tabs, filters): pick up new nodes
     var t = 0;
-    new MutationObserver(function () { clearTimeout(t); t = setTimeout(function () { markBanner(); scan(document, true); }, 120); })
+    new MutationObserver(function () { markBanner(); scan(document, true); })
       .observe(document.body, { childList: true, subtree: true });
 
     // top progress bar

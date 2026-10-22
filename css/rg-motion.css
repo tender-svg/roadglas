@@ -55,3 +55,6 @@ body.cms-editing h1,html.rgm-pre body.cms-editing h1 ~ *{opacity:1!important}
 /* ---- boxes (cards, brochure box, feature tiles): rise and settle as one piece ---- */
 html.rg-motion .rgm-block{transform:translateY(42px) scale(.965)}
 html.rg-motion .rgm-block.rgm-in{transform:none}
+
+/* start state without a transition (set for one frame by js/rg-motion.js) */
+html.rg-motion .rgm.rgm-nt{transition:none!important}
