@@ -74,6 +74,7 @@ function tagPage(html, pageKey, registry) {
     const a = el.attribs || {};
     if (SKIP_TAGS.has(el.name)) return;
     if ('data-cms' in a) return;                                   // explicit key in the source: respect it, do not look inside
+    if (a['data-tpl'] !== undefined) return;                       // add / remove lists (js/rg-solution-tpl.js): saved as one list, not as keyed texts
     if (a['data-dyn'] !== undefined || a['data-dd'] !== undefined || a['data-sale'] !== undefined) return;
     const cls = (a.class || '').split(/\s+/);
     if (cls.some(c => skipClasses.has(c)) || cls.includes('rg-1') || cls.includes('rg-burger')) return;

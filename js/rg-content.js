@@ -379,10 +379,13 @@
   // paving-mat.html / reinforcement-grid.html: the sections the Dashboard switched off for THIS solution are hidden (the solution is found by the page its "View Solution" button opens)
   function productPage() {
     var file = location.pathname.split('/').pop() || ''; if (window.RGL) RGL.hold();
+    // the lists of this page (figures, features, types, coating, table, steps, Q&A): add / remove in edit mode, saved as "tpl-<list>" of THIS page
+    var pg = (file.replace(/\.html$/, '') || '').toLowerCase().replace(/[^a-z0-9\-_]/g, '-');
+    var lists = window.RGTPL ? tplRows(pg).then(function (prow) { RGTPL.init(pg, prow, { noSections: true }); }).catch(function () { RGTPL.init(pg, [], { noSections: true }); }) : Promise.resolve();
     get('solutions').then(function (rows) {
       sols.load(rows); var m = sols.rows.filter(function (x) { return String(x.link || '').split('/').pop().split('?')[0] === file; })[0]; if (!m) return;
       return tplRows(('product-detail-' + m.slug).toLowerCase().replace(/[^a-z0-9\-_]/g, '-')).then(applySections);
-    }).catch(function () { }).then(function () { if (window.RGL) RGL.release(); });
+    }).catch(function () { }).then(function () { return lists; }).then(function () { if (window.RGL) RGL.release(); });
   }
   function notFound(host, what, back) { host.innerHTML = '<section class="rg-26" style="text-align:center"><div class="rg-27"><h2 class="rg-29">' + what + ' not found</h2><p class="rg-82">This page does not exist (any more).</p><button data-href="' + back + '" class="rg-98" style="margin-top:20px">Go back</button></div></section>'; }
   var crumb = function (items) { return items.map(function (c, i) { return i === items.length - 1 ? '<span>' + esc(c[0]) + '</span>' : '<button data-href="' + c[1] + '" class="rg-94">' + c[0] + '</button><span>/</span>'; }).join(''); };

@@ -35,7 +35,7 @@
     return Array.isArray(d);
   };
 
-  var state = {}, dirty = {}, pslug = '', cur = 0, started = false;
+  var state = {}, dirty = {}, pslug = '', cur = 0, started = false, resHref = 'resources.html';
   // sections that are switched off for this solution in the Dashboard (page element "tpl-sections": { "types": false, ... }; no entry = shown)
   function sections(rows) {
     var off = {}; (rows || []).forEach(function (r) { if (r.element_id === 'tpl-sections') { try { off = JSON.parse(r.content_value) || {}; } catch (e) { /* all shown */ } } });
@@ -77,7 +77,7 @@
         var on = i === cur, st = "border:2px solid #E52C1A;background:" + (on ? '#E52C1A;color:#fff' : 'transparent;color:#2C2E35') + ";padding:18px 28px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.04em;font-size:20px";
         return '<span' + (editing() ? ' style="position:relative;display:inline-block"' : '') + '><button type="button" data-ttab="' + i + '" style="' + st + '"' + ed('types', i, 'n') + '>' + esc(x.n) + '</button>' + (editing() && d.length > 1 ? '<button type="button" class="tp-x" data-tact="del" data-tp="types" data-ti="' + i + '" title="Remove this type" style="top:-10px;right:-10px;width:22px;height:22px">×</button>' : '') + '</span>';
       }).join('');
-      return '<div class="rg-116">' + tabs + addBtn('types', 'Add product type') + '</div><div class="rg-117"><div class="rg-118"' + ed('types', cur, 'b') + '>' + esc(t.b) + '</div><div class="rg-119"><div class="rg-86"' + ed('types', cur, 't') + '>' + esc(t.t) + '</div><p class="rg-120"' + ed('types', cur, 'd') + '>' + esc(t.d) + '</p></div></div><div class="rg-121"><button data-href="resources.html" class="rg-122 hv-4">View Resources →</button></div>';
+      return '<div class="rg-116">' + tabs + addBtn('types', 'Add product type') + '</div><div class="rg-117"><div class="rg-118"' + ed('types', cur, 'b') + '>' + esc(t.b) + '</div><div class="rg-119"><div class="rg-86"' + ed('types', cur, 't') + '>' + esc(t.t) + '</div><p class="rg-120"' + ed('types', cur, 'd') + '>' + esc(t.d) + '</p></div></div><div class="rg-121"><button data-href="' + esc(resHref) + '" class="rg-122 hv-4">View Resources →</button></div>';
     }
   };
   function draw(n) { var host = $('[data-tpl="' + n + '"]'); if (host && state[n]) host.innerHTML = RENDER[n](state[n]); }
@@ -144,11 +144,15 @@
 
   window.RGTPL = {
     // pageName = the page name of this solution page (product-detail-<name>), rows = its saved page elements
-    init: function (pageName, rows) {
-      pslug = pageName; var saved = {};
+    init: function (pageName, rows, opts) {
+      opts = opts || {}; pslug = pageName; var saved = {};
+      var hostOf = function (n) { return $('[data-tpl="' + n + '"]'); };
+      var th = hostOf('types'); resHref = (th && th.getAttribute('data-res')) || 'resources.html';
+      // the real texts of paving-mat.html / reinforcement-grid.html (written by tools/build-pages.js) are the defaults of their lists
+      var fromPage = function (n) { var h = hostOf(n), v = null; try { v = h && h.getAttribute('data-default') ? JSON.parse(h.getAttribute('data-default')) : null; } catch (e) { v = null; } return valid(n, v) ? v : null; };
       (rows || []).forEach(function (r) { if (/^tpl-/.test(r.element_id || '')) { try { saved[r.element_id.slice(4)] = JSON.parse(r.content_value); } catch (e) { /* use the default */ } } });
-      Object.keys(DEF).forEach(function (n) { state[n] = valid(n, saved[n]) ? saved[n] : DEF[n](); });
-      dirty = {}; sections(rows); drawAll();
+      Object.keys(DEF).forEach(function (n) { state[n] = valid(n, saved[n]) ? saved[n] : (fromPage(n) || DEF[n]()); });
+      dirty = {}; if (!opts.noSections) sections(rows); drawAll();
       if (!started) { started = true; bind(); register(); }
     }
   };

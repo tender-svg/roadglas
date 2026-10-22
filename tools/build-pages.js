@@ -294,7 +294,7 @@ function page(file, title, desc, bodyHtml, defaults, bodyClass, extraHead) {
     '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
     '<link rel="icon" type="image/png" sizes="64x64" href="images/favicon.png">\n<link rel="apple-touch-icon" href="images/apple-touch-icon.png">\n' +
     (extraHead || '') + (bodyClass !== 'login' ? LOADER_HEAD : '') + '<link rel="stylesheet" href="css/styles.css">\n<link rel="stylesheet" href="css/site.css">\n' + (bodyClass !== 'login' ? PRE_HOLD : '') + '<link rel="stylesheet" href="css/rg-motion.css">\n' + (editor ? '<link rel="stylesheet" href="css/cms.css">\n' : '') + '</head>\n' +
-    '<body data-page="' + escAttr(bodyClass) + '" data-state=\'' + JSON.stringify(defaults) + '\'>\n' + (bodyClass !== 'login' ? LOADER_BODY : '') + bodyHtml + '\n<script src="js/site.js" defer></script>\n<script src="js/rg-dialog.js" defer></script>\n<script src="js/rg-edit.js" defer></script>\n<script src="js/rg-cache.js" defer></script>\n<script src="js/rg-motion.js" defer></script>\n' + (bodyClass === 'ref-solution' ? '<script src="js/rg-solution-tpl.js" defer></script>\n' : '') + '<script src="js/rg-content.js" defer></script>\n' + (editor ? '<script src="js/cms.js" defer></script>\n<script src="js/rg-toolbar.js" defer></script>\n' : '') + '</body>\n</html>\n';
+    '<body data-page="' + escAttr(bodyClass) + '" data-state=\'' + JSON.stringify(defaults) + '\'>\n' + (bodyClass !== 'login' ? LOADER_BODY : '') + bodyHtml + '\n<script src="js/site.js" defer></script>\n<script src="js/rg-dialog.js" defer></script>\n<script src="js/rg-edit.js" defer></script>\n<script src="js/rg-cache.js" defer></script>\n<script src="js/rg-motion.js" defer></script>\n' + (bodyClass === 'ref-solution' || bodyClass === 'mat' || bodyClass === 'grid' ? '<script src="js/rg-solution-tpl.js" defer></script>\n' : '') + '<script src="js/rg-content.js" defer></script>\n' + (editor ? '<script src="js/cms.js" defer></script>\n<script src="js/rg-toolbar.js" defer></script>\n' : '') + '</body>\n</html>\n';
 }
 
 // the sections of a product page that can be switched off per solution in the Dashboard (see js/rg-content.js productPage / js/rg-solution-tpl.js)
@@ -306,12 +306,55 @@ function markSections(html) {
   return $('#__r').html();
 }
 
+// paving-mat.html / reinforcement-grid.html: the repeating parts (figures, key features, product types, coating, application table,
+// installation steps, Q&A) become the same add / remove lists as the solution template (js/rg-solution-tpl.js). The REAL texts of the page
+// are read here and written into the host as data-default (JSON): they are what the list shows until the editor saves a changed list.
+function productLists(html, defaults) {
+  const cheerio = require('cheerio');
+  const $ = cheerio.load('<div id="__r">' + html + '</div>', { _useHtmlParser2: true, decodeEntities: false });
+  const H = el => $(el).html().trim();
+  const dec = t => String(t).replace(/&nbsp;/g, ' ').replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n)).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&amp;/g, '&');
+  const P = el => dec($(el).text().replace(/\s+/g, ' ').trim());   // list items are plain text (js/rg-solution-tpl.js escapes them when it draws)
+  const eh = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const blks = $('[data-vgroup="ty"]').toArray(); if (!blks.length) return html;
+  const b0 = $(blks[0]), D = {};
+  D.stats = $('.rg-100 .rg-101').map((i, e) => ({ v: P($(e).find('.rg-102')), l: P($(e).find('.rg-103')) })).get();
+  D.features = b0.find('.rg-109 .rg-110').map((i, e) => ({ t: P($(e).find('.rg-112')), d: P($(e).find('p.rg-36')) })).get();
+  const tabs = b0.find('.rg-116 button').toArray();
+  D.types = blks.map((b, i) => ({ n: tabs[i] ? P(tabs[i]) : 'Type ' + (i + 1), b: P($(b).find('.rg-118')), t: P($(b).find('.rg-119 .rg-86')), d: P($(b).find('.rg-120')) }));
+  D.coating = $('.rg-126 .rg-127').map((i, e) => ({ t: P($(e).find('.rg-129')), d: P($(e).find('.rg-130')) })).get();
+  D.table = { cols: $('.rg-134 .rg-135 .rg-136').map((i, e) => P(e)).get(), rows: $('.rg-134 .rg-137').map((i, r) => [$(r).children('span').map((j, c) => P(c)).get()]).get() };
+  D.steps = $('.rg-140 .rg-141 .rg-143').map((i, e) => P(e)).get();
+  // Q&A: every state variant has one answer open; the questions are the same in all of them
+  const fv = $('[data-vgroup="faq"]').toArray(); let faqHead = null;
+  if (fv.length) {
+    const first = $(fv[0]); faqHead = { eyebrow: H(first.find('.rg-147')), title: H(first.find('.rg-148')) };
+    const qs = first.find('.rg-150').map((i, e) => P($(e).find('span').first())).get(), ans = qs.map(() => '');
+    fv.forEach(v => $(v).find('.rg-150').each((i, e) => { const p = $(e).find('p.rg-153'); if (p.length) ans[i] = P(p); }));
+    D.faq = qs.map((q, i) => ({ q, a: ans[i] }));
+  }
+  // structure like the template: one list instead of the state variants
+  blks.slice(1).forEach(b => $(b).remove()); $(blks[0]).replaceWith($(blks[0]).contents());
+  const host = (sel, n, extra) => { const e = $(sel).first(); if (!e.length || !D[n] || (Array.isArray(D[n]) && !D[n].length)) return; e.attr('data-tpl', n).attr('data-default', esc(JSON.stringify(D[n]))); if (extra) Object.keys(extra).forEach(k => e.attr(k, extra[k])); };
+  const resHref = (/data-href="(resources\.html[^"]*)"[^>]*class="rg-122/.exec($.html($('.rg-121').first())) || [])[1] || 'resources.html';
+  host('.rg-100', 'stats'); host('.rg-109', 'features'); host('.rg-115', 'types', { 'data-res': resHref }); host('.rg-126', 'coating'); host('.rg-134', 'table'); host('.rg-140', 'steps');
+  if (fv.length && D.faq && D.faq.length) {
+    const items = D.faq.map(x => '<details class="rg-150"><summary class="rg-151"><span>' + eh(x.q) + '</span><span class="rg-152"></span></summary><p class="rg-153">' + eh(x.a) + '</p></details>').join('');
+    const sec = '<section class="rg-38" data-tsec="faq"><div class="rg-146"><div class="rg-147">' + faqHead.eyebrow + '</div><h2 class="rg-148">' + faqHead.title + '</h2><div class="rg-149" data-tpl="faq" data-default="' + esc(JSON.stringify(D.faq)) + '">' + items + '</div></div></section>';
+    const fvs = $('[data-vgroup="faq"]'); fvs.slice(1).remove(); fvs.first().replaceWith(sec);
+    delete defaults.faq;
+  }
+  delete defaults.ty;
+  return $('#__r').html();
+}
+
 // ------------------------------------------------------------------ run
 const written = [];
 for (const [key, meta] of Object.entries(PAGES)) {
   const viewKey = key;
   const a0 = assemble(viewKey, 0), defaults = a0.defaults;
-  let html = (key === 'mat' || key === 'grid') ? markSections(a0.html) : a0.html;
+  let html = (key === 'mat' || key === 'grid') ? productLists(markSections(a0.html), defaults) : a0.html;
   if (key === 'resources') html = html.replace(/<p class="rg-217"[^>]*>[\s\S]*?<\/p>/g, '');   // no "Pavement Reinforcement Resources" line beside the product heading
   fs.writeFileSync(path.join(ROOT, meta.file), page(meta.file, meta.title, meta.desc, html, defaults, key));
   written.push(meta.file);
