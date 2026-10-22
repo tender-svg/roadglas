@@ -9,15 +9,26 @@
   var SKIP = 'header, footer, nav, #rg-loader, .sl-arr, button, [data-screen-label="Home hero"], .rg-25';
   var seen = new WeakSet();
 
-  function skip(el) { return !!el.closest(SKIP) || !!el.closest('.rgm-banner'); }
+  // whole boxes (cards, brochure box, feature tiles) animate as one piece; their texts / photos then do not animate again
+  var BLOCK = 'article, .rg-207, .rg-110, .rg-127, .rg-101';
+  function skip(el, isBlock) { return !!el.closest(SKIP) || !!el.closest('.rgm-banner') || (!isBlock && !!el.closest(BLOCK)); }
 
+  var pending = [];   // seen on the first screen while the loader / banner entrance is still running
+  function reveal(el, extra) {
+    if (extra) el.style.setProperty('--rgm-d', ((parseInt(el.style.getPropertyValue('--rgm-d'), 10) || 0) + extra) + 'ms');
+    el.classList.add('rgm-in');
+    // after the entrance, drop the heavy transition so hovers / sliders stay snappy (boxes lose the animation classes completely)
+    setTimeout(function () {
+      el.style.setProperty('--rgm-d', '0ms');
+      if (el.classList.contains('rgm-block')) { el.classList.remove('rgm', 'rgm-up', 'rgm-block', 'rgm-in'); el.style.removeProperty('--rgm-d'); }
+    }, 1800 + (extra || 0));
+  }
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (en) {
       if (!en.isIntersecting) return;
       io.unobserve(en.target);
-      en.target.classList.add('rgm-in');
-      // after the entrance, drop the heavy transition so hovers / sliders stay snappy
-      setTimeout(function () { en.target.style.setProperty('--rgm-d', '0ms'); }, 1800);
+      if (!ready) { pending.push(en.target); return; }
+      reveal(en.target, 0);
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
 
@@ -25,9 +36,9 @@
 
   // late = content (re)drawn after load (CMS text/cards, tabs, edits): what is already on screen must never hide and re-animate
   function add(el, cls, delay, late) {
-    if (seen.has(el) || skip(el)) return;
+    if (seen.has(el) || skip(el, cls === 'rgm-block')) return;
     seen.add(el);
-    if (late && inView(el)) return;
+    if (late && ready && inView(el)) return;
     el.classList.add('rgm', cls);
     if (delay) el.style.setProperty('--rgm-d', delay + 'ms');
     io.observe(el);
@@ -42,6 +53,14 @@
 
   function scan(scope, late) {
     scope = scope || document;
+    [].forEach.call(scope.querySelectorAll('h2'), function (h) {   // the small red label above a section heading
+      var e = h.previousElementSibling;
+      if (e && e.tagName === 'DIV' && !e.children.length && e.textContent.trim().length > 0 && e.textContent.trim().length < 60) add(e, 'rgm-up', 0, late);
+    });
+    [].forEach.call(scope.querySelectorAll(BLOCK), function (b) {
+      if (b.closest('.sl-view') || b.closest('[data-vgroup][hidden]')) return;
+      add(b, 'rgm-block', Math.min(stagger(b), 440), late);
+    });
     [].forEach.call(scope.querySelectorAll('h1, h2, h3'), function (el) { add(el, 'rgm-head', 0, late); });
     [].forEach.call(scope.querySelectorAll('p, li, form, table'), function (el) {
       if (el.closest('.sl-view, [data-vgroup][hidden]')) { if (!el.closest('.sl-view')) return; }
@@ -73,6 +92,8 @@
     if (heroPlay) heroPlay();
     [].forEach.call(document.querySelectorAll('.rgm-banner:not(.rgm-banner-on)'), function (s) { void s.offsetWidth; s.classList.add('rgm-banner-on'); });
     root.classList.remove('rgm-pre');
+    var q = pending; pending = [];
+    q.forEach(function (el) { reveal(el, 450); });
   }
 
   // inner pages: the title banner (photo + h1 + breadcrumb / text / buttons) gets the same entrance as the home hero
