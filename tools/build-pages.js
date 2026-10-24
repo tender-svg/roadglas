@@ -294,7 +294,7 @@ function page(file, title, desc, bodyHtml, defaults, bodyClass, extraHead) {
     '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
     '<link rel="icon" type="image/png" sizes="64x64" href="images/favicon.png">\n<link rel="apple-touch-icon" href="images/apple-touch-icon.png">\n' +
     (extraHead || '') + (bodyClass !== 'login' ? LOADER_HEAD : '') + '<link rel="stylesheet" href="css/styles.css">\n<link rel="stylesheet" href="css/site.css">\n' + (bodyClass !== 'login' ? PRE_HOLD : '') + '<link rel="stylesheet" href="css/rg-motion.css">\n' + (editor ? '<link rel="stylesheet" href="css/cms.css">\n' : '') + '</head>\n' +
-    '<body data-page="' + escAttr(bodyClass) + '" data-state=\'' + JSON.stringify(defaults) + '\'>\n' + (bodyClass !== 'login' ? LOADER_BODY : '') + bodyHtml + '\n<script src="js/site.js" defer></script>\n<script src="js/rg-dialog.js" defer></script>\n<script src="js/rg-edit.js" defer></script>\n<script src="js/rg-cache.js" defer></script>\n<script src="js/rg-motion.js" defer></script>\n' + (bodyClass === 'ref-solution' || bodyClass === 'mat' || bodyClass === 'grid' ? '<script src="js/rg-solution-tpl.js" defer></script>\n' : '') + '<script src="js/rg-content.js" defer></script>\n' + (editor ? '<script src="js/cms.js" defer></script>\n<script src="js/rg-toolbar.js" defer></script>\n' : '') + '</body>\n</html>\n';
+    '<body data-page="' + escAttr(bodyClass) + '" data-state=\'' + JSON.stringify(defaults) + '\'>\n' + (bodyClass !== 'login' ? LOADER_BODY : '') + bodyHtml + '\n<script src="js/site.js" defer></script>\n<script src="js/rg-dialog.js" defer></script>\n' + (bodyClass !== 'login' ? '<script src="js/rg-consent.js" defer></script>\n' : '') + '<script src="js/rg-edit.js" defer></script>\n<script src="js/rg-cache.js" defer></script>\n<script src="js/rg-motion.js" defer></script>\n' + (bodyClass === 'ref-solution' || bodyClass === 'mat' || bodyClass === 'grid' ? '<script src="js/rg-solution-tpl.js" defer></script>\n' : '') + '<script src="js/rg-content.js" defer></script>\n' + (editor ? '<script src="js/cms.js" defer></script>\n<script src="js/rg-toolbar.js" defer></script>\n' : '') + '</body>\n</html>\n';
 }
 
 // the sections of a product page that can be switched off per solution in the Dashboard (see js/rg-content.js productPage / js/rg-solution-tpl.js)
@@ -442,6 +442,9 @@ function solutionTemplate() {
     fs.writeFileSync(path.join(ROOT, file), page(file, title, desc, setActive(shell, ACTIVE[key]) + '\n<main data-ref="' + key + '"></main>', {}, key));
     written.push(file);
   }
+  // privacy policy (cookie banner: js/rg-consent.js): top bar + header, banner + policy text from tools/privacy-content.js
+  fs.writeFileSync(path.join(ROOT, 'privacy-policy.html'), page('privacy-policy.html', 'Privacy Policy | RoadGlas® Asphalt Reinforcement', 'How the RoadGlas website uses cookies, browser storage and third-party tools, and your privacy choices.', setActive(shell, null) + '\n' + require('./privacy-content')(), {}, 'privacy'));
+  written.push('privacy-policy.html');
 }
 // (login.html is a hand-written page, not generated here: split login screen like the other CMS sites)
 // hover rules -> css/site.css (kept above the hand-written responsive part)

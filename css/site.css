@@ -345,3 +345,17 @@ section.rg-38 + section.rg-26{padding-top:52px}
   section.rg-38:has(+ section.rg-26){padding-bottom:36px}
   section.rg-38 + section.rg-26{padding-top:36px}
 }
+
+/* privacy policy page (tools/privacy-content.js) */
+.pp-wrap{max-width:920px;margin:0 auto;font-size:17px;line-height:1.75;color:#2C2E35}
+.pp-wrap h2{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:30px;line-height:1.15;text-transform:uppercase;color:#0E3692;margin:40px 0 12px;scroll-margin-top:110px}
+.pp-wrap p{margin:0 0 16px}
+.pp-updated{color:#5A5B60;font-size:15px;letter-spacing:.04em}
+.pp-wrap ul{margin:0 0 18px;padding-left:22px;display:grid;gap:8px;list-style:disc}
+.pp-wrap li::marker{color:#E52C1A}
+.pp-table{overflow-x:auto;margin:0 0 20px;border:1px solid #ECECED}
+.pp-table table{width:100%;border-collapse:collapse;font-size:15.5px;line-height:1.5}
+.pp-table th{background:#0E3692;color:#fff;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:15px;text-align:left;padding:12px 14px}
+.pp-table td{padding:12px 14px;border-top:1px solid #ECECED;vertical-align:top}
+.pp-contact{padding:16px 20px;background:#F3F4F6;border-left:4px solid #E52C1A}
+.pp-home:hover{color:#F2B8A8}
