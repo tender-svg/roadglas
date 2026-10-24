@@ -64,7 +64,18 @@
     '.rgc-sw i:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}' +
     '.rgc-sw input:checked+i{background:#0E3692}.rgc-sw input:checked+i:after{transform:translateX(22px)}' +
     '.rgc-sw input:focus-visible+i{outline:3px solid #F2B8A8;outline-offset:2px}' +
-    '@media (max-width:520px){#rgc-banner{right:12px;left:12px;bottom:12px;width:auto;max-width:none}.rgc-btn{flex:1 1 100%}}' +
+    /* phones: a compact card (small type, tight spacing, the three buttons in one row) */
+    '@media (max-width:520px){' +
+      '#rgc-banner{right:10px;left:10px;bottom:10px;width:auto;max-width:none}' +
+      '.rgc-card{padding:9px 13px 9px;font-size:12px;line-height:1.35}' +
+      '.rgc-h{margin:0 0 4px;padding-bottom:4px}.rgc-h h3{font-size:15px}.rgc-x{font-size:20px}' +
+      '.rgc-card p{margin:0 0 4px}' +
+      '.rgc-b{display:grid;grid-template-columns:1fr 1fr 1.35fr;gap:5px;margin:6px 0 5px}' +
+      '.rgc-btn{padding:7px 3px;font-size:12px;letter-spacing:.03em;line-height:1.1;border-width:1.5px}' +
+      '.rgc-dns{font-size:11px}' +
+      '#rgc-pref{padding:10px}#rgc-pref .rgc-card{padding:14px 14px 12px}' +
+      '.rgc-row{padding:10px 0;gap:10px}.rgc-row b{font-size:15px}.rgc-row span.rgc-d{font-size:12.5px}.rgc-on{font-size:12px;padding:3px 8px}' +
+    '}' +
     '@media (prefers-reduced-motion:reduce){#rgc-banner,#rgc-pref,#rgc-pref .rgc-card{animation:none;transition:none}}';
   var styled = false;
   function addCss() { if (styled) return; styled = true; var s = document.createElement('style'); s.id = 'rgc-css'; s.textContent = css; document.head.appendChild(s); }
