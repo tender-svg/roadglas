@@ -359,3 +359,16 @@ section.rg-38 + section.rg-26{padding-top:52px}
 .pp-table td{padding:12px 14px;border-top:1px solid #ECECED;vertical-align:top}
 .pp-contact{padding:16px 20px;background:#F3F4F6;border-left:4px solid #E52C1A}
 .pp-home:hover{color:#F2B8A8}
+
+/* home hero on phones: the longer slides (3-line titles + text) must fit above the slide dots, so smaller type, tighter spacing, a bit more height */
+@media (max-width:600px){
+  .rg-14{height:540px}
+  .rg-14 .rg-17{padding-top:20px;padding-bottom:72px}
+  .rg-14 .rg-19{font-size:14px;letter-spacing:.1em;margin-bottom:12px}
+  .rg-14 .rg-20{font-size:clamp(34px,10.2vw,44px);line-height:1}
+  .rg-14 .rg-21{font-size:16px;line-height:1.5;margin:14px 0 22px}
+  .rg-14 .rg-23{padding:12px 22px;font-size:16px}
+  .rg-14 .rg-24{bottom:24px}
+  /* the slide texts carry font sizes set in the CMS text toolbar (e.g. 73px / 76px) that are far too big for a phone: here the size of the slide rule above wins; the web view keeps the CMS sizes */
+  .rg-14 .rg-19 *,.rg-14 .rg-20 *,.rg-14 .rg-21 *{font-size:inherit!important;line-height:inherit!important}
+}
