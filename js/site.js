@@ -189,6 +189,10 @@
     fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payloadOf(kind, form)) })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || j.success === false) throw new Error(j.message || ('Error ' + r.status)); }); })
       .then(function () {
+        // reset turnstile widget
+        if (window.turnstile && typeof window.turnstile.reset === 'function') {
+          try { window.turnstile.reset(); } catch (err) {}
+        }
         // fill the thank-you message with the first name, then show the "sent" block
         var name = valueOf(form, 'first') || valueOf(form, 'gname') || '';
         [].slice.call(document.querySelectorAll('[data-fill="first"]')).forEach(function (s) { s.textContent = name; });
@@ -201,28 +205,39 @@
   // what the backend (ContactController /api/contact) expects, per form; form_type decides which CC rows of the dashboard apply
   function payloadOf(kind, form) {
     var v = function (k) { var x = valueOf(form, k); return x === true ? 'Yes' : x === false ? '' : String(x || ''); }, join = function () { return [].slice.call(arguments).filter(Boolean).join(' '); };
+    var turnstileToken = (form.querySelector('[name="cf-turnstile-response"]') && form.querySelector('[name="cf-turnstile-response"]').value) || (window.turnstile && typeof window.turnstile.getResponse === 'function' ? window.turnstile.getResponse() : '') || '';
+    var hpValue = (form.querySelector('input[name="website_hp"]') && form.querySelector('input[name="website_hp"]').value) || '';
+
+    var base = {
+      captcha_token: turnstileToken,
+      website_hp: hpValue
+    };
+
     if (kind === 'contact') {
-      return { form_type: 'support', subject: 'Contact form', name: join(v('first'), v('last')), email: v('email'), phone: v('phone'), company: v('company'), product: v('product'),
-        message: [v('sector') && 'Sector: ' + v('sector'), v('location') && 'Project location: ' + v('location'), '', v('message')].join('\n').replace(/^\n+/, '') };
+      return Object.assign(base, { form_type: 'support', subject: 'Contact form', name: join(v('first'), v('last')), email: v('email'), phone: v('phone'), company: v('company'), product: v('product'),
+        message: [v('sector') && 'Sector: ' + v('sector'), v('location') && 'Project location: ' + v('location'), '', v('message')].join('\n').replace(/^\n+/, '') });
     }
     if (kind === 'lunch') {
-      return { form_type: 'lunch_learn', subject: 'Lunch & Learn request', name: join(v('first'), v('last')), email: v('email'), phone: v('phone'), company: v('company'), product: v('products'),
+      return Object.assign(base, { form_type: 'lunch_learn', subject: 'Lunch & Learn request', name: join(v('first'), v('last')), email: v('email'), phone: v('phone'), company: v('company'), product: v('products'),
         project_country: v('country'), project_state: v('state'), project_city: v('city'),
-        message: ['Title: ' + v('title'), 'People attending: ' + v('attending'), v('date') && 'Preferred date: ' + v('date'), v('notes') && 'Notes: ' + v('notes')].filter(Boolean).join('\n') };
+        message: ['Title: ' + v('title'), 'People attending: ' + v('attending'), v('date') && 'Preferred date: ' + v('date'), v('notes') && 'Notes: ' + v('notes')].filter(Boolean).join('\n') });
     }
-    return { form_type: 'credit_application', subject: 'Credit Application', name: v('pname') || v('company'), email: v('email'), phone: v('phone'), company: v('company'), product: v('products'), message: '',
+    return Object.assign(base, { form_type: 'credit_application', subject: 'Credit Application', name: v('pname') || v('company'), email: v('email'), phone: v('phone'), company: v('company'), product: v('products'), message: '',
       company_address: v('address'), project_country: v('country'), project_state: v('state'), project_city: v('city'), zip: v('zip'), county: v('county'), fax: v('fax'), salesperson: v('salesperson'), date_started: v('started'),
       mailing_address: v('maddress'), mailing_city: v('mcity'), mailing_state: v('mstate'), mailing_zip: v('mzip'), owners: v('owners'), fed_tax_id: v('taxid'), duns: v('duns'), accounting_contact: v('accounting'),
       business_type: v('btype'), credit_amount: v('amount'), po_required: v('po'),
       ref1_company: v('r1'), ref1_email: v('r1email'), ref1_phone: v('r1phone'), ref2_company: v('r2'), ref2_email: v('r2email'), ref2_phone: v('r2phone'), ref3_company: v('r3'), ref3_email: v('r3email'), ref3_phone: v('r3phone'),
       bank_name: v('bank'), bank_phone: v('bankphone'), bank_account: v('bankacct'), bank_contact: v('bankcontact'), bank_address: v('bankaddr'), bank_city: v('bankcity'), bank_state: v('bankstate'), bank_zip: v('bankzip'),
       tax_business_type: v('taxbiz'), tax_exempt_all: v('exall'), tax_exempt_some: v('exsome'), agree_terms: v('agreeTerms'), agree_guaranty: v('agreeGuaranty'), agree_tos: v('agreeSale'),
-      guarantor_name: v('gname'), guarantor_title: v('gtitle'), sign_name: v('pname'), sign_signature: v('sig'), sign_title: v('stitle') };
+      guarantor_name: v('gname'), guarantor_title: v('gtitle'), sign_name: v('pname'), sign_signature: v('sig'), sign_title: v('stitle') });
   }
   function resetForm(btn) {
     var kind = body.getAttribute('data-page');
     var key = kind === 'contact' ? 'sent' : kind === 'lunch' ? 'lsent' : kind === 'credit' ? 'csent' : null; if (!key) return;
     [].slice.call(document.querySelectorAll('form[data-submit]')).forEach(function (f) { f.reset(); });
+    if (window.turnstile && typeof window.turnstile.reset === 'function') {
+      try { window.turnstile.reset(); } catch (err) {}
+    }
     var patch = {}; patch[key] = false; setState(patch);
   }
   function toggleSale(btn) {
@@ -232,4 +247,79 @@
   }
   // the credit page ships with the sale terms folded away
   (function () { var b = document.querySelector('[data-act="toggle-sale"]'); if (b) b.textContent = 'Show full Terms & General Conditions of Sale'; })();
+
+  /* ------------------------------------------------------------ bot protection (Cloudflare Turnstile + Honeypot) */
+  var CF_SITEKEY = '0x4AAAAAAFrgpAvn0SGkLylt';
+  function initBotProtection() {
+    if (!document.querySelector('script[src*="challenges.cloudflare.com/turnstile"]')) {
+      var s = document.createElement('script');
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=auto';
+      s.async = true;
+      s.defer = true;
+      document.head.appendChild(s);
+    }
+    var forms = document.querySelectorAll('form[data-submit], form.rg-251, form.rg-301, #contactForm, #careerForm, #quoteForm, #inquiryForm, form[action*="/api/contact"]');
+    Array.prototype.forEach.call(forms, function (form) {
+      // 1. Invisible Honeypot Trap
+      if (!form.querySelector('input[name="website_hp"]')) {
+        var hp = document.createElement('div');
+        hp.setAttribute('style', 'display:none !important; visibility:hidden !important; opacity:0; position:absolute; left:-9999px; height:0; width:0; overflow:hidden;');
+        hp.setAttribute('aria-hidden', 'true');
+        hp.innerHTML = '<input type="text" name="website_hp" id="website_hp" tabindex="-1" autocomplete="off" value="" />';
+        form.insertBefore(hp, form.firstChild);
+      }
+      // 2. Turnstile Widget Container
+      if (!form.querySelector('.cf-turnstile')) {
+        var btn = form.querySelector('button[type="submit"], input[type="submit"]');
+        if (btn) {
+          var target = btn.closest('.rg-256, .rg-333, .form-actions, .submit-wrap') || btn;
+          var tw = document.createElement('div');
+          tw.className = 'cf-turnstile';
+          tw.setAttribute('data-sitekey', CF_SITEKEY);
+          tw.setAttribute('data-theme', 'light');
+          target.parentNode.insertBefore(tw, target);
+        }
+      }
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBotProtection);
+  } else {
+    initBotProtection();
+  }
+
+  // Handle career / multipart submissions if present or added
+  document.addEventListener('submit', function (e) {
+    var form = e.target;
+    var action = form.getAttribute('action') || '';
+    if (action.indexOf('/api/contact-with-resume') >= 0 || form.id === 'careerForm') {
+      e.preventDefault();
+      var turnstileToken = (form.querySelector('[name="cf-turnstile-response"]') && form.querySelector('[name="cf-turnstile-response"]').value) || (window.turnstile && typeof window.turnstile.getResponse === 'function' ? window.turnstile.getResponse() : '') || '';
+      var hp = (form.querySelector('input[name="website_hp"]') && form.querySelector('input[name="website_hp"]').value) || '';
+      var fd = new FormData(form);
+      fd.set('captcha_token', turnstileToken);
+      fd.set('website_hp', hp);
+      var btn = form.querySelector('button[type="submit"]'), label = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
+      fetch(action || '/api/contact-with-resume', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data && data.success !== false) {
+            form.reset();
+            if (window.turnstile && typeof window.turnstile.reset === 'function') {
+              try { window.turnstile.reset(); } catch (err) {}
+            }
+            alert('Your application has been submitted successfully.');
+          } else {
+            throw new Error((data && data.message) || 'Submission failed');
+          }
+        })
+        .catch(function (err) {
+          alert('Submission error: ' + (err && err.message || 'Please try again.'));
+        })
+        .finally(function () {
+          if (btn) { btn.disabled = false; btn.textContent = label; }
+        });
+    }
+  });
 })();

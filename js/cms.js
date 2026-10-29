@@ -270,6 +270,57 @@
   window.addEventListener('message', function (e) { if (e.data === 'rg-cms-changed') dashChanged = true; });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('#cms-dash.open')) closeDashboard(); });
 
+  /* ---------------------------------------------------------------- Email Settings (CMS Dashboard) */
+  function renderSmtpConfigFields(config) {
+    config = config || {};
+    var val = esc(config.recipient_email || config.from_email || '');
+    return '<div class="cms-field" style="margin-bottom:14px">' +
+      '<label for="smtp-recipient-email" style="display:block;font-weight:600;margin-bottom:4px;font-size:14px">Recipient Email (Inquiry Inbox)</label>' +
+      '<input type="email" id="smtp-recipient-email" name="recipient_email" placeholder="e.g. info@yourdomain.com" value="' + val + '" style="width:100%;padding:8px 10px;border:1px solid #CECFD1;font-size:14px;box-sizing:border-box">' +
+      '<small style="display:block;color:#6b6c72;margin-top:4px;font-size:12px">Inquiries from the website contact forms will be sent to this email address.</small>' +
+      '</div>';
+  }
+
+  function loadEmailConfig() {
+    return fetch('/api/v2/email-config', { credentials: 'include', cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (config) {
+        config = config || {};
+        var field = document.getElementById('smtp-recipient-email');
+        if (field) {
+          field.value = config.recipient_email || config.from_email || '';
+        }
+        return config;
+      });
+  }
+
+  function saveEmailConfig(extraPayload) {
+    var field = document.getElementById('smtp-recipient-email');
+    var val = (field ? field.value : '').trim();
+    var payload = Object.assign({}, extraPayload || {}, {
+      recipient_email: val,
+      from_email: val
+    });
+    return fetch('/api/v2/email-config', {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function (r) {
+      if (!r.ok) throw new Error('Failed to save email configuration');
+      return r.json();
+    });
+  }
+
+  window.renderSmtpConfigFields = renderSmtpConfigFields;
+  window.loadEmailConfig = loadEmailConfig;
+  window.saveEmailConfig = saveEmailConfig;
+  if (window.RGCMS) {
+    window.RGCMS.renderSmtpConfigFields = renderSmtpConfigFields;
+    window.RGCMS.loadEmailConfig = loadEmailConfig;
+    window.RGCMS.saveEmailConfig = saveEmailConfig;
+  }
+
   /* ---------------------------------------------------------------- start */
   var hold = function () { if (window.RGL) RGL.hold(); }, release = function () { if (window.RGL) RGL.release(); };   // the page loader stays until the CMS texts are in
   hold(); var loaded = loadSaved(); loaded.then(release, release);
@@ -280,7 +331,7 @@
     RGC.admin(true);   // a signed-in admin always works on fresh data
     if (window.RGL && RGL.cachedUsed) { location.reload(); return; }   // this view was drawn from the cache: load it again with fresh data
     buildBar(s);
-    Object.assign(window.RGCMS, { admin: true, setEditing: setEditing, save: save, uploadImage: uploadImage, openDashboard: openDashboard, dirty: dirty, markDirty: markDirty, badges: function () { return badges; } });   // also used by tools/test-cms.js
+    Object.assign(window.RGCMS, { admin: true, setEditing: setEditing, save: save, uploadImage: uploadImage, openDashboard: openDashboard, dirty: dirty, markDirty: markDirty, badges: function () { return badges; }, renderSmtpConfigFields: renderSmtpConfigFields, loadEmailConfig: loadEmailConfig, saveEmailConfig: saveEmailConfig });   // also used by tools/test-cms.js
     document.dispatchEvent(new CustomEvent('rg-admin', { detail: {} }));
     document.addEventListener('input', onInput); document.addEventListener('keydown', onKey, true); document.addEventListener('paste', onPaste, true); document.addEventListener('click', onClickCapture, true);
     if (location.hash === '#edit') setEditing(true);
