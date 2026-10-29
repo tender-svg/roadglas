@@ -49,6 +49,16 @@
     '.rgc-btn.rgc-pref{border-color:#0E3692;color:#0E3692}.rgc-btn.rgc-pref:hover{background:#0E3692;color:#fff}' +
     '.rgc-btn:focus-visible,.rgc-x:focus-visible,.rgc-card a:focus-visible{outline:3px solid #F2B8A8;outline-offset:2px}' +
     '.rgc-dns{font-size:13.5px}' +
+    /* compact banner styling */
+    '#rgc-banner{position:fixed;right:20px;bottom:20px;z-index:2147482800;width:340px;max-width:calc(100vw - 32px);animation:rgc-in .45s cubic-bezier(.16,1,.3,1)}' +
+    '#rgc-banner .rgc-card{padding:12px 15px 11px;font-size:12.5px;line-height:1.4;border-top-width:4px;box-shadow:0 10px 30px rgba(0,0,0,.22),0 2px 6px rgba(0,0,0,.08)}' +
+    '#rgc-banner .rgc-h{margin:0 0 6px;padding-bottom:5px;gap:8px}' +
+    '#rgc-banner .rgc-h h3{font-size:15px;letter-spacing:.02em}' +
+    '#rgc-banner .rgc-x{font-size:19px}' +
+    '#rgc-banner .rgc-card p{margin:0 0 6px;font-size:12px;line-height:1.38}' +
+    '#rgc-banner .rgc-b{display:grid;grid-template-columns:1fr 1fr 1.35fr;gap:5px;margin:8px 0 6px}' +
+    '#rgc-banner .rgc-btn{padding:6px 3px;font-size:11.5px;letter-spacing:.04em;border-width:1.5px;text-align:center;line-height:1.15;white-space:nowrap}' +
+    '#rgc-banner .rgc-dns{font-size:11px;line-height:1.3}' +
     /* preferences window */
     '#rgc-pref{position:fixed;inset:0;z-index:2147482900;background:rgba(10,12,16,.62);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;transition:opacity .18s ease}' +
     '#rgc-pref.in{opacity:1}' +
@@ -88,8 +98,7 @@
     addCss();
     var b = el('div'); b.id = 'rgc-banner'; b.setAttribute('role', 'dialog'); b.setAttribute('aria-label', 'Cookie notice');
     b.innerHTML = '<div class="rgc-card"><div class="rgc-h"><h3>Our Site Uses Cookies</h3><button type="button" class="rgc-x" aria-label="Close">&times;</button></div>' +
-      '<p>We use cookies to make our website work and to remember your preferences. We also use a third-party tracking tag from ' + THIRD_PARTY.name + ' to understand which businesses visit our website.</p>' +
-      '<p>See our <a href="' + POLICY + '#cookies">Cookie Policy</a> and <a href="' + POLICY + '">Privacy Statement</a> for details, including your privacy rights.</p>' +
+      '<p>We use cookies to make our website work and to remember your preferences. See our <a href="' + POLICY + '#cookies">Cookie Policy</a> and <a href="' + POLICY + '">Privacy Statement</a> for details, including your privacy rights.</p>' +
       '<div class="rgc-b"><button type="button" class="rgc-btn rgc-yes" data-a="accept">Accept</button><button type="button" class="rgc-btn" data-a="deny">Deny</button><button type="button" class="rgc-btn rgc-pref" data-a="prefs">View preferences</button></div>' +
       '<a class="rgc-dns" href="' + POLICY + '#california">Do Not Sell or Share My Personal Information</a></div>';
     document.body.appendChild(b);
