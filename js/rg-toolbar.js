@@ -10,7 +10,8 @@
     'Raleway', 'Oswald', 'Merriweather', 'Playfair Display', 'Nunito', 'Ubuntu', 'PT Sans', 'Noto Sans', 'Inter', 'Work Sans', 'Source Sans Pro', 'Mulish', 'Quicksand', 'Karla', 'Fira Sans', 'Cabin',
     'DM Sans', 'Josefin Sans', 'Archivo', 'Rokkitt', 'Bitter', 'Crimson Text', 'Libre Baskerville', 'Lora', 'PT Serif', 'Arvo', 'Domine', 'Zilla Slab', 'Abril Fatface', 'Dancing Script', 'Pacifico', 'Caveat', 'Comfortaa'];
   var SAFE = ['Barlow', 'Barlow Condensed', 'Arial', 'Helvetica', 'Georgia', 'Times New Roman', 'Verdana', 'Tahoma', 'Trebuchet MS', 'Courier New'], loadedFonts = {};
-  var EDITABLE = '[data-cms][contenteditable="true"]';
+  // the texts of the page (data-cms) and the texts of the dashboard-managed cards / lists (data-e, data-arr: the formatting is stored in the same text field, see RGE.clean in js/rg-edit.js)
+  var EDITABLE = '[data-cms][contenteditable="true"],[data-e][contenteditable="true"]:not([data-multi]),[data-arr][contenteditable="true"],[data-tp][contenteditable="true"]';
   var ALIGN_SVG = {
     left: 'M1 2h12M1 5h8M1 8h12M1 11h8', center: 'M1 2h12M3 5h8M1 8h12M3 11h8', right: 'M1 2h12M5 5h8M1 8h12M5 11h8', justify: 'M1 2h12M1 5h12M1 8h12M1 11h12'
   };
@@ -49,7 +50,11 @@
     colorBtn.style.background = '#000000';
 
     var activeEl = null, saved = null;   // saved = { start, end }: the selection as character offsets (kept while the focus is in the toolbar)
-    var changed = function () { if (activeEl && window.RGCMS.markDirty) RGCMS.markDirty(activeEl); };
+    var changed = function () {
+      if (!activeEl) return;
+      if (activeEl.hasAttribute('data-cms')) { if (window.RGCMS.markDirty) RGCMS.markDirty(activeEl); }
+      else activeEl.dispatchEvent(new Event('input', { bubbles: true }));   // data-e / data-arr: the list editor (RGE.bind) stores the text with its formatting
+    };
     var editableOf = function (node) { var el = node && (node.nodeType === 1 ? node : node.parentElement); return el && el.closest ? el.closest(EDITABLE) : null; };
 
     /* ----- selection <-> character offsets */
@@ -105,7 +110,12 @@
     function onSelection() {
       if (!window.RGCMS.editing) return;
       var sel = window.getSelection(); if (!sel || !sel.rangeCount) return;
-      var range = sel.getRangeAt(0), el = editableOf(range.commonAncestorContainer); if (!el) return;
+      var range = sel.getRangeAt(0), el = editableOf(range.commonAncestorContainer);
+      if (!el && !sel.isCollapsed) {   // a selection that runs out of the text (triple-click, drag past the end): keep the part inside the text it started / ended in
+        el = editableOf(range.startContainer) || editableOf(range.endContainer);
+        if (el) { range = range.cloneRange(); if (!el.contains(range.startContainer)) range.setStart(el, 0); if (!el.contains(range.endContainer)) range.setEnd(el, el.childNodes.length); }
+      }
+      if (!el) return;
       activeEl = el;
       if (el._rgInitial === undefined) { el._rgInitial = el.innerHTML; el._rgInitialStyle = el.getAttribute('style') || ''; }
       if (!sel.isCollapsed) { var off = toOffsets(el, range); if (off && off.start < off.end) saved = off; } else saved = null;
@@ -131,7 +141,7 @@
     }
     function apply(ch, save) {
       if (!activeEl) return false; cleanFonts(activeEl);
-      var target = null, isNew = false;
+      var target = null, isNew = false, live = window.getSelection(), keep = hasSel() && live && live.rangeCount && activeEl.contains(live.anchorNode) ? { start: saved.start, end: saved.end } : null;
       if (hasSel()) {
         var range = toRange(activeEl, saved.start, saved.end);
         if (range && !range.collapsed) {
@@ -152,7 +162,10 @@
       if (ch.color !== undefined) { target.style.setProperty('color', ch.color, 'important'); [].slice.call(target.querySelectorAll('span')).forEach(function (s) { s.style.removeProperty('color'); }); }
       if (ch.fontFamily !== undefined) { target.style.fontFamily = ch.fontFamily ? "'" + ch.fontFamily + "', sans-serif" : ''; [].slice.call(target.querySelectorAll('span')).forEach(function (s) { s.style.fontFamily = ''; }); }
       if (ch.fontSize !== undefined) { target.style.fontSize = ch.fontSize; [].slice.call(target.querySelectorAll('span')).forEach(function (s) { s.style.fontSize = ''; }); }
-      cleanSpans(activeEl); if (save !== false) changed(); return true;
+      cleanSpans(activeEl);
+      // wrapping / unwrapping the text collapses the browser's live selection: put the selection back, or the next change would hit the whole text
+      if (keep) { var back = toRange(activeEl, keep.start, keep.end); if (back) { live.removeAllRanges(); live.addRange(back); } saved = keep; }
+      if (save !== false) changed(); return true;
     }
 
     /* ----- buttons */
@@ -210,6 +223,7 @@
         else if (range.endContainer === node) node.textContent = caseText(t.slice(0, range.endOffset), mode) + t.slice(range.endOffset);
         else node.textContent = caseText(t, mode);
       });
+      if (range && hasSel()) { var live = window.getSelection(), back = toRange(activeEl, saved.start, saved.end); if (back && live.rangeCount && activeEl.contains(live.anchorNode)) { live.removeAllRanges(); live.addRange(back); } }
       changed();
     });
 

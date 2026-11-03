@@ -13,7 +13,38 @@
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var RGE = window.RGE = {};
   RGE.editing = function () { return !!(window.RGCMS && window.RGCMS.editing); };
-  RGE.slugify = function (s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); };
+  /* formatted text (colour / font / size / bold / italic from the text toolbar) lives in the same text field as a small piece of HTML.
+   rich() draws it safely (only span / b / i / u / br with a few style properties survive), plain() is the text without the tags, clean() turns what the
+   editor shows back into the stored value (plain text stays plain text). */
+  var RICH_TAG = /<(span|b|i|u|strong|em|br)[\s>\/]/i, KEEP_STYLE = /^(color|font-family|font-size|font-weight|font-style|text-decoration|text-align|display)$/;
+  var escText = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  function sanitizeNode(src, dst) {
+    [].slice.call(src.childNodes).forEach(function (n) {
+      if (n.nodeType === 3) { dst.appendChild(document.createTextNode(n.nodeValue)); return; }
+      if (n.nodeType !== 1) return;
+      var tag = n.tagName.toLowerCase();
+      if (tag === 'br') { dst.appendChild(document.createElement('br')); return; }
+      if (!/^(span|b|i|u|strong|em|font)$/.test(tag)) { sanitizeNode(n, dst); return; }   // any other tag: keep its text only
+      var o = document.createElement(tag === 'font' ? 'span' : tag);
+      if (tag === 'font') { if (n.getAttribute('color')) o.style.color = n.getAttribute('color'); if (n.getAttribute('face')) o.style.fontFamily = n.getAttribute('face'); }
+      for (var i = 0; i < n.style.length; i++) {
+        var p = n.style[i], v = n.style.getPropertyValue(p);
+        if (KEEP_STYLE.test(p) && !/url\s*\(|expression|javascript:|[<>]/i.test(v)) o.style.setProperty(p, v, n.style.getPropertyPriority(p));
+      }
+      sanitizeNode(n, o); dst.appendChild(o);
+    });
+  }
+  var parse = function (html) { var t = document.createElement('template'); t.innerHTML = html; var out = document.createElement('div'); sanitizeNode(t.content, out); return out; };
+  RGE.isRich = function (s) { return RICH_TAG.test(String(s == null ? '' : s)); };
+  RGE.rich = function (s) { s = String(s == null ? '' : s); return RICH_TAG.test(s) ? parse(s).innerHTML : escText(s); };
+  RGE.plain = function (s) { s = String(s == null ? '' : s); return RICH_TAG.test(s) ? parse(s).textContent : s; };
+  RGE.clean = function (el) {
+    var out = parse(el.innerHTML), hasTag = !!out.querySelector('span,b,i,u,strong,em,br');
+    [].slice.call(out.querySelectorAll('span')).forEach(function (sp) { if (!sp.getAttribute('style') && sp.attributes.length <= 1) { while (sp.firstChild) sp.parentNode.insertBefore(sp.firstChild, sp); sp.remove(); } });
+    hasTag = !!out.querySelector('span,b,i,u,strong,em,br');
+    return hasTag ? out.innerHTML.replace(/&nbsp;/g, ' ') : out.textContent.split(String.fromCharCode(160)).join(' ');
+  };
+  RGE.slugify = function (s) { return RGE.plain(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); };
   var refresh = function () { if (window.RGCMS && window.RGCMS.refresh) window.RGCMS.refresh(); };
 
   /* ---------------------------------------------------------------- backend */
@@ -125,10 +156,10 @@
     function onEdit(e) {
       if (!RGE.editing()) return; var t = e.target;
       var arr = t.closest && t.closest('[data-arr]');
-      if (arr && !isField(t)) { var m = st.by(arr.getAttribute('data-id')); if (!m) return; m[arr.getAttribute('data-arr')][parseInt(arr.getAttribute('data-i'), 10)] = arr.textContent.replace(/ /g, ' '); st.mark(m); if (o.onField) o.onField(m, arr.getAttribute('data-arr'), arr); return; }
+      if (arr && !isField(t)) { var m = st.by(arr.getAttribute('data-id')); if (!m) return; m[arr.getAttribute('data-arr')][parseInt(arr.getAttribute('data-i'), 10)] = RGE.clean(arr); st.mark(m); if (o.onField) o.onField(m, arr.getAttribute('data-arr'), arr); return; }
       var f = t.getAttribute && t.getAttribute('data-e'); if (!f) return;
       var item = st.by(t.getAttribute('data-id')); if (!item) return;
-      var v = isField(t) ? (t.type === 'checkbox' ? t.checked : t.type === 'number' ? (parseInt(t.value, 10) || 0) : t.value) : (t.hasAttribute('data-multi') ? t.innerText : t.textContent).split(String.fromCharCode(160)).join(' ');
+      var v = isField(t) ? (t.type === 'checkbox' ? t.checked : t.type === 'number' ? (parseInt(t.value, 10) || 0) : t.value) : t.hasAttribute('data-multi') ? t.innerText.split(String.fromCharCode(160)).join(' ') : RGE.clean(t);
       item[f] = v; st.mark(item); if (o.onField) o.onField(item, f, t);
     }
     host.addEventListener('input', onEdit); host.addEventListener('change', onEdit);

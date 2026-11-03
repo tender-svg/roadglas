@@ -4,7 +4,9 @@
   'use strict';
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
-  var slugify = function (s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); };
+  // texts formatted on the website (colour / font / size) are stored as a little HTML: the lists show them as plain text
+  var plain = function (s) { s = String(s == null ? '' : s); return /<(span|b|i|u|strong|em|br)[\s>\/]/i.test(s) ? (new DOMParser().parseFromString(s, 'text/html').body.textContent || '') : s; };
+  var slugify = function (s) { return plain(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); };
   var goLogin = function () { location.replace('login.html'); };
   // inside the live site's dashboard popup: tell the page that content changed (it reloads when the popup is closed)
   var embedded = /[?&]embed=1/.test(location.search); if (embedded) document.documentElement.classList.add('embed');
@@ -52,14 +54,14 @@
   var pill = function (on) { return '<span class="db-pill ' + (on ? 'on' : 'off') + '">' + (on ? 'Live' : 'Hidden') + '</span>'; };
   // products = the solutions (their slug is the value): the product selects of Resources and Project Highlights list every solution made here
   var solRows = function () { return ((MODS.solutions && MODS.solutions.rows) || []).filter(function (r) { return r.is_active !== false; }); };
-  var productOptions = function (noneKey, noneLabel) { var o = solRows().map(function (r) { return [r.slug, r.title]; }); return o.length ? o : [[noneKey, noneLabel]]; };   // only the solutions: "All" is the filter that shows everything
+  var productOptions = function (noneKey, noneLabel) { var o = solRows().map(function (r) { return [r.slug, plain(r.title)]; }); return o.length ? o : [[noneKey, noneLabel]]; };   // only the solutions: "All" is the filter that shows everything
   // old saved values mat / grid -> the solution of that family
   var normProd = function (v) {
     v = String(v || ''); if (!v || v === 'all' || v === 'other') return v || 'all';
     if (solRows().some(function (r) { return r.slug === v; })) return v;
     var s = solRows().filter(function (r) { return r.product_family === v; })[0]; return s ? s.slug : v;
   };
-  var productName = function (k) { k = normProd(k); var s = solRows().filter(function (r) { return r.slug === k; })[0]; return s ? s.title : 'All products / other'; };
+  var productName = function (k) { k = normProd(k); var s = solRows().filter(function (r) { return r.slug === k; })[0]; return s ? plain(s.title) : 'All products / other'; };
   var firstProduct = function (none) { var r = solRows()[0]; return r ? r.slug : none; };
 
   /* ---------------------------------------------------------------- the four sections */
@@ -78,7 +80,7 @@
         { name: 'triggers', label: 'Primary structural triggers for use', type: 'lines', full: true, help: 'One point per line.' },
         { name: 'is_active', label: 'Show on the website', type: 'checkbox' },
       ],
-      columns: [['', function (r) { return thumb(r.image_url); }], ['Application', function (r) { return '<div class="db-title">' + esc(r.title) + '</div><div class="db-sub">' + esc(clipText(meta(r).short, 110)) + '</div>'; }], ['Page', function (r) { return '<span class="db-sub">application-' + esc(r.slug || '') + '.html</span>'; }], ['Order', function (r) { return esc(r.display_order || 0); }], ['Status', function (r) { return pill(r.is_active !== false); }]],
+      columns: [['', function (r) { return thumb(r.image_url); }], ['Application', function (r) { return '<div class="db-title">' + esc(plain(r.title)) + '</div><div class="db-sub">' + esc(clipText(meta(r).short, 110)) + '</div>'; }], ['Page', function (r) { return '<span class="db-sub">application-' + esc(r.slug || '') + '.html</span>'; }], ['Order', function (r) { return esc(r.display_order || 0); }], ['Status', function (r) { return pill(r.is_active !== false); }]],
       toForm: function (r) {
         var t = tabs(r); return { title: r.title, short: meta(r).short || '', display_order: r.display_order || 0, description: r.description || '', image: r.image_url || '',
           invest: (t.invest || []).join('\n'), triggers: (t.triggers || []).join('\n'), is_active: r.is_active !== false };
@@ -106,7 +108,7 @@
         { name: 'sections', label: "Sections shown on this solution's page", type: 'sections', full: true, help: 'Untick a section to hide it on the page made from the template (product-detail-<name>.html), e.g. Product Types for a product that has no types. You can switch it back on at any time.' },
         { name: 'is_active', label: 'Show on the website', type: 'checkbox' },
       ],
-      columns: [['', function (r) { return thumb(r.icon_image_url); }], ['Product', function (r) { return '<div class="db-title">' + esc(r.title) + '</div><div class="db-sub">' + esc(r.category || '') + '</div>'; }], ['Opens', function (r) { return esc(r.custom_link || ''); }], ['Status', function (r) { return pill(r.is_active !== false); }]],
+      columns: [['', function (r) { return thumb(r.icon_image_url); }], ['Product', function (r) { return '<div class="db-title">' + esc(plain(r.title)) + '</div><div class="db-sub">' + esc(r.category || '') + '</div>'; }], ['Opens', function (r) { return esc(r.custom_link || ''); }], ['Status', function (r) { return pill(r.is_active !== false); }]],
       toForm: function (r) { var t = solText(r.short_description); return { title: r.title, category: r.category || '', display_order: r.display_order || 0, text: t.text, bullets: t.bullets.join('\n'), icon_image_url: r.icon_image_url || '', product_family: r.product_family || 'other', custom_link: r.custom_link || '', is_active: r.is_active !== false }; },
       toBody: function (v, row) {
         return { title: v.title, slug: row ? row.slug : slugify(v.title), short_description: v.text + (lines(v.bullets).length ? '\n' + lines(v.bullets).map(function (x) { return '- ' + x; }).join('\n') : ''), icon_image_url: v.icon_image_url, category: v.category, product_family: v.product_family, display_order: v.display_order, is_active: v.is_active };
@@ -138,7 +140,7 @@
         { name: 'images', label: 'Photos (the first one is the main photo)', type: 'images', count: 4, folder: 'projects', full: true },
         { name: 'case_study', label: 'Case study (PDF) or link: opens from "Download Case Study"', type: 'file', folder: 'projects', full: true },
       ],
-      columns: [['', function (r) { return thumb(r.hero_image_url); }], ['Project', function (r) { return '<div class="db-title">' + esc(r.title) + '</div><div class="db-sub">' + esc(r.location || '') + '</div>'; }], ['Product', function (r) { return esc(productName(extras(r).prod === 'other' ? 'all' : extras(r).prod)); }], ['Year', function (r) { return esc(extras(r).year || ''); }], ['Page', function (r) { return '<span class="db-sub">project-highlight-' + esc(r.slug || '') + '.html</span>'; }]],
+      columns: [['', function (r) { return thumb(r.hero_image_url); }], ['Project', function (r) { return '<div class="db-title">' + esc(plain(r.title)) + '</div><div class="db-sub">' + esc(r.location || '') + '</div>'; }], ['Product', function (r) { return esc(productName(extras(r).prod === 'other' ? 'all' : extras(r).prod)); }], ['Year', function (r) { return esc(extras(r).year || ''); }], ['Page', function (r) { return '<span class="db-sub">project-highlight-' + esc(r.slug || '') + '.html</span>'; }]],
       toForm: function (r) {
         var x = extras(r); return { title: r.title, location: r.location || '', year: x.year || '', owner: r.application || '', product: normProd(x.prod || 'other'), products_used: r.products_used || '', challenge_title: x.challengeTitle || '',
           challenge_text: r.challenge_text || '', solution_text: r.solution_text || '', case_study: x.file || '', images: (x.images && x.images.length ? x.images : (r.hero_image_url ? [r.hero_image_url] : [])) };
@@ -165,7 +167,7 @@
         { name: 'thumbnail_url', label: 'Cover photo', type: 'image', folder: 'resources', full: true },
         { name: 'is_active', label: 'Show on the website', type: 'checkbox' },
       ],
-      columns: [['', function (r) { return thumb(r.thumbnail_url); }], ['Resource', function (r) { return '<div class="db-title">' + esc(r.title) + '</div>'; }], ['Type', function (r) { return esc(r.document_type || ''); }], ['Page', function (r) { var k = r.document_type === 'Blog Post' ? 'blog' : r.document_type === 'Webinar' ? 'webinar' : ''; return k ? '<span class="db-sub">' + k + '-' + esc(slugify(r.title)) + '.html</span>' : '<span class="db-sub">—</span>'; }], ['Product', function (r) { return esc(productName(parseProduct(r.description).product)); }], ['Status', function (r) { return pill(r.is_active !== false); }]],
+      columns: [['', function (r) { return thumb(r.thumbnail_url); }], ['Resource', function (r) { return '<div class="db-title">' + esc(plain(r.title)) + '</div>'; }], ['Type', function (r) { return esc(r.document_type || ''); }], ['Page', function (r) { var k = r.document_type === 'Blog Post' ? 'blog' : r.document_type === 'Webinar' ? 'webinar' : ''; return k ? '<span class="db-sub">' + k + '-' + esc(slugify(r.title)) + '.html</span>' : '<span class="db-sub">—</span>'; }], ['Product', function (r) { return esc(productName(parseProduct(r.description).product)); }], ['Status', function (r) { return pill(r.is_active !== false); }]],
       toForm: function (r) { var p = parseProduct(r.description), sp = splitDesc(p.text, r.document_type); return { title: r.title, document_type: r.document_type || 'Data Sheet', product: normProd(p.product), description: sp.desc, body: sp.body, file_url: r.file_url || '', thumbnail_url: r.thumbnail_url || '', is_active: r.is_active !== false }; },
       toBody: function (v, row) {
         var b = { title: v.title, document_type: v.document_type, description: '[product:' + v.product + '] ' + v.description + (v.body && isArticle(v.document_type) ? '\n\n[page]\n\n' + v.body : ''), file_url: v.file_url, thumbnail_url: v.thumbnail_url, is_active: v.is_active };

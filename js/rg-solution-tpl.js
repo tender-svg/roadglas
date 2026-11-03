@@ -8,6 +8,7 @@
 (function () {
   'use strict';
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var rt = function (s) { return window.RGE && RGE.rich ? RGE.rich(s) : esc(s); };   // text with the formatting made in the text toolbar
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var editing = function () { return !!(window.RGCMS && window.RGCMS.editing); };
   var LABEL = { stats: 'Figures', features: 'Key features', types: 'Product types', coating: 'Coating', table: 'Application table', steps: 'Installation steps', faq: 'Q&A' };
@@ -53,20 +54,20 @@
 
   /* ----- one renderer per list */
   var RENDER = {
-    stats: function (d) { return d.map(function (s, i) { return '<div class="rg-101"' + rel() + '><div class="rg-102"' + ed('stats', i, 'v') + '>' + esc(s.v) + '</div><div class="rg-103"' + ed('stats', i, 'l') + '>' + esc(s.l) + '</div>' + xBtn('stats', i, 'figure') + '</div>'; }).join('') + cell(addBtn('stats', 'Add figure')); },
-    features: function (d) { return d.map(function (c, i) { return '<div class="rg-110"' + rel() + '><div class="rg-111">' + num(i) + '</div><h3 class="rg-112"' + ed('features', i, 't') + '>' + esc(c.t) + '</h3><p class="rg-36"' + ed('features', i, 'd') + '>' + esc(c.d) + '</p>' + xBtn('features', i, 'feature') + '</div>'; }).join('') + cell(addBtn('features', 'Add feature')); },
-    coating: function (d) { return d.map(function (c, i) { return '<div class="rg-127"' + rel() + '><div class="rg-128">' + num(i) + '</div><h3 class="rg-129"' + ed('coating', i, 't') + '>' + esc(c.t) + '</h3><p class="rg-130"' + ed('coating', i, 'd') + '>' + esc(c.d) + '</p>' + xBtn('coating', i, 'item') + '</div>'; }).join('') + cell(addBtn('coating', 'Add item')); },
-    steps: function (d) { return d.map(function (t, i) { return '<div class="rg-141"' + rel() + '><span class="rg-142">' + (i + 1) + '</span><p class="rg-143"' + ed('steps', i) + '>' + esc(t) + '</p>' + (editing() ? '<button type="button" class="app-x" data-tact="del" data-tp="steps" data-ti="' + i + '" title="Remove this step" style="color:#2C2E35;background:rgba(0,0,0,.08)">×</button>' : '') + '</div>'; }).join('') + addBtn('steps', 'Add step'); },
+    stats: function (d) { return d.map(function (s, i) { return '<div class="rg-101"' + rel() + '><div class="rg-102"' + ed('stats', i, 'v') + '>' + rt(s.v) + '</div><div class="rg-103"' + ed('stats', i, 'l') + '>' + rt(s.l) + '</div>' + xBtn('stats', i, 'figure') + '</div>'; }).join('') + cell(addBtn('stats', 'Add figure')); },
+    features: function (d) { return d.map(function (c, i) { return '<div class="rg-110"' + rel() + '><div class="rg-111">' + num(i) + '</div><h3 class="rg-112"' + ed('features', i, 't') + '>' + rt(c.t) + '</h3><p class="rg-36"' + ed('features', i, 'd') + '>' + rt(c.d) + '</p>' + xBtn('features', i, 'feature') + '</div>'; }).join('') + cell(addBtn('features', 'Add feature')); },
+    coating: function (d) { return d.map(function (c, i) { return '<div class="rg-127"' + rel() + '><div class="rg-128">' + num(i) + '</div><h3 class="rg-129"' + ed('coating', i, 't') + '>' + rt(c.t) + '</h3><p class="rg-130"' + ed('coating', i, 'd') + '>' + rt(c.d) + '</p>' + xBtn('coating', i, 'item') + '</div>'; }).join('') + cell(addBtn('coating', 'Add item')); },
+    steps: function (d) { return d.map(function (t, i) { return '<div class="rg-141"' + rel() + '><span class="rg-142">' + (i + 1) + '</span><p class="rg-143"' + ed('steps', i) + '>' + rt(t) + '</p>' + (editing() ? '<button type="button" class="app-x" data-tact="del" data-tp="steps" data-ti="' + i + '" title="Remove this step" style="color:#2C2E35;background:rgba(0,0,0,.08)">×</button>' : '') + '</div>'; }).join('') + addBtn('steps', 'Add step'); },
     faq: function (d) {
       return d.map(function (x, i) {
-        return '<details class="rg-150"' + (editing() ? ' open' : '') + rel() + '><summary class="rg-151"><span' + ed('faq', i, 'q') + '>' + esc(x.q) + '</span><span class="rg-152"></span></summary><p class="rg-153"' + ed('faq', i, 'a') + '>' + esc(x.a) + '</p>' + (editing() ? '<button type="button" class="tp-x" data-tact="del" data-tp="faq" data-ti="' + i + '" title="Remove this question" style="top:20px;right:64px">×</button>' : '') + '</details>';
+        return '<details class="rg-150"' + (editing() ? ' open' : '') + rel() + '><summary class="rg-151"><span' + ed('faq', i, 'q') + '>' + rt(x.q) + '</span><span class="rg-152"></span></summary><p class="rg-153"' + ed('faq', i, 'a') + '>' + rt(x.a) + '</p>' + (editing() ? '<button type="button" class="tp-x" data-tact="del" data-tp="faq" data-ti="' + i + '" title="Remove this question" style="top:20px;right:64px">×</button>' : '') + '</details>';
       }).join('') + (editing() ? '<div style="padding:16px 26px">' + addBtn('faq', 'Add question') + '</div>' : '');
     },
     table: function (d) {
       var n = d.cols.length, grid = ' style="grid-template-columns:' + (n === 3 ? '1fr 1.3fr 1.5fr' : 'repeat(' + Math.max(1, n) + ',1fr)') + (editing() ? ';position:relative' : '') + '"';
-      var head = '<div class="rg-135"' + grid + '>' + d.cols.map(function (c, j) { return '<span class="rg-136"' + (editing() ? ' style="position:relative;padding-right:30px"' : '') + '><span' + ed('table', 0, null, ' data-tr="h" data-tc="' + j + '"') + '>' + esc(c) + '</span>' + (editing() && n > 1 ? '<button type="button" class="tp-x" data-tact="delcol" data-tp="table" data-tc="' + j + '" title="Remove this column" style="top:50%;right:2px;margin-top:-13px;width:22px;height:22px;background:#fff;color:#E52C1A">×</button>' : '') + '</span>'; }).join('') + '</div>';
+      var head = '<div class="rg-135"' + grid + '>' + d.cols.map(function (c, j) { return '<span class="rg-136"' + (editing() ? ' style="position:relative;padding-right:30px"' : '') + '><span' + ed('table', 0, null, ' data-tr="h" data-tc="' + j + '"') + '>' + rt(c) + '</span>' + (editing() && n > 1 ? '<button type="button" class="tp-x" data-tact="delcol" data-tp="table" data-tc="' + j + '" title="Remove this column" style="top:50%;right:2px;margin-top:-13px;width:22px;height:22px;background:#fff;color:#E52C1A">×</button>' : '') + '</span>'; }).join('') + '</div>';
       var body = d.rows.map(function (r, i) {
-        return '<div class="rg-137"' + grid + '>' + d.cols.map(function (c, j) { return '<span class="' + (j === 0 ? 'rg-138' : 'rg-136') + '"' + ed('table', 0, null, ' data-tr="' + i + '" data-tc="' + j + '"') + '>' + esc(r[j] == null ? '' : r[j]) + '</span>'; }).join('') + (editing() ? '<button type="button" class="tp-x" data-tact="delrow" data-tp="table" data-tr="' + i + '" title="Remove this row" style="top:50%;right:6px;margin-top:-13px">×</button>' : '') + '</div>';
+        return '<div class="rg-137"' + grid + '>' + d.cols.map(function (c, j) { return '<span class="' + (j === 0 ? 'rg-138' : 'rg-136') + '"' + ed('table', 0, null, ' data-tr="' + i + '" data-tc="' + j + '"') + '>' + rt(r[j] == null ? '' : r[j]) + '</span>'; }).join('') + (editing() ? '<button type="button" class="tp-x" data-tact="delrow" data-tp="table" data-tr="' + i + '" title="Remove this row" style="top:50%;right:6px;margin-top:-13px">×</button>' : '') + '</div>';
       }).join('');
       return head + body + (editing() ? '<div style="display:flex;gap:10px;flex-wrap:wrap;padding:12px;border-top:1px solid #ECECED">' + addBtn('table', 'Add row', 'addrow') + addBtn('table', 'Add column', 'addcol') + '</div>' : '');
     },
@@ -75,9 +76,9 @@
       if (cur >= d.length) cur = d.length - 1; var t = d[cur];
       var tabs = d.map(function (x, i) {
         var on = i === cur, st = "border:2px solid #E52C1A;background:" + (on ? '#E52C1A;color:#fff' : 'transparent;color:#2C2E35') + ";padding:18px 28px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.04em;font-size:20px";
-        return '<span' + (editing() ? ' style="position:relative;display:inline-block"' : '') + '><button type="button" data-ttab="' + i + '" style="' + st + '"' + ed('types', i, 'n') + '>' + esc(x.n) + '</button>' + (editing() && d.length > 1 ? '<button type="button" class="tp-x" data-tact="del" data-tp="types" data-ti="' + i + '" title="Remove this type" style="top:-10px;right:-10px;width:22px;height:22px">×</button>' : '') + '</span>';
+        return '<span' + (editing() ? ' style="position:relative;display:inline-block"' : '') + '><button type="button" data-ttab="' + i + '" style="' + st + '"' + ed('types', i, 'n') + '>' + rt(x.n) + '</button>' + (editing() && d.length > 1 ? '<button type="button" class="tp-x" data-tact="del" data-tp="types" data-ti="' + i + '" title="Remove this type" style="top:-10px;right:-10px;width:22px;height:22px">×</button>' : '') + '</span>';
       }).join('');
-      return '<div class="rg-116">' + tabs + addBtn('types', 'Add product type') + '</div><div class="rg-117"><div class="rg-118"' + ed('types', cur, 'b') + '>' + esc(t.b) + '</div><div class="rg-119"><div class="rg-86"' + ed('types', cur, 't') + '>' + esc(t.t) + '</div><p class="rg-120"' + ed('types', cur, 'd') + '>' + esc(t.d) + '</p></div></div><div class="rg-121"><button data-href="' + esc(resHref) + '" class="rg-122 hv-4">View Resources →</button></div>';
+      return '<div class="rg-116">' + tabs + addBtn('types', 'Add product type') + '</div><div class="rg-117"><div class="rg-118"' + ed('types', cur, 'b') + '>' + rt(t.b) + '</div><div class="rg-119"><div class="rg-86"' + ed('types', cur, 't') + '>' + rt(t.t) + '</div><p class="rg-120"' + ed('types', cur, 'd') + '>' + rt(t.d) + '</p></div></div><div class="rg-121"><button data-href="' + esc(resHref) + '" class="rg-122 hv-4">View Resources →</button></div>';
     }
   };
   function draw(n) { var host = $('[data-tpl="' + n + '"]'); if (host && state[n]) host.innerHTML = RENDER[n](state[n]); }
@@ -91,7 +92,7 @@
     types: function (d) { var k = d.length + 1; return { n: 'Type ' + k, b: 'T' + k, t: 'Type ' + k + ' (Placeholder)', d: 'Describe this product type. (Placeholder)' }; }
   };
   function setText(el) {
-    var n = el.getAttribute('data-tp'), d = state[n], i = +el.getAttribute('data-ti'), f = el.getAttribute('data-tf'), t = el.textContent.split(String.fromCharCode(160)).join(' ');
+    var n = el.getAttribute('data-tp'), d = state[n], i = +el.getAttribute('data-ti'), f = el.getAttribute('data-tf'), t = RGE.clean(el);
     if (!d) return;
     if (n === 'table') { var tr = el.getAttribute('data-tr'), tc = +el.getAttribute('data-tc'); if (tr === 'h') d.cols[tc] = t; else d.rows[+tr][tc] = t; }
     else if (n === 'steps') d[i] = t; else if (d[i]) d[i][f] = t;
