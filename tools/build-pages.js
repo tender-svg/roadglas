@@ -349,6 +349,16 @@ function productLists(html, defaults) {
   return $('#__r').html();
 }
 
+// honeypot + Cloudflare Turnstile inside every public form (contact / lunch / credit)
+function botProtect(html) {
+  return html.replace(/(<form data-submit="(?:contact|lunch|credit)"[^>]*>)([\s\S]*?<\/form>)/g, (m, open, rest) => {
+    const hp = '\n<div style="display:none !important; visibility:hidden !important; opacity:0; position:absolute; left:-9999px; height:0; width:0; overflow:hidden;" aria-hidden="true"><input type="text" name="website_hp" id="website_hp" tabindex="-1" autocomplete="off" value="" /></div>';
+    const ts = '<div class="cf-turnstile" data-sitekey="0x4AAAAAAFrgpAvn0SGkLylt" data-theme="light"></div>\n';
+    rest = rest.replace(/(<div class="rg-(?:256|333)">)/, ts + '$1');
+    return open + hp + rest;
+  });
+}
+
 // ------------------------------------------------------------------ run
 const written = [];
 for (const [key, meta] of Object.entries(PAGES)) {
@@ -356,6 +366,7 @@ for (const [key, meta] of Object.entries(PAGES)) {
   const a0 = assemble(viewKey, 0), defaults = a0.defaults;
   let html = (key === 'mat' || key === 'grid') ? productLists(markSections(a0.html), defaults) : a0.html;
   if (key === 'resources') html = html.replace(/<p class="rg-217"[^>]*>[\s\S]*?<\/p>/g, '');   // no "Pavement Reinforcement Resources" line beside the product heading
+  html = botProtect(html);
   fs.writeFileSync(path.join(ROOT, meta.file), page(meta.file, meta.title, meta.desc, html, defaults, key));
   written.push(meta.file);
 }
