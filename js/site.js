@@ -282,10 +282,40 @@
       }
     });
   }
+  /* The product choice of the contact / lunch & learn / credit forms = the solutions made in the Dashboard: a new solution shows up here by itself.
+     The options written in the page stay when the list can't be loaded. The value sent is the solution's name as plain text (the CC mail rules of the Dashboard match on it). */
+  var productNames = null;
+  function plainName(t) { t = String(t == null ? '' : t); return /<[a-z][^>]*>/i.test(t) ? (new DOMParser().parseFromString(t, 'text/html').body.textContent || '') : t; }
+  function fillProductSelects() {
+    var sels = [].slice.call(document.querySelectorAll('select[data-f="product"],select[data-f="products"]')).filter(function (el) { return !el.getAttribute('data-dyn-done'); });
+    if (!sels.length) return;
+    var apply = function (names) {
+      sels.forEach(function (sel) {
+        var keep = sel.value, first = sel.options[0] && !sel.options[0].value ? sel.options[0] : null, tail = [].slice.call(sel.options).filter(function (o) { return /^not sure/i.test(o.textContent.trim()); });
+        sel.innerHTML = ''; if (first) sel.appendChild(first);
+        names.forEach(function (n) { var o = document.createElement('option'); o.textContent = n; sel.appendChild(o); });
+        tail.forEach(function (o) { sel.appendChild(o); });
+        if (keep && names.concat(tail.map(function (o) { return o.textContent; })).indexOf(keep) >= 0) sel.value = keep;
+        sel.setAttribute('data-dyn-done', '1');
+      });
+    };
+    if (productNames) { apply(productNames); return; }
+    fetch('/api/v2/solutions', { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (rows) {
+      var names = (Array.isArray(rows) ? rows : []).filter(function (r) { return r.is_active !== false && r.is_deleted !== true; })
+        .sort(function (a, b) { return (a.display_order || 0) - (b.display_order || 0); }).map(function (r) { return plainName(r.title).trim(); }).filter(Boolean);
+      if (!names.length) return; productNames = names; apply(names); fillProductSelects();
+    }).catch(function () { /* keep the options of the page */ });
+  }
+  function initProductSelects() {
+    fillProductSelects();
+    if (window.MutationObserver) new MutationObserver(function () { fillProductSelects(); }).observe(document.body, { childList: true, subtree: true });   // forms drawn later
+  }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initBotProtection);
+    document.addEventListener('DOMContentLoaded', initProductSelects);
   } else {
     initBotProtection();
+    initProductSelects();
   }
 
   // Handle career / multipart submissions if present or added
