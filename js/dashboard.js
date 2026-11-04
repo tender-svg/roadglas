@@ -135,6 +135,7 @@
         { name: 'product', label: 'Product used (for the filter)', type: 'select', legacy: 'Other', options: function () { return productOptions('other', 'Other'); } },
         { name: 'products_used', label: 'Products used (text shown on the page)', type: 'text', full: true },
         { name: 'challenge_title', label: "Client's challenge: heading", type: 'text', full: true },
+        { name: 'solution_title', label: 'RoadGlas solution: heading', type: 'text', full: true },
         { name: 'challenge_text', label: "Client's challenge: text", type: 'textarea', full: true },
         { name: 'solution_text', label: 'RoadGlas solution: text', type: 'textarea', full: true },
         { name: 'images', label: 'Photos (the first one is the main photo)', type: 'images', count: 4, folder: 'projects', full: true },
@@ -142,12 +143,12 @@
       ],
       columns: [['', function (r) { return thumb(r.hero_image_url); }], ['Project', function (r) { return '<div class="db-title">' + esc(plain(r.title)) + '</div><div class="db-sub">' + esc(r.location || '') + '</div>'; }], ['Product', function (r) { return esc(productName(extras(r).prod === 'other' ? 'all' : extras(r).prod)); }], ['Year', function (r) { return esc(extras(r).year || ''); }], ['Page', function (r) { return '<span class="db-sub">project-highlight-' + esc(r.slug || '') + '.html</span>'; }]],
       toForm: function (r) {
-        var x = extras(r); return { title: r.title, location: r.location || '', year: x.year || '', owner: r.application || '', product: normProd(x.prod || 'other'), products_used: r.products_used || '', challenge_title: x.challengeTitle || '',
+        var x = extras(r); return { title: r.title, location: r.location || '', year: x.year || '', owner: r.application || '', product: normProd(x.prod || 'other'), products_used: r.products_used || '', challenge_title: x.challengeTitle || '', solution_title: x.solutionTitle || '',
           challenge_text: r.challenge_text || '', solution_text: r.solution_text || '', case_study: x.file || '', images: (x.images && x.images.length ? x.images : (r.hero_image_url ? [r.hero_image_url] : [])) };
       },
       toBody: function (v, row, all) {
         var body = { title: v.title, location: v.location, application: v.owner, products_used: v.products_used, hero_image_url: v.images[0] || '', challenge_text: v.challenge_text, solution_text: v.solution_text,
-          result_text: JSON.stringify({ year: v.year, prod: v.product, challengeTitle: v.challenge_title, file: v.case_study || '', images: v.images }) };
+          result_text: JSON.stringify({ year: v.year, prod: v.product, challengeTitle: v.challenge_title, solutionTitle: v.solution_title, file: v.case_study || '', images: v.images }) };
         if (!row) { var s = slugify(v.title) || 'project'; var taken = (all || []).map(function (a) { return a.slug; }); if (taken.indexOf(s) >= 0) s += '-' + Date.now().toString(36).slice(-4); body.slug = s; body.project_benefits = ''; }
         return body;
       },

@@ -106,14 +106,14 @@
   });
   var stories = RGE.store({
     name: 'stories', path: 'stories',
-    toModel: function (r) { var x = storyX(r); return { id: r.id, slug: r.slug, title: r.title || '', location: r.location || '', year: x.year || '', owner: r.application || '', products: r.products_used || '', prod: normProd(x.prod || 'other'), cTitle: x.challengeTitle || '', challenge: r.challenge_text || '', solution: r.solution_text || '', file: x.file || '', images: (x.images && x.images.length ? x.images : (r.hero_image_url ? [r.hero_image_url] : [])).slice() }; },
+    toModel: function (r) { var x = storyX(r); return { id: r.id, slug: r.slug, title: r.title || '', location: r.location || '', year: x.year || '', owner: r.application || '', products: r.products_used || '', prod: normProd(x.prod || 'other'), cTitle: x.challengeTitle || '', sTitle: x.solutionTitle || '', challenge: r.challenge_text || '', solution: r.solution_text || '', file: x.file || '', images: (x.images && x.images.length ? x.images : (r.hero_image_url ? [r.hero_image_url] : [])).slice() }; },
     toBody: function (m, isNew, st) {
       var imgs = m.images.filter(Boolean);
-      var b = { title: m.title || 'Untitled', location: m.location, application: m.owner, products_used: m.products, hero_image_url: imgs[0] || '', challenge_text: m.challenge, solution_text: m.solution, result_text: JSON.stringify({ year: m.year, prod: m.prod, challengeTitle: m.cTitle, file: m.file || '', images: imgs }) };
+      var b = { title: m.title || 'Untitled', location: m.location, application: m.owner, products_used: m.products, hero_image_url: imgs[0] || '', challenge_text: m.challenge, solution_text: m.solution, result_text: JSON.stringify({ year: m.year, prod: m.prod, challengeTitle: m.cTitle, solutionTitle: m.sTitle, file: m.file || '', images: imgs }) };
       if (isNew) { b.slug = uniqueSlug(m.title, st.rows.map(function (x) { return x.slug; })); b.project_benefits = ''; }
       return b;
     },
-    defaults: function () { return { title: 'New project highlight', location: '', year: '', owner: '', products: '', prod: (prodList[0] && prodList[0].key) || 'other', cTitle: '', challenge: '', solution: '', file: '', images: [] }; },
+    defaults: function () { return { title: 'New project highlight', location: '', year: '', owner: '', products: '', prod: (prodList[0] && prodList[0].key) || 'other', cTitle: '', sTitle: '', challenge: '', solution: '', file: '', images: [] }; },
   });
   var TYPES = ['Data Sheet', 'Application Guide', 'Installation', 'Q&A', 'Specification', 'Technical Note', 'Webinar', 'Video', 'Blog Post'];
   var ress = RGE.store({
@@ -269,7 +269,7 @@
         host.innerHTML = '<section class="rg-79"><div class="rg-131"><div class="rg-188">' + strip + '<div class="rg-189"><img src="' + esc(imgs[gi] || '') + '" alt="' + esc(r.title) + '" class="rg-63">' + (n > 1 ? '<button data-g="prev" aria-label="Previous image" class="rg-190 dyn-h-red">‹</button><button data-g="next" aria-label="Next image" class="rg-191 dyn-h-red">›</button>' : '') + '<span class="rg-192">' + (imgs.length ? gi + 1 : 0) + ' / ' + imgs.length + '</span>' + (imgs.length ? photoBtn(r, 'images', 'projects', 'Change this photo', gi) : '') + '</div>' +
           (imgs.length > 1 || editing() ? '<div class="rg-193">' + thumbs + '</div>' : '') + (editing() ? '<div>' + '<button type="button" class="dyn-add" data-eact="photo-add" data-id="' + esc(r.id) + '" data-field="images" data-folder="projects">＋ Add photo</button></div>' : '') + '</div>' +
           '<div class="rg-194"><div class="rg-195">Project Highlights</div><h2 class="rg-196"' + ed(r, 'title') + '>' + rt(r.title) + '</h2><div class="rg-197"><span class="rg-198"></span><span' + ed(r, 'location') + '>' + rt(r.location) + '</span></div><div class="rg-199"><div><strong' + ed(r, 'year') + '>' + rt(r.year) + '</strong></div><div><strong>Owner:</strong> <span' + ed(r, 'owner') + '>' + rt(r.owner) + '</span></div><div><strong>Products Used:</strong> <span' + ed(r, 'products') + '>' + rt(r.products) + '</span></div></div><div class="rg-200">' + caseBtn(r) + '</div>' + caseStrip(r) + '</div></div></section>' +
-          '<section class="rg-201"><div class="rg-202"><div class="rg-203">' + tabs + '</div><h3 class="rg-204"' + (tab === 'c' ? ed(r, 'cTitle') : '') + '>' + rt(tab === 'c' ? (r.cTitle || (editing() ? '' : "Client's Challenge")) : 'RoadGlas® Engineered Solution') + '</h3><p class="rg-205"' + ed(r, tab === 'c' ? 'challenge' : 'solution') + '>' + rt(tab === 'c' ? r.challenge : r.solution) + '</p></div></section>';
+          '<section class="rg-201"><div class="rg-202"><div class="rg-203">' + tabs + '</div><h3 class="rg-204"' + ed(r, tab === 'c' ? 'cTitle' : 'sTitle') + '>' + rt(tab === 'c' ? (r.cTitle || (editing() ? '' : "Client's Challenge")) : (r.sTitle || 'RoadGlas® Engineered Solution')) + '</h3><p class="rg-205"' + ed(r, tab === 'c' ? 'challenge' : 'solution') + '>' + rt(tab === 'c' ? r.challenge : r.solution) + '</p></div></section>';
         reapply(); focusEnd(host, focus);
       }
       host.addEventListener('click', function (e) {
