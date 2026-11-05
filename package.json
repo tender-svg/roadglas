@@ -1,0 +1,9 @@
+{
+  "name": "roadglas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RoadGlas website (static pages, CMS editing in the browser)",
+  "scripts": {
+    "dist": "node tools/build-dist.js"
+  }
+}
