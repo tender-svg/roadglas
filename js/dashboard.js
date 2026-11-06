@@ -272,6 +272,7 @@
   function openEditor(key, row) {
     var m = MODS[key]; editing = { key: key, row: row || null };
     var vals = row ? m.toForm(row) : m.defaults();
+    Object.keys(vals).forEach(function (k) { if (typeof vals[k] === 'string') vals[k] = plain(vals[k]); });   // texts that were formatted by an older version of the website are shown (and saved) as plain text
     $('#modalTitle').textContent = (row ? 'Edit ' : 'Add ') + m.one;
     $('#editorBody').innerHTML = m.fields.map(function (f) { return fieldHtml(f, vals[f.name] != null ? vals[f.name] : ''); }).join('');
     $('#formMsg').textContent = ''; $('#saveBtn').disabled = false; $('#saveBtn').textContent = 'Save';

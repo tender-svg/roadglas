@@ -178,3 +178,10 @@ body.cms-editing [data-ttab]{cursor:text}
 #cms-linked .fl-name{font-size:14px;color:#4a4c53;word-break:break-all;min-width:0;flex:1}
 #cms-linked .ft .rm{margin-right:auto;border-color:#E52C1A;color:#E52C1A}
 #cms-linked .ft .rm:hover{background:#E52C1A;color:#fff}
+
+/* add / remove lists of the fixed pages (js/rg-lists.js) */
+.rl-w{position:relative;min-width:0}
+.rl-x{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;border:0;background:#E52C1A;color:#fff;font-size:15px;line-height:22px;padding:0;cursor:pointer;z-index:3;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.rl-x:hover{background:#B8200F}
+.rl-w>.rl-x{top:-9px;right:-9px}
+.rl-add{margin-top:14px;align-self:flex-start}

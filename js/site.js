@@ -126,6 +126,11 @@
     host.addEventListener('mouseleave', function () { paused = false; });
     window.addEventListener('resize', layout);
     timer = setInterval(function () { if (!paused && !body.classList.contains('cms-editing')) step(1); }, 4000);
+    // cards added / removed in the CMS (js/rg-lists.js): measure again; a new card is shown
+    document.addEventListener('rg-list-changed', function (e) {
+      if (!e.detail || e.detail.name !== 'home-benefits') return;
+      cards = [].slice.call(track.children); N = cards.length; if (e.detail.added) cur = Math.max(0, N - pv()); layout();
+    });
     layout();
     return { step: step, go: function (i) { cur = i; layout(); } };
   })();

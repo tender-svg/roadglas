@@ -8,7 +8,7 @@
   'use strict';
   var page = document.body.getAttribute('data-page');
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
-  var rt = function (s) { return window.RGE && RGE.rich ? RGE.rich(s) : esc(s); };   // text of an editable field: plain text, or the formatting made with the text toolbar
+  var rt = function (s) { return esc(window.RGE && RGE.plain ? RGE.plain(s) : s); };   // text of an editable field (plain; the page's own formatting is laid over it by js/rg-edit.js)
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
   var RGE = window.RGE;
@@ -34,8 +34,9 @@
   function focusEnd(host, sel) { if (!sel) return; var f = $(sel, host); if (!f) return; f.focus(); try { var r = document.createRange(); r.selectNodeContents(f); r.collapse(false); var s = getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) { /* ignore */ } }
 
   /* ---------- markup helpers for the editable parts (they only produce anything in edit mode) ---------- */
-  var ed = function (m, f) { return editing() ? ' contenteditable="true" spellcheck="false" data-e="' + f + '" data-id="' + esc(m.id) + '"' : ''; };
-  var arrEd = function (m, f, i) { return editing() ? ' contenteditable="true" spellcheck="false" data-arr="' + f + '" data-i="' + i + '" data-id="' + esc(m.id) + '"' : ''; };
+  var fk = function (m, f, i) { return ' data-fk="' + esc(m.id) + '|' + f + (i != null ? '|' + i : '') + '"'; };   // the key of this text's formatting (RGE.fmtSet)
+  var ed = function (m, f) { return fk(m, f) + (editing() ? ' contenteditable="true" spellcheck="false" data-e="' + f + '" data-id="' + esc(m.id) + '"' : ''); };
+  var arrEd = function (m, f, i) { return fk(m, f, i) + (editing() ? ' contenteditable="true" spellcheck="false" data-arr="' + f + '" data-i="' + i + '" data-id="' + esc(m.id) + '"' : ''); };
   var photoBtn = function (m, f, folder, label, i) { return editing() ? '<button type="button" class="dyn-photo" data-eact="photo" data-id="' + esc(m.id) + '" data-field="' + f + '"' + (i != null ? ' data-i="' + i + '"' : '') + ' data-folder="' + folder + '">📷 ' + (label || 'Change photo') + '</button>' : ''; };
   var addBtn = function (label, extra) { return editing() ? '<button type="button" class="dyn-add" data-eact="add"' + (extra || '') + '>＋ ' + label + '</button>' : ''; };
   var delBtn = function (m, label) { return editing() ? '<button type="button" class="dyn-del" data-eact="del" data-id="' + esc(m.id) + '">🗑 ' + (label || 'Delete') + '</button>' : ''; };

@@ -33,7 +33,7 @@
   /* ---------------------------------------------------------------- public API for the other scripts (rg-content.js builds lists and uses these) */
   var savedRows = [], hooks = {};
   window.RGCMS = window.RGCMS || {};
-  window.RGCMS.admin = false; window.RGCMS.editing = false;
+  window.RGCMS.admin = false; window.RGCMS.editing = false; window.RGCMS.slug = slug;   // slug: the page name the texts of this page are saved under
   window.RGCMS.registerHook = function (id, h) { hooks[id] = h; refreshSave(); };   // h = { count(): number of unsaved changes, run(): Promise }
   window.RGCMS.refresh = function () { refreshSave(); };
   window.RGCMS.reapply = function () { applySaved(savedRows); if (editing) makeEditable(true); };   // after a list was (re)drawn

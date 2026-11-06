@@ -44,6 +44,48 @@
     hasTag = !!out.querySelector('span,b,i,u,strong,em,br');
     return hasTag ? out.innerHTML.replace(/&nbsp;/g, ' ') : out.textContent.split(String.fromCharCode(160)).join(' ');
   };
+  /* ---- formatting of the texts of cards / lists that come from the Dashboard (data-e / data-arr) ----
+     The text stays plain in its record (a record is shown on several pages: Home card, Applications page ...). The colour / font / size made with the text toolbar
+     belongs to ONE page: it is kept in the page element "rt-fmt" of that page ({ "<id>|<field>[|<n>]": html }) and laid over the text while the text is unchanged. */
+  var fmt = { map: null, dirty: false }, fmtP = null;
+  var normSp = function (s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); };
+  function fmtLoad() {
+    if (fmtP) return fmtP; var slug = window.RGCMS && RGCMS.slug; if (!slug) return Promise.resolve();
+    fmtP = fetch('/api/v2/page-elements/' + encodeURIComponent(slug), { cache: 'no-store', credentials: 'include' }).then(function (r) { return r.ok ? r.json() : []; }).then(function (rows) {
+      fmt.map = fmt.map || {};
+      (Array.isArray(rows) ? rows : []).forEach(function (r) { if (r.element_id === 'rt-fmt') { try { var m = JSON.parse(r.content_value) || {}; Object.keys(m).forEach(function (k) { if (!(k in fmt.map)) fmt.map[k] = m[k]; }); } catch (e) { /* no formatting */ } } });
+    }).catch(function () { fmt.map = fmt.map || {}; });
+    return fmtP;
+  }
+  function fmtApply() {
+    var els = [].slice.call(document.querySelectorAll('[data-fk]:not([data-fk-done])')); if (!els.length) return;
+    fmtLoad().then(function () {
+      els.forEach(function (el) {
+        if (el.getAttribute('data-fk-done') || !document.body.contains(el)) return; el.setAttribute('data-fk-done', '1');
+        var h = fmt.map && fmt.map[el.getAttribute('data-fk')];
+        if (h && normSp(RGE.plain(h)) === normSp(el.textContent)) el.innerHTML = RGE.rich(h);   // a changed text drops the old formatting
+      });
+    });
+  }
+  RGE.fmtSet = function (key, html) {
+    if (!key) return; fmt.map = fmt.map || {};
+    if (RGE.isRich(html)) fmt.map[key] = html; else if (key in fmt.map) delete fmt.map[key]; else return;
+    fmt.dirty = true; if (window.RGCMS && RGCMS.refresh) RGCMS.refresh();
+  };
+  (function startFmt() {
+    var go = function () { fmtApply(); if (window.MutationObserver) new MutationObserver(fmtApply).observe(document.body, { childList: true, subtree: true }); };
+    if (document.body) go(); else document.addEventListener('DOMContentLoaded', go);
+    (function register() {
+      if (!(window.RGCMS && RGCMS.registerHook)) { setTimeout(register, 100); return; }
+      RGCMS.registerHook('rtfmt', {
+        count: function () { return fmt.dirty ? 1 : 0; },
+        run: function () {
+          if (!fmt.dirty) return Promise.resolve(0);
+          return RGE.api('POST', 'page-elements', { page_slug: RGCMS.slug, element_id: 'rt-fmt', content_type: 'text', content_value: JSON.stringify(fmt.map || {}) }).then(function () { fmt.dirty = false; return 1; });
+        }
+      });
+    })();
+  })();
   RGE.slugify = function (s) { return RGE.plain(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); };
   var refresh = function () { if (window.RGCMS && window.RGCMS.refresh) window.RGCMS.refresh(); };
 
@@ -156,11 +198,12 @@
     function onEdit(e) {
       if (!RGE.editing()) return; var t = e.target;
       var arr = t.closest && t.closest('[data-arr]');
-      if (arr && !isField(t)) { var m = st.by(arr.getAttribute('data-id')); if (!m) return; m[arr.getAttribute('data-arr')][parseInt(arr.getAttribute('data-i'), 10)] = RGE.clean(arr); st.mark(m); if (o.onField) o.onField(m, arr.getAttribute('data-arr'), arr); return; }
+      if (arr && !isField(t)) { var m = st.by(arr.getAttribute('data-id')); if (!m) return; var an = arr.getAttribute('data-arr'), ai = parseInt(arr.getAttribute('data-i'), 10), rv = RGE.clean(arr), pv = RGE.plain(rv); RGE.fmtSet(arr.getAttribute('data-fk'), rv); if (m[an][ai] !== pv) { m[an][ai] = pv; st.mark(m); } if (o.onField) o.onField(m, arr.getAttribute('data-arr'), arr); return; }
       var f = t.getAttribute && t.getAttribute('data-e'); if (!f) return;
       var item = st.by(t.getAttribute('data-id')); if (!item) return;
-      var v = isField(t) ? (t.type === 'checkbox' ? t.checked : t.type === 'number' ? (parseInt(t.value, 10) || 0) : t.value) : t.hasAttribute('data-multi') ? t.innerText.split(String.fromCharCode(160)).join(' ') : RGE.clean(t);
-      item[f] = v; st.mark(item); if (o.onField) o.onField(item, f, t);
+      var v = isField(t) ? (t.type === 'checkbox' ? t.checked : t.type === 'number' ? (parseInt(t.value, 10) || 0) : t.value) : t.hasAttribute('data-multi') ? t.innerText.split(String.fromCharCode(160)).join(' ') : null;
+      if (v === null) { var rf = RGE.clean(t); v = RGE.plain(rf); RGE.fmtSet(t.getAttribute('data-fk'), rf); }   // the text goes to its record plain, the formatting to this page
+      if (item[f] !== v) { item[f] = v; st.mark(item); } if (o.onField) o.onField(item, f, t);
     }
     host.addEventListener('input', onEdit); host.addEventListener('change', onEdit);
 

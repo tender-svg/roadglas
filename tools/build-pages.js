@@ -294,7 +294,7 @@ function page(file, title, desc, bodyHtml, defaults, bodyClass, extraHead) {
     '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
     '<link rel="icon" type="image/png" sizes="64x64" href="images/favicon.png">\n<link rel="apple-touch-icon" href="images/apple-touch-icon.png">\n' +
     (extraHead || '') + (bodyClass !== 'login' ? LOADER_HEAD : '') + '<link rel="stylesheet" href="css/styles.css">\n<link rel="stylesheet" href="css/site.css">\n' + (bodyClass !== 'login' ? PRE_HOLD : '') + '<link rel="stylesheet" href="css/rg-motion.css">\n' + (editor ? '<link rel="stylesheet" href="css/cms.css">\n' : '') + '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=auto" async defer></script>\n</head>\n' +
-    '<body data-page="' + escAttr(bodyClass) + '" data-state=\'' + JSON.stringify(defaults) + '\'>\n' + (bodyClass !== 'login' ? LOADER_BODY : '') + bodyHtml + '\n<script src="js/site.js" defer></script>\n<script src="js/rg-dialog.js" defer></script>\n' + (bodyClass !== 'login' ? '<script src="js/rg-consent.js" defer></script>\n' : '') + '<script src="js/rg-edit.js" defer></script>\n<script src="js/rg-cache.js" defer></script>\n<script src="js/rg-motion.js" defer></script>\n' + (bodyClass === 'ref-solution' || bodyClass === 'mat' || bodyClass === 'grid' ? '<script src="js/rg-solution-tpl.js" defer></script>\n' : '') + '<script src="js/rg-content.js" defer></script>\n' + (editor ? '<script src="js/cms.js" defer></script>\n<script src="js/rg-toolbar.js" defer></script>\n' : '') + '</body>\n</html>\n';
+    '<body data-page="' + escAttr(bodyClass) + '" data-state=\'' + JSON.stringify(defaults) + '\'>\n' + (bodyClass !== 'login' ? LOADER_BODY : '') + bodyHtml + '\n<script src="js/site.js" defer></script>\n<script src="js/rg-dialog.js" defer></script>\n' + (bodyClass !== 'login' ? '<script src="js/rg-consent.js" defer></script>\n' : '') + '<script src="js/rg-edit.js" defer></script>\n<script src="js/rg-cache.js" defer></script>\n<script src="js/rg-motion.js" defer></script>\n' + (bodyClass === 'ref-solution' || bodyClass === 'mat' || bodyClass === 'grid' ? '<script src="js/rg-solution-tpl.js" defer></script>\n' : '') + '<script src="js/rg-content.js" defer></script>\n<script src="js/rg-lists.js" defer></script>\n' + (editor ? '<script src="js/cms.js" defer></script>\n<script src="js/rg-toolbar.js" defer></script>\n' : '') + '</body>\n</html>\n';
 }
 
 // the sections of a product page that can be switched off per solution in the Dashboard (see js/rg-content.js productPage / js/rg-solution-tpl.js)
@@ -367,6 +367,10 @@ for (const [key, meta] of Object.entries(PAGES)) {
   let html = (key === 'mat' || key === 'grid') ? productLists(markSections(a0.html), defaults) : a0.html;
   if (key === 'resources') html = html.replace(/<p class="rg-217"[^>]*>[\s\S]*?<\/p>/g, '');   // no "Pavement Reinforcement Resources" line beside the product heading
   html = botProtect(html);
+  if (key === 'home') {   // the tick list and the "Top 10 benefits" cards: add / remove items in edit mode (js/rg-lists.js)
+    html = html.replace('<div class="rg-48">', '<div class="rg-48" data-rlist="home-checks" data-rl-new=\'["New item"]\'>');
+    html = html.replace('<div style="display:flex;gap:22px;transform:translateX(calc(0 *', '<div data-rlist="home-benefits" data-rl-num="0" data-rl-new=\'["00","New benefit","Describe this benefit."]\' style="display:flex;gap:22px;transform:translateX(calc(0 *');
+  }
   fs.writeFileSync(path.join(ROOT, meta.file), page(meta.file, meta.title, meta.desc, html, defaults, key));
   written.push(meta.file);
 }
